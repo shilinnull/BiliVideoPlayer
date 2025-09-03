@@ -18,6 +18,10 @@ public:
     ~BiliVideoPlayer();
 
 private:
+    // 初始化UI
+    void initUI();
+
+private:
     Ui::BiliVideoPlayer *ui;
 };
 #endif // BILIVIDEOPLAYER_H
