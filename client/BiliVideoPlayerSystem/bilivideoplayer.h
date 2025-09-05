@@ -22,6 +22,9 @@ private:
     // 初始化UI
     void initUI();
 
+    // 连接信号和槽
+    void connectSignalAndSlot();
+
 private:
     Ui::BiliVideoPlayer *ui;
 };

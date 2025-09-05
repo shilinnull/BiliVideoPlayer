@@ -9,6 +9,8 @@ BiliVideoPlayer::BiliVideoPlayer(QWidget *parent)
 
     // 初始化UI
     initUI();
+    // 初始化信号和槽
+    connectSignalAndSlot();
 }
 
 BiliVideoPlayer::~BiliVideoPlayer()
@@ -28,4 +30,10 @@ void BiliVideoPlayer::initUI()
     dropShadow->setOffset(0, 0);
     // this->setGraphicsEffect(dropShadow); // 这样设置会在程序输出窗口出现参数错误
     ui->biliPlayerBg->setGraphicsEffect(dropShadow); // 应该设置到背景上
+}
+
+void BiliVideoPlayer::connectSignalAndSlot()
+{
+    connect(ui->minBtn, &QPushButton::clicked, this, &QWidget::showMinimized);
+    connect(ui->quitBtn, &QPushButton::clicked, this, &QWidget::close);
 }
