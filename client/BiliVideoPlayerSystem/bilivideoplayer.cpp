@@ -37,3 +37,29 @@ void BiliVideoPlayer::connectSignalAndSlot()
     connect(ui->minBtn, &QPushButton::clicked, this, &QWidget::showMinimized);
     connect(ui->quitBtn, &QPushButton::clicked, this, &QWidget::close);
 }
+
+void BiliVideoPlayer::mousePressEvent(QMouseEvent *event)
+{
+    // 检查是否在head区域
+    QPoint point = event->position().toPoint();
+    if(ui->head->geometry().contains(point)) {
+        if(event->button() == Qt::LeftButton) {
+            // 记录鼠标按下位置和窗口左上角的相对距离
+            dragPos = event->globalPosition().toPoint() - geometry().topLeft();
+            return ;
+        }
+    }
+    return QWidget::mousePressEvent(event);
+}
+
+void BiliVideoPlayer::mouseMoveEvent(QMouseEvent *event)
+{
+    QPoint point = event->position().toPoint();
+    if(ui->head->geometry().contains(point)) {
+        if(event->buttons() == Qt::LeftButton) {
+            move(event->globalPosition().toPoint() - dragPos);
+            return ;
+        }
+    }
+    return QWidget::mouseMoveEvent(event);
+}

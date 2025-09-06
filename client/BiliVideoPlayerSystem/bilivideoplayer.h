@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QGraphicsDropShadowEffect>
+#include <QMouseEvent>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -24,6 +25,13 @@ private:
 
     // 连接信号和槽
     void connectSignalAndSlot();
+
+protected:
+    // 实现窗口拖拽
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+private:
+    QPoint dragPos;
 
 private:
     Ui::BiliVideoPlayer *ui;
