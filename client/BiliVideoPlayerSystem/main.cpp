@@ -1,5 +1,5 @@
 #include "bilivideoplayer.h"
-#include "startuppage.h"
+// #include "startuppage.h"
 
 #include <QApplication>
 

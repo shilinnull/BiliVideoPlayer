@@ -339,6 +339,9 @@
              <height>16777215</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">#bodyLeft { background-color: transparent; }</string>
+           </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
             <property name="spacing">
              <number>0</number>
@@ -357,6 +360,9 @@
             </property>
             <item>
              <widget class="QWidget" name="btnBox" native="true">
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
                <property name="spacing">
                 <number>49</number>
@@ -374,7 +380,7 @@
                 <number>0</number>
                </property>
                <item>
-                <widget class="QPushButton" name="homePageBtn">
+                <widget class="pageSwitchButton" name="homePageBtn">
                  <property name="minimumSize">
                   <size>
                    <width>52</width>
@@ -383,7 +389,7 @@
                  </property>
                  <property name="maximumSize">
                   <size>
-                   <width>25</width>
+                   <width>52</width>
                    <height>45</height>
                   </size>
                  </property>
@@ -393,7 +399,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="myPageBtn">
+                <widget class="pageSwitchButton" name="myPageBtn">
                  <property name="minimumSize">
                   <size>
                    <width>52</width>
@@ -402,9 +408,14 @@
                  </property>
                  <property name="maximumSize">
                   <size>
-                   <width>25</width>
+                   <width>52</width>
                    <height>45</height>
                   </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <fontweight>Medium</fontweight>
+                  </font>
                  </property>
                  <property name="text">
                   <string/>
@@ -412,7 +423,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="sysPageBtn">
+                <widget class="pageSwitchButton" name="sysPageBtn">
                  <property name="minimumSize">
                   <size>
                    <width>52</width>
@@ -421,7 +432,7 @@
                  </property>
                  <property name="maximumSize">
                   <size>
-                   <width>25</width>
+                   <width>52</width>
                    <height>45</height>
                   </size>
                  </property>
@@ -450,7 +461,74 @@
           </widget>
          </item>
          <item>
-          <widget class="QWidget" name="bodyRight" native="true"/>
+          <widget class="QWidget" name="bodyRight" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QStackedWidget" name="stackedWidget">
+              <widget class="QWidget" name="homePage">
+               <widget class="QLabel" name="label">
+                <property name="geometry">
+                 <rect>
+                  <x>230</x>
+                  <y>280</y>
+                  <width>80</width>
+                  <height>23</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>home</string>
+                </property>
+               </widget>
+              </widget>
+              <widget class="QWidget" name="myPage">
+               <widget class="QLabel" name="label_2">
+                <property name="geometry">
+                 <rect>
+                  <x>440</x>
+                  <y>310</y>
+                  <width>80</width>
+                  <height>23</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>my</string>
+                </property>
+               </widget>
+              </widget>
+              <widget class="QWidget" name="sysPage">
+               <widget class="QLabel" name="label_3">
+                <property name="geometry">
+                 <rect>
+                  <x>270</x>
+                  <y>310</y>
+                  <width>80</width>
+                  <height>23</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>sys</string>
+                </property>
+               </widget>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -460,6 +538,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pageSwitchButton</class>
+   <extends>QPushButton</extends>
+   <header>pageswitchbutton.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

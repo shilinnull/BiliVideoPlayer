@@ -11,6 +11,13 @@ class BiliVideoPlayer;
 }
 QT_END_NAMESPACE
 
+
+enum StackedWidgetPage {
+    HomePage = 0,
+    MyselfPage = 1,
+    AdminPage = 2
+};
+
 class BiliVideoPlayer : public QWidget
 {
     Q_OBJECT
@@ -25,7 +32,8 @@ private:
 
     // 连接信号和槽
     void connectSignalAndSlot();
-
+    void onSwitchStackedWidgetPage(int pageId);
+    void resetSwitchBtnInfo(int pageId);
 protected:
     // 实现窗口拖拽
     void mousePressEvent(QMouseEvent* event) override;
