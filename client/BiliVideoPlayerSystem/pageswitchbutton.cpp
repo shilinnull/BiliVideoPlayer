@@ -47,5 +47,5 @@ void pageSwitchButton::mousePressEvent(QMouseEvent *event)
 {
     (void)event;
     emit switchPage(pageId);         // 切换页面
-    qDebug() << "切换" << pageId << "按钮" << btnTittle->text();
+    LOG() << "切换" << pageId << "按钮" << btnTittle->text();
 }

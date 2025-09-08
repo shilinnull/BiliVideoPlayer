@@ -5,6 +5,8 @@
 #include <QGraphicsDropShadowEffect>
 #include <QMouseEvent>
 
+#include "util.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class BiliVideoPlayer;

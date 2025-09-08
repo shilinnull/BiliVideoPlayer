@@ -78,7 +78,7 @@ void BiliVideoPlayer::resetSwitchBtnInfo(int pageId)
         ui->myPageBtn->setImageAndText(":/images/homePage/wode.png", "我的", MyselfPage);
         ui->sysPageBtn->setImageAndText(":/images/homePage/adminxuan.png", "系统", AdminPage);
     } else {
-        qDebug() << "暂时不支持页面";
+        LOG() << "暂时不支持页面";
     }
 }
 
