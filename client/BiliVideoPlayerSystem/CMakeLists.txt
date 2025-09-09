@@ -17,6 +17,7 @@ qt_add_executable(BiliVideoPlayerSystem
     startuppage.h startuppage.cpp
     pageswitchbutton.h pageswitchbutton.cpp
     util.h
+    homepagewidget.h homepagewidget.cpp homepagewidget.ui
 )
 
 include_directories(

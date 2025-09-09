@@ -480,21 +480,7 @@
             </property>
             <item>
              <widget class="QStackedWidget" name="stackedWidget">
-              <widget class="QWidget" name="homePage">
-               <widget class="QLabel" name="label">
-                <property name="geometry">
-                 <rect>
-                  <x>230</x>
-                  <y>280</y>
-                  <width>80</width>
-                  <height>23</height>
-                 </rect>
-                </property>
-                <property name="text">
-                 <string>home</string>
-                </property>
-               </widget>
-              </widget>
+              <widget class="homePageWidget" name="homePage"/>
               <widget class="QWidget" name="myPage">
                <widget class="QLabel" name="label_2">
                 <property name="geometry">
@@ -542,7 +528,13 @@
   <customwidget>
    <class>pageSwitchButton</class>
    <extends>QPushButton</extends>
-   <header>pageswitchbutton.h</header>
+   <header location="global">pageswitchbutton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>homePageWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">homepagewidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
