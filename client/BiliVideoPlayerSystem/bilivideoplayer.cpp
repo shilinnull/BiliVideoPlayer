@@ -46,13 +46,6 @@ void BiliVideoPlayer::connectSignalAndSlot()
     connect(ui->sysPageBtn, &pageSwitchButton::switchPage, this, &BiliVideoPlayer::onSwitchStackedWidgetPage);
 }
 
-void BiliVideoPlayer::onSwitchStackedWidgetPage(int pageId)
-{
-    ui->stackedWidget->setCurrentIndex(pageId);     // 切换页面
-    resetSwitchBtnInfo(pageId);                     // 重新设置按钮上的背景和字体
-    repaint();                                      // 保证页面可以立即刷新出来
-}
-
 void BiliVideoPlayer::resetSwitchBtnInfo(int pageId)
 {
     // 重新设置左侧栏未选中按钮颜⾊
@@ -80,6 +73,13 @@ void BiliVideoPlayer::resetSwitchBtnInfo(int pageId)
     } else {
         LOG() << "暂时不支持页面";
     }
+}
+
+void BiliVideoPlayer::onSwitchStackedWidgetPage(int pageId)
+{
+    ui->stackedWidget->setCurrentIndex(pageId);     // 切换页面
+    resetSwitchBtnInfo(pageId);                     // 重新设置按钮上的背景和字体
+    repaint();                                      // 保证页面可以立即刷新出来
 }
 
 void BiliVideoPlayer::mousePressEvent(QMouseEvent *event)

@@ -1,4 +1,5 @@
 #include "pageswitchbutton.h"
+#include "util.h"
 
 pageSwitchButton::pageSwitchButton(QWidget *parent)
     : QPushButton{parent}

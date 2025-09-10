@@ -4,6 +4,7 @@ project(BiliVideoPlayerSystem LANGUAGES CXX)
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 qt_standard_project_setup()
 
@@ -18,6 +19,7 @@ qt_add_executable(BiliVideoPlayerSystem
     pageswitchbutton.h pageswitchbutton.cpp
     util.h
     homepagewidget.h homepagewidget.cpp homepagewidget.ui
+    searchlineedit.h searchlineedit.cpp
 )
 
 include_directories(
@@ -94,6 +96,7 @@ target_link_libraries(BiliVideoPlayerSystem
         Qt::Core
         Qt::Widgets
 )
+target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
 target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
 target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
 

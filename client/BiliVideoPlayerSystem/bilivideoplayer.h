@@ -34,8 +34,10 @@ private:
 
     // 连接信号和槽
     void connectSignalAndSlot();
-    void onSwitchStackedWidgetPage(int pageId);
     void resetSwitchBtnInfo(int pageId);
+
+private slots:
+    void onSwitchStackedWidgetPage(int pageId);
 protected:
     // 实现窗口拖拽
     void mousePressEvent(QMouseEvent* event) override;

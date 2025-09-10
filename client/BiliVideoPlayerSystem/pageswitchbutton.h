@@ -4,8 +4,6 @@
 #include <QPushButton>
 #include <QLabel>
 
-#include "util.h"
-
 class pageSwitchButton : public QPushButton
 {
     Q_OBJECT
