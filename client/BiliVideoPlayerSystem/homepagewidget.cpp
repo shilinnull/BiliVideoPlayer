@@ -2,13 +2,16 @@
 #include "ui_homepagewidget.h"
 #include "util.h"
 
+#include <QVBoxLayout>
+
 homePageWidget::homePageWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::homePageWidget)
 {
     ui->setupUi(this);
 
-    initKindsAndTags();
+    initKindsAndTags();     // 初始化分类和标签按钮
+    initRefreshAndTop();    // 初始化刷新和置顶按钮
 }
 
 homePageWidget::~homePageWidget()
@@ -48,6 +51,40 @@ void homePageWidget::initKindsAndTags()
 
     // 默认显示历史标签
     resetTags(tags["历史"]);
+    // 默认选中第一个标签
+    QList<QPushButton*> kindBtns = ui->classifys->findChildren<QPushButton*>();
+    onKindBtnClicked(kindBtns[1]);
+}
+
+void homePageWidget::initRefreshAndTop()
+{
+    // 先创建一个QWidget
+    QWidget* refreshTopWidget = new QWidget(this);
+    refreshTopWidget->setFixedSize(42, 94);
+    refreshTopWidget->setStyleSheet("QPushButton{"
+                                    "border-radius: 21px;"
+                                    "border: none;"
+                                    "background-color: #FFECF1;}"
+                                    "QPushButton:hover{background-color: #EC5D85;}");
+
+    QVBoxLayout* layout = new QVBoxLayout(refreshTopWidget);
+    QPushButton* topBtn = new QPushButton(refreshTopWidget);
+    topBtn->setFixedSize(42, 42);
+    topBtn->setStyleSheet("border-image : url(:/images/homePage/zhiding.png);");
+    layout->addWidget(topBtn);
+
+    QPushButton* refreshBtn = new QPushButton(refreshTopWidget);
+    refreshBtn->setFixedSize(42, 42);
+    refreshBtn->setStyleSheet("border-image : url(:/images/homePage/shuaxin.png);");
+
+    layout->addWidget(refreshBtn);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(10);
+
+    refreshTopWidget->move(1080, 500);
+
+    connect(topBtn, &QPushButton::clicked, this, &homePageWidget::onTopBtnClicked);
+    connect(refreshBtn, &QPushButton::clicked, this, &homePageWidget::onRefreshBtnClicked);
 }
 
 QPushButton *homePageWidget::buildSelectBtn(QWidget *parent, const QString &color, const QString &text)
@@ -115,6 +152,14 @@ void homePageWidget::onTagBtnClicked(QPushButton *clickLabelBtn)
         if(tagBtn != clickLabelBtn && tagBtn->text() != "标签")
             tagBtn->setStyleSheet("color: " + default_text_color);
     }
+}
 
+void homePageWidget::onRefreshBtnClicked()
+{
+    LOG() << "刷新按钮点击了";
+}
 
+void homePageWidget::onTopBtnClicked()
+{
+    LOG() << "置顶按钮点击了";
 }
