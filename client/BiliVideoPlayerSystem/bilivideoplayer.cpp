@@ -11,7 +11,6 @@ BiliVideoPlayer::BiliVideoPlayer(QWidget *parent)
     initUI();
     // 初始化信号和槽
     connectSignalAndSlot();
-
 }
 
 BiliVideoPlayer::~BiliVideoPlayer()

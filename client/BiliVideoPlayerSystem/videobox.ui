@@ -7,11 +7,17 @@
     <x>0</x>
     <y>0</y>
     <width>310</width>
-    <height>257</height>
+    <height>225</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">#videoBox
+{
+	background-color: #FFFFFF;
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -42,6 +48,20 @@
        <width>310</width>
        <height>174</height>
       </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">#imageBox
+{
+	border-image:url(:/images/homePage/videoImage.png);
+}
+
+QLabel
+{
+	color: #FFFFFF;
+	border: none;
+	font-size: 14px;
+	font-family: 微软雅黑;
+}</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
@@ -133,7 +153,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QLabel" name="playNum">
+             <widget class="QLabel" name="playLabel">
               <property name="minimumSize">
                <size>
                 <width>20</width>
@@ -146,8 +166,21 @@
                 <height>20</height>
                </size>
               </property>
+              <property name="styleSheet">
+               <string notr="true">#playLabel
+{
+	border-image: url(:/images/homePage/bofang.png);
+}</string>
+              </property>
               <property name="text">
-               <string>30.1万</string>
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="playNum">
+              <property name="text">
+               <string>31.6万</string>
               </property>
              </widget>
             </item>
@@ -155,7 +188,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QWidget" name="lickBox" native="true">
+          <widget class="QWidget" name="likeBox" native="true">
            <property name="minimumSize">
             <size>
              <width>100</width>
@@ -168,10 +201,97 @@
              <height>16777215</height>
             </size>
            </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <property name="spacing">
+             <number>6</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="likeImage">
+              <property name="minimumSize">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">#likeImage
+{
+	border-image : url(&quot;:/images/homePage/dainzan.png&quot;);
+}</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="likeNum">
+              <property name="text">
+               <string>1266</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
          <item>
-          <widget class="QWidget" name="timeBox" native="true"/>
+          <widget class="QWidget" name="timeBox" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>12</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>60</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="videoDuration">
+              <property name="text">
+               <string>25:26</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -193,10 +313,151 @@
        <height>19</height>
       </size>
      </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="videoTitle">
+        <property name="styleSheet">
+         <string notr="true">#videoTitle
+{
+	color: #666666;
+	font-weight: bold;
+	font-size: 16px;
+	font-family: 微软雅黑;
+}</string>
+        </property>
+        <property name="text">
+         <string>【北京旅游攻略】一条视频告诉你去了北京该怎么玩</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="userBox" native="true"/>
+    <widget class="QWidget" name="userBox" native="true">
+     <property name="styleSheet">
+      <string notr="true">QLabel
+{ 
+	color : #999999; 
+	font-size : 14px;
+	font-family : 微软雅黑; 
+}</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_6">
+      <property name="spacing">
+       <number>3</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="userIcon">
+        <property name="minimumSize">
+         <size>
+          <width>18</width>
+          <height>18</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>18</width>
+          <height>18</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#userIcon
+{ 
+	border-image: url(&quot;:/images/homePage/touxiang.png&quot;); 
+}</string>
+        </property>
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="userNikeName">
+        <property name="text">
+         <string>用户昵称：</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="loadupTime">
+        <property name="text">
+         <string>9-16</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>153</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="delVideoBtn">
+        <property name="minimumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#delVideoBtn 
+{ 
+	border:none;
+	background:transparent; 
+	border-image:url(:/images/myself/gengduo.png); 
+}</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>

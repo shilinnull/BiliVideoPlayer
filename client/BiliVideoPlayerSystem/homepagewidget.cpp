@@ -1,6 +1,7 @@
 #include "homepagewidget.h"
 #include "ui_homepagewidget.h"
 #include "util.h"
+#include "videobox.h"
 
 #include <QVBoxLayout>
 
@@ -12,6 +13,7 @@ homePageWidget::homePageWidget(QWidget *parent)
 
     initKindsAndTags();     // 初始化分类和标签按钮
     initRefreshAndTop();    // 初始化刷新和置顶按钮
+    initVideos();           // 初始化视频列表
 }
 
 homePageWidget::~homePageWidget()
@@ -81,10 +83,19 @@ void homePageWidget::initRefreshAndTop()
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(10);
 
-    refreshTopWidget->move(1080, 500);
+    refreshTopWidget->move(1278, 618);
 
     connect(topBtn, &QPushButton::clicked, this, &homePageWidget::onTopBtnClicked);
     connect(refreshBtn, &QPushButton::clicked, this, &homePageWidget::onRefreshBtnClicked);
+}
+
+void homePageWidget::initVideos()
+{
+    for(int i = 0; i < 16; i++)
+    {
+        VideoBox* video = new VideoBox();
+        ui->videoGLayout->addWidget(video, i / 4, i % 4);
+    }
 }
 
 QPushButton *homePageWidget::buildSelectBtn(QWidget *parent, const QString &color, const QString &text)

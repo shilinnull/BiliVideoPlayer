@@ -15,6 +15,8 @@ public:
     explicit VideoBox(QWidget *parent = nullptr);
     ~VideoBox();
 
+    bool eventFilter(QObject* watched, QEvent* event);
+
 private:
     Ui::VideoBox *ui;
 };

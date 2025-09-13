@@ -274,6 +274,44 @@
       </property>
       <item>
        <widget class="QScrollArea" name="videoScroll">
+        <property name="styleSheet">
+         <string notr="true">#videoScroll
+{ 
+	border : none; 
+}
+
+#videoScroll QScrollBar:vertical /*垂直滚动条*/ 
+{ 
+	border : none; 
+	background-color : #FFFFFF; 
+	width : 10px;
+}
+
+#videoScroll QScrollBar::handle:vertical
+{ 
+	/*设置垂直滚动条⼿柄*/ 
+	border : none; 
+	border-radius : 5px;
+	background-color : #E8E8E8; 
+	min-height: 134px;
+}
+
+#videoScroll QScrollBar::handle:vertical:hover
+{
+	background-color : #D0D0D0;
+}
+
+#videoScroll QScrollBar::add-line:vertical,
+#videoScroll QScrollBar::sub-line:vertical,
+#videoScroll QScrollBar::up-arrow:vertical, 
+#videoScroll QScrollBar::down-arrow:vertical 
+{ 
+	border:none;
+	width: 0px; 
+	height: 0px; 
+	background: none;
+}</string>
+        </property>
         <property name="horizontalScrollBarPolicy">
          <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
         </property>
@@ -285,9 +323,15 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>1328</width>
-           <height>678</height>
+           <width>1330</width>
+           <height>680</height>
           </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">#scrollAreaWidgetContents
+{ 
+	background-color: #FFFFFF;
+}</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <property name="spacing">

@@ -6,8 +6,8 @@ StartupPage::StartupPage(QDialog *parent)
     setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
 
     // 窗口大小和图片的大小
-    int windowWidth = 1250;
-    int windowHeight = 700;
+    int windowWidth = 1450;
+    int windowHeight = 860;
     int imageWidth = 280;
     int imageHeight = 128;
 

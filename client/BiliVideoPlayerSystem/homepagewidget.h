@@ -17,7 +17,8 @@ public:
     ~homePageWidget();
 
     void initKindsAndTags();            // 初始化分类和标签
-    void initRefreshAndTop();        // 初始化刷新和置顶按钮
+    void initRefreshAndTop();           // 初始化刷新和置顶按钮
+    void initVideos();                  // 初始化视频列表
 
     // 创建按钮函数
     QPushButton* buildSelectBtn(QWidget *parent, const QString &color, const QString &text);
