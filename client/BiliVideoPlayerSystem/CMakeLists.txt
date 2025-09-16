@@ -21,6 +21,7 @@ qt_add_executable(BiliVideoPlayerSystem
     homepagewidget.h homepagewidget.cpp homepagewidget.ui
     searchlineedit.h searchlineedit.cpp
     videobox.h videobox.cpp videobox.ui
+    playerpage.h playerpage.cpp playerpage.ui
 )
 
 include_directories(

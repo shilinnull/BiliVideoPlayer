@@ -12,6 +12,8 @@ VideoBox::VideoBox(QWidget *parent)
 
     ui->imageBox->installEventFilter(this);
     ui->videoTitle->installEventFilter(this);
+
+    playPage = new PlayerPage();
 }
 
 VideoBox::~VideoBox()
@@ -23,9 +25,14 @@ bool VideoBox::eventFilter(QObject *watched, QEvent *event)
 {
     if(ui->imageBox == watched || ui->videoTitle == watched) {
         if(QEvent::MouseButtonPress == event->type()) {
-            LOG() << "点击打开窗口";
+            onPlayBtnClicked();
             return true;
         }
     }
     return QObject::eventFilter(watched, event);
+}
+
+void VideoBox::onPlayBtnClicked()
+{
+    playPage->show();
 }

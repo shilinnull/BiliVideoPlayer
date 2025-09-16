@@ -2,6 +2,7 @@
 #define VIDEOBOX_H
 
 #include <QWidget>
+#include "playerpage.h"
 
 namespace Ui {
 class VideoBox;
@@ -16,9 +17,12 @@ public:
     ~VideoBox();
 
     bool eventFilter(QObject* watched, QEvent* event);
+private:
+    void onPlayBtnClicked();
 
 private:
     Ui::VideoBox *ui;
+    PlayerPage* playPage;
 };
 
 #endif // VIDEOBOX_H
