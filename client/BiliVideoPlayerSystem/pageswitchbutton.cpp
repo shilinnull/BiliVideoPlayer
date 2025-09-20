@@ -1,7 +1,7 @@
-#include "pageswitchbutton.h"
+#include "PageSwitchButton.h"
 #include "util.h"
 
-pageSwitchButton::pageSwitchButton(QWidget *parent)
+PageSwitchButton::PageSwitchButton(QWidget *parent)
     : QPushButton{parent}
 {
     setFixedSize(QSize(48, 46));
@@ -15,7 +15,7 @@ pageSwitchButton::pageSwitchButton(QWidget *parent)
     setStyleSheet("border:none;");
 }
 
-void pageSwitchButton::setImageAndText(const QString &imagePath, const QString &text, int pageId)
+void PageSwitchButton::setImageAndText(const QString &imagePath, const QString &text, int pageId)
 {
     btnImage->setPixmap(QPixmap(imagePath));
     btnTittle->setText(text);
@@ -24,12 +24,12 @@ void pageSwitchButton::setImageAndText(const QString &imagePath, const QString &
     btnTittle->move((48 - text.size() * 12) / 2, 30);
 }
 
-void pageSwitchButton::setImage(const QString &imagePath)
+void PageSwitchButton::setImage(const QString &imagePath)
 {
     btnImage->setPixmap(QPixmap(imagePath));
 }
 
-void pageSwitchButton::setTextColor(const QString &textColor)
+void PageSwitchButton::setTextColor(const QString &textColor)
 {
     btnTittle->setStyleSheet("font-family: 微软雅黑;"
                             "font-size: 12px;"
@@ -39,12 +39,12 @@ void pageSwitchButton::setTextColor(const QString &textColor)
 
 }
 
-int pageSwitchButton::getPageId() const
+int PageSwitchButton::getPageId() const
 {
     return this->pageId;
 }
 
-void pageSwitchButton::mousePressEvent(QMouseEvent *event)
+void PageSwitchButton::mousePressEvent(QMouseEvent *event)
 {
     (void)event;
     emit switchPage(pageId);         // 切换页面

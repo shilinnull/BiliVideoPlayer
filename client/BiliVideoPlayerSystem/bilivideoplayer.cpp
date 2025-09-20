@@ -40,15 +40,15 @@ void BiliVideoPlayer::connectSignalAndSlot()
     connect(ui->minBtn, &QPushButton::clicked, this, &QWidget::showMinimized);
     connect(ui->quitBtn, &QPushButton::clicked, this, &QWidget::close);
 
-    connect(ui->homePageBtn, &pageSwitchButton::switchPage, this, &BiliVideoPlayer::onSwitchStackedWidgetPage);
-    connect(ui->myPageBtn, &pageSwitchButton::switchPage, this, &BiliVideoPlayer::onSwitchStackedWidgetPage);
-    connect(ui->sysPageBtn, &pageSwitchButton::switchPage, this, &BiliVideoPlayer::onSwitchStackedWidgetPage);
+    connect(ui->homePageBtn, &PageSwitchButton::switchPage, this, &BiliVideoPlayer::onSwitchStackedWidgetPage);
+    connect(ui->myPageBtn, &PageSwitchButton::switchPage, this, &BiliVideoPlayer::onSwitchStackedWidgetPage);
+    connect(ui->sysPageBtn, &PageSwitchButton::switchPage, this, &BiliVideoPlayer::onSwitchStackedWidgetPage);
 }
 
 void BiliVideoPlayer::resetSwitchBtnInfo(int pageId)
 {
     // 重新设置左侧栏未选中按钮颜⾊
-    QList<pageSwitchButton*> switchBtns = findChildren<pageSwitchButton*>();
+    QList<PageSwitchButton*> switchBtns = findChildren<PageSwitchButton*>();
     for(auto &switchBtn : switchBtns) {
         if(switchBtn->getPageId() != pageId)
             switchBtn->setTextColor("#666666");

@@ -5,9 +5,9 @@
 
 #include <QVBoxLayout>
 
-homePageWidget::homePageWidget(QWidget *parent)
+HomePageWidget::HomePageWidget(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::homePageWidget)
+    , ui(new Ui::HomePageWidget)
 {
     ui->setupUi(this);
 
@@ -16,12 +16,12 @@ homePageWidget::homePageWidget(QWidget *parent)
     initVideos();           // 初始化视频列表
 }
 
-homePageWidget::~homePageWidget()
+HomePageWidget::~HomePageWidget()
 {
     delete ui;
 }
 
-void homePageWidget::initKindsAndTags()
+void HomePageWidget::initKindsAndTags()
 {
     // 创建分类按钮
     QPushButton* kindBtn = buildSelectBtn(ui->classifys, clicked_text_color, "分类");
@@ -58,7 +58,7 @@ void homePageWidget::initKindsAndTags()
     onKindBtnClicked(kindBtns[1]);
 }
 
-void homePageWidget::initRefreshAndTop()
+void HomePageWidget::initRefreshAndTop()
 {
     // 先创建一个QWidget
     QWidget* refreshTopWidget = new QWidget(this);
@@ -85,11 +85,11 @@ void homePageWidget::initRefreshAndTop()
 
     refreshTopWidget->move(1278, 618);
 
-    connect(topBtn, &QPushButton::clicked, this, &homePageWidget::onTopBtnClicked);
-    connect(refreshBtn, &QPushButton::clicked, this, &homePageWidget::onRefreshBtnClicked);
+    connect(topBtn, &QPushButton::clicked, this, &HomePageWidget::onTopBtnClicked);
+    connect(refreshBtn, &QPushButton::clicked, this, &HomePageWidget::onRefreshBtnClicked);
 }
 
-void homePageWidget::initVideos()
+void HomePageWidget::initVideos()
 {
     for(int i = 0; i < 16; i++)
     {
@@ -98,7 +98,7 @@ void homePageWidget::initVideos()
     }
 }
 
-QPushButton *homePageWidget::buildSelectBtn(QWidget *parent, const QString &color, const QString &text)
+QPushButton *HomePageWidget::buildSelectBtn(QWidget *parent, const QString &color, const QString &text)
 {
     QPushButton* btn = new QPushButton(text, parent);
     btn->setMinimumHeight(26);
@@ -107,7 +107,7 @@ QPushButton *homePageWidget::buildSelectBtn(QWidget *parent, const QString &colo
     return btn;
 }
 
-void homePageWidget::resetTags(const QList<QString> &tags)
+void HomePageWidget::resetTags(const QList<QString> &tags)
 {
     // 创建标签
     QPushButton* tag = buildSelectBtn(ui->labels, clicked_text_color, "标签");
@@ -125,7 +125,7 @@ void homePageWidget::resetTags(const QList<QString> &tags)
     ui->labelHLayout->setSpacing(4);
 }
 
-void homePageWidget::onKindBtnClicked(QPushButton *clickKindBtn)
+void HomePageWidget::onKindBtnClicked(QPushButton *clickKindBtn)
 {
 
     clickKindBtn->setStyleSheet("background-color: " + clicked_background_color + ";"
@@ -151,7 +151,7 @@ void homePageWidget::onKindBtnClicked(QPushButton *clickKindBtn)
     resetTags(tags[clickKindBtn->text()]);
 }
 
-void homePageWidget::onTagBtnClicked(QPushButton *clickLabelBtn)
+void HomePageWidget::onTagBtnClicked(QPushButton *clickLabelBtn)
 {
 
     clickLabelBtn->setStyleSheet("background-color: " + clicked_background_color + ";"
@@ -165,12 +165,12 @@ void homePageWidget::onTagBtnClicked(QPushButton *clickLabelBtn)
     }
 }
 
-void homePageWidget::onRefreshBtnClicked()
+void HomePageWidget::onRefreshBtnClicked()
 {
     LOG() << "刷新按钮点击了";
 }
 
-void homePageWidget::onTopBtnClicked()
+void HomePageWidget::onTopBtnClicked()
 {
     LOG() << "置顶按钮点击了";
 }

@@ -1,14 +1,14 @@
-#ifndef PAGESWITCHBUTTON_H
-#define PAGESWITCHBUTTON_H
+#ifndef PageSwitchButton_H
+#define PageSwitchButton_H
 
 #include <QPushButton>
 #include <QLabel>
 
-class pageSwitchButton : public QPushButton
+class PageSwitchButton : public QPushButton
 {
     Q_OBJECT
 public:
-    explicit pageSwitchButton(QWidget *parent = nullptr);
+    explicit PageSwitchButton(QWidget *parent = nullptr);
 
     void setImageAndText(const QString &imagePath, const QString &text, int pageId);
     void setImage(const QString& imagePath);
@@ -27,4 +27,4 @@ signals:
     void switchPage(int pageId);
 };
 
-#endif // PAGESWITCHBUTTON_H
+#endif // PageSwitchButton_H

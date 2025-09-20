@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>homePageWidget</class>
- <widget class="QWidget" name="homePageWidget">
+ <class>HomePageWidget</class>
+ <widget class="QWidget" name="HomePageWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -230,7 +230,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="searchLineEdit" name="search"/>
+          <widget class="SearchLineEdit" name="search"/>
          </item>
          <item>
           <spacer name="verticalSpacer">
@@ -363,9 +363,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>searchLineEdit</class>
+   <class>SearchLineEdit</class>
    <extends>QLineEdit</extends>
-   <header location="global">searchlineedit.h</header>
+   <header location="global">SearchLineEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

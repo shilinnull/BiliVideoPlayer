@@ -1,5 +1,5 @@
-#ifndef SEARCHLINEEDIT_H
-#define SEARCHLINEEDIT_H
+#ifndef SearchLineEdit_H
+#define SearchLineEdit_H
 
 #include <QLineEdit>
 #include <QEvent>
@@ -8,11 +8,11 @@
 #include <QWidget>
 
 
-class searchLineEdit : public QLineEdit
+class SearchLineEdit : public QLineEdit
 {
     Q_OBJECT
 public:
-    explicit searchLineEdit(QWidget *parent = nullptr);
+    explicit SearchLineEdit(QWidget *parent = nullptr);
 
 private slots:
     void searchBtnClicked();
@@ -26,4 +26,4 @@ private:
     QPushButton* searchBtn;
 };
 
-#endif // SEARCHLINEEDIT_H
+#endif // SearchLineEdit_H

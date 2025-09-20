@@ -1,20 +1,20 @@
-#ifndef HOMEPAGEWIDGET_H
-#define HOMEPAGEWIDGET_H
+#ifndef HomePageWidget_H
+#define HomePageWidget_H
 
 #include <QWidget>
 #include <QPushButton>
 
 namespace Ui {
-class homePageWidget;
+class HomePageWidget;
 }
 
-class homePageWidget : public QWidget
+class HomePageWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit homePageWidget(QWidget *parent = nullptr);
-    ~homePageWidget();
+    explicit HomePageWidget(QWidget *parent = nullptr);
+    ~HomePageWidget();
 
     void initKindsAndTags();            // 初始化分类和标签
     void initRefreshAndTop();           // 初始化刷新和置顶按钮
@@ -31,9 +31,9 @@ private slots:
     void onTopBtnClicked();                             // 置顶按钮点击
 
 private:
-    Ui::homePageWidget *ui;
+    Ui::HomePageWidget *ui;
 
     QHash<QString, QList<QString>> tags;
 };
 
-#endif // HOMEPAGEWIDGET_H
+#endif // HomePageWidget_H

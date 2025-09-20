@@ -1,9 +1,9 @@
-#include "searchlineedit.h"
+#include "SearchLineEdit.h"
 #include "util.h"
 
 #include <QHBoxLayout>
 
-searchLineEdit::searchLineEdit(QWidget *parent)
+SearchLineEdit::SearchLineEdit(QWidget *parent)
     : QLineEdit{parent}
 {
     // 搜索框图标
@@ -38,16 +38,16 @@ searchLineEdit::searchLineEdit(QWidget *parent)
     hLayout->addWidget(searchBtn);
     hLayout->setContentsMargins(11, 0, 2, 0);   // 左上右下
 
-    connect(searchBtn, &QPushButton::clicked, this, &searchLineEdit::searchBtnClicked); // 按钮点击
-    connect(this, &QLineEdit::returnPressed, this, &searchLineEdit::searchBtnClicked);  // 输入框回车
+    connect(searchBtn, &QPushButton::clicked, this, &SearchLineEdit::searchBtnClicked); // 按钮点击
+    connect(this, &QLineEdit::returnPressed, this, &SearchLineEdit::searchBtnClicked);  // 输入框回车
 }
 
-void searchLineEdit::searchBtnClicked()
+void SearchLineEdit::searchBtnClicked()
 {
     LOG() << "搜索按钮点击搜索视频";
 }
 
-void searchLineEdit::enterEvent(QEnterEvent *event)
+void SearchLineEdit::enterEvent(QEnterEvent *event)
 {
     Q_UNUSED(event);
 
@@ -59,7 +59,7 @@ void searchLineEdit::enterEvent(QEnterEvent *event)
                              "font-style: normal;");
 }
 
-void searchLineEdit::leaveEvent(QEvent *event)
+void SearchLineEdit::leaveEvent(QEvent *event)
 {
     Q_UNUSED(event);
 
