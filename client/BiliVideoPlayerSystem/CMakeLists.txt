@@ -11,15 +11,12 @@ qt_standard_project_setup()
 qt_add_executable(BiliVideoPlayerSystem
     WIN32 MACOSX_BUNDLE
     main.cpp
-    bilivideoplayer.cpp
-    bilivideoplayer.h
-    bilivideoplayer.ui
-    imageRes.qrc
+    bilivideoplayer.cpp bilivideoplayer.h bilivideoplayer.ui
     startuppage.h startuppage.cpp
-    PageSwitchButton.h PageSwitchButton.cpp
+    pageswitchbutton.h pageswitchbutton.cpp
     util.h
-    HomePageWidget.h HomePageWidget.cpp HomePageWidget.ui
-    SearchLineEdit.h SearchLineEdit.cpp
+    homepagewidget.h homepagewidget.cpp homepagewidget.ui
+    searchlineEdit.h searchlineEdit.cpp
     videobox.h videobox.cpp videobox.ui
     playerpage.h playerpage.cpp playerpage.ui
     playslider.h playslider.cpp playslider.ui

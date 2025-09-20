@@ -1,4 +1,4 @@
-#include "SearchLineEdit.h"
+#include "searchlineedit.h"
 #include "util.h"
 
 #include <QHBoxLayout>

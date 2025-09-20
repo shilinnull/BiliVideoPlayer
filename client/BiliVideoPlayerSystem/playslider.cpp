@@ -2,7 +2,7 @@
 #include "ui_playslider.h"
 
 #include <QRect>
-#include"util.h"
+#include "util.h"
 
 PlaySlider::PlaySlider(QWidget *parent)
     : QWidget(parent)
