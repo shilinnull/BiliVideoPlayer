@@ -20,6 +20,7 @@ qt_add_executable(BiliVideoPlayerSystem
     videobox.h videobox.cpp videobox.ui
     playerpage.h playerpage.cpp playerpage.ui
     playslider.h playslider.cpp playslider.ui
+    volume.h volume.cpp volume.ui
 )
 
 include_directories(

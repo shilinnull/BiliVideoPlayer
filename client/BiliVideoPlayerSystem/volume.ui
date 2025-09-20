@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Volume</class>
+ <widget class="QWidget" name="Volume">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>60</width>
+    <height>164</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QWidget" name="volumeBg" native="true">
+     <property name="styleSheet">
+      <string notr="true">#volumeBg
+{ 
+	background-color : #3D3B3B; 
+	border-radius : 4px; 
+}</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>7</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>7</number>
+      </property>
+      <item>
+       <widget class="QWidget" name="volumeBox" native="true">
+        <property name="styleSheet">
+         <string notr="true">QFrame
+{
+	border-radius : 2px; 
+}</string>
+        </property>
+        <widget class="QFrame" name="inLine">
+         <property name="geometry">
+          <rect>
+           <x>28</x>
+           <y>5</y>
+           <width>4</width>
+           <height>145</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">#inLine{ background-color : #D8D8D8; }</string>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Raised</enum>
+         </property>
+        </widget>
+        <widget class="QFrame" name="outLine">
+         <property name="geometry">
+          <rect>
+           <x>28</x>
+           <y>100</y>
+           <width>4</width>
+           <height>50</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">#outLine{ background-color : #3ECEFE; }</string>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Raised</enum>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="volumeBtn">
+         <property name="geometry">
+          <rect>
+           <x>25</x>
+           <y>95</y>
+           <width>10</width>
+           <height>10</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">#volumeBtn
+{ 
+	background-color : #D8D8D8; 
+	border: 1px solid #979797; 
+	border-radius : 5px; 
+}</string>
+         </property>
+         <property name="text">
+          <string>PushButton</string>
+         </property>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
