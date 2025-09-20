@@ -66,8 +66,8 @@ void HomePageWidget::initRefreshAndTop()
     refreshTopWidget->setStyleSheet("QPushButton{"
                                     "border-radius: 21px;"
                                     "border: none;"
-                                    "background-color: #FFECF1;}"
-                                    "QPushButton:hover{background-color: #EC5D85;}");
+                                    "background-color: #61666D;}"
+                                    "QPushButton:hover{background-color: #FF6699;}");
 
     QVBoxLayout* layout = new QVBoxLayout(refreshTopWidget);
     QPushButton* topBtn = new QPushButton(refreshTopWidget);

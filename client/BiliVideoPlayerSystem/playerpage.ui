@@ -164,7 +164,7 @@ QPushButton{ border : none; }</string>
    <item>
     <widget class="QWidget" name="screen" native="true">
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(170,170,127);</string>
+      <string notr="true">background-color: rgb(2,164,245);</string>
      </property>
     </widget>
    </item>

@@ -40,6 +40,8 @@ SearchLineEdit::SearchLineEdit(QWidget *parent)
 
     connect(searchBtn, &QPushButton::clicked, this, &SearchLineEdit::searchBtnClicked); // 按钮点击
     connect(this, &QLineEdit::returnPressed, this, &SearchLineEdit::searchBtnClicked);  // 输入框回车
+
+    searchBtn->installEventFilter(this);
 }
 
 void SearchLineEdit::searchBtnClicked()
@@ -47,26 +49,24 @@ void SearchLineEdit::searchBtnClicked()
     LOG() << "搜索按钮点击搜索视频";
 }
 
-void SearchLineEdit::enterEvent(QEnterEvent *event)
+bool SearchLineEdit::eventFilter(QObject *watched, QEvent *event)
 {
-    Q_UNUSED(event);
-
-    searchBtn->setStyleSheet("background-color: #EC5D85;" // 搜索按钮背景色
-                             "border-radius: 16px;"
-                             "font-family: 微软雅黑;"
-                             "font-size: 14px;"
-                             "color: #FFFFFF;"  // 搜索按钮字体颜色
-                             "font-style: normal;");
-}
-
-void SearchLineEdit::leaveEvent(QEvent *event)
-{
-    Q_UNUSED(event);
-
-    searchBtn->setStyleSheet("background-color: #FFECF1;" // 搜索按钮背景色
-                             "border-radius: 16px;"
-                             "font-family: 微软雅黑;"
-                             "font-size: 14px;"
-                             "color: #222222;"  // 搜索按钮字体颜色
-                             "font-style: normal;");
+    if(searchBtn == watched) {
+        if(event->type() == QEvent::Enter)  {
+            searchBtn->setStyleSheet("background-color: #EC5D85;" // 搜索按钮背景色
+                                     "border-radius: 16px;"
+                                     "font-family: 微软雅黑;"
+                                     "font-size: 14px;"
+                                     "color: #FFFFFF;"  // 搜索按钮字体颜色
+                                     "font-style: normal;");
+        } else if(event->type() == QEvent::Leave) {
+            searchBtn->setStyleSheet("background-color: #FFECF1;" // 搜索按钮背景色
+                                     "border-radius: 16px;"
+                                     "font-family: 微软雅黑;"
+                                     "font-size: 14px;"
+                                     "color: #222222;"  // 搜索按钮字体颜色
+                                     "font-style: normal;");
+        }
+    }
+    return QWidget::eventFilter(watched, event);
 }

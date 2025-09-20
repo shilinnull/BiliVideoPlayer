@@ -17,8 +17,7 @@ public:
 private slots:
     void searchBtnClicked();
 protected:
-    void enterEvent(QEnterEvent *event) override;
-    void leaveEvent(QEvent *event) override;
+    bool eventFilter(QObject *watched, QEvent *event);
 signals:
 
 private:

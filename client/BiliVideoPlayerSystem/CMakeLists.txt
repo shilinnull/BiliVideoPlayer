@@ -16,7 +16,7 @@ qt_add_executable(BiliVideoPlayerSystem
     pageswitchbutton.h pageswitchbutton.cpp
     util.h
     homepagewidget.h homepagewidget.cpp homepagewidget.ui
-    searchlineEdit.h searchlineEdit.cpp
+    searchlineedit.h searchlineedit.cpp
     videobox.h videobox.cpp videobox.ui
     playerpage.h playerpage.cpp playerpage.ui
     playslider.h playslider.cpp playslider.ui
