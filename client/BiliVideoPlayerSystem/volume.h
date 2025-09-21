@@ -15,6 +15,9 @@ public:
     explicit Volume(QWidget *parent = nullptr);
     ~Volume();
 
+    bool eventFilter(QObject *watched, QEvent* event) override;
+    void calcVolume();
+
 private:
     Ui::Volume *ui;
 };
