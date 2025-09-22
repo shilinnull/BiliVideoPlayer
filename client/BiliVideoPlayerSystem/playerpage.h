@@ -5,6 +5,7 @@
 #include <QMouseEvent>
 
 #include "volume.h"
+#include "playspeed.h"
 
 namespace Ui {
 class PlayerPage;
@@ -25,13 +26,15 @@ protected:
     void mouseMoveEvent(QMouseEvent* event) override;
 
 private slots:
-    void onVolumeBtnClicked();
+    void onVolumeBtnClicked();      // 音量
+    void onSpeedBtnClicked();       // 倍速
 
 private:
     Ui::PlayerPage *ui;
     QPoint dragPos;
 
-    Volume* volume;     // 音量调节窗口
+    Volume* volume;                 // 音量调节
+    PlaySpeed* playSpeed;           // 播放速度
 };
 
 #endif // PLAYERPAGE_H

@@ -10,10 +10,13 @@ PlayerPage::PlayerPage(QWidget *parent)
     // setAttribute(Qt::WA_ShowModal, true);       // 设置窗口为模态
 
     volume = new Volume(this);
+    playSpeed = new PlaySpeed(this);
 
     connect(ui->minBtn, &QPushButton::clicked, this, &QWidget::showMinimized);
     connect(ui->quitBtn, &QPushButton::clicked, this, &QWidget::close);
     connect(ui->volumeBtn, &QPushButton::clicked, this, &PlayerPage::onVolumeBtnClicked);
+    connect(ui->speedBtn, &QPushButton::clicked, this, &PlayerPage::onSpeedBtnClicked);
+
 }
 
 PlayerPage::~PlayerPage()
@@ -26,6 +29,9 @@ void PlayerPage::moveWindows(const QPoint &point)
     // 13 是音量调节窗口右边界和PlayerPage右边界的距离
     QPoint newPoint = point + QPoint(this->width() - volume->width() - 13, 533);
     volume->move(newPoint);
+
+    newPoint = point + QPoint(this->width() - playSpeed->width() - 72, 563);
+    playSpeed->move(newPoint);
 }
 
 void PlayerPage::mousePressEvent(QMouseEvent *event)
@@ -56,4 +62,10 @@ void PlayerPage::onVolumeBtnClicked()
 {
     moveWindows(mapToGlobal(QPoint(0, 0)));
     volume->show();
+}
+
+void PlayerPage::onSpeedBtnClicked()
+{
+    moveWindows(mapToGlobal(QPoint(0, 0)));
+    playSpeed->show();
 }
