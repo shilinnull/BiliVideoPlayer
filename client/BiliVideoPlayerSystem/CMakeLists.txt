@@ -22,6 +22,7 @@ qt_add_executable(BiliVideoPlayerSystem
     playslider.h playslider.cpp playslider.ui
     volume.h volume.cpp volume.ui
     playspeed.h playspeed.cpp playspeed.ui
+    myselfwidget.h myselfwidget.cpp myselfwidget.ui
 )
 
 include_directories(
