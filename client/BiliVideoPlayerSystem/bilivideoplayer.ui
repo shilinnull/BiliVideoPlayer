@@ -481,21 +481,7 @@
             <item>
              <widget class="QStackedWidget" name="stackedWidget">
               <widget class="HomePageWidget" name="homePage"/>
-              <widget class="QWidget" name="myPage">
-               <widget class="QLabel" name="label_2">
-                <property name="geometry">
-                 <rect>
-                  <x>440</x>
-                  <y>310</y>
-                  <width>80</width>
-                  <height>23</height>
-                 </rect>
-                </property>
-                <property name="text">
-                 <string>my</string>
-                </property>
-               </widget>
-              </widget>
+              <widget class="MyselfWidget" name="myPage"/>
               <widget class="QWidget" name="sysPage">
                <widget class="QLabel" name="label_3">
                 <property name="geometry">
@@ -534,6 +520,12 @@
    <class>HomePageWidget</class>
    <extends>QWidget</extends>
    <header location="global">HomePageWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MyselfWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">myselfwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
