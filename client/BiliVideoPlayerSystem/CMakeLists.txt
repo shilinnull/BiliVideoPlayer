@@ -5,6 +5,7 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 qt_standard_project_setup()
 
@@ -23,6 +24,7 @@ qt_add_executable(BiliVideoPlayerSystem
     volume.h volume.cpp volume.ui
     playspeed.h playspeed.cpp playspeed.ui
     myselfwidget.h myselfwidget.cpp myselfwidget.ui
+    avatarbutton.h avatarbutton.cpp
 )
 
 include_directories(
@@ -99,6 +101,7 @@ target_link_libraries(BiliVideoPlayerSystem
         Qt::Core
         Qt::Widgets
 )
+target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
 target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
 target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
 target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
