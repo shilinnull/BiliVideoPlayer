@@ -1,6 +1,7 @@
 #include "myselfwidget.h"
 #include "ui_myselfwidget.h"
 #include "videobox.h"
+#include "modifymyselfdialog.h"
 
 #include <QFileDialog>
 
@@ -22,6 +23,7 @@ void MyselfWidget::initUI()
     ui->attentionBtn->hide();
 
     connect(ui->avatarBtn, &AvatarButton::clicked, this, &MyselfWidget::uploadAvatarBtnClicked);
+    connect(ui->settingBtn, &QPushButton::clicked, this, &MyselfWidget::settingBtnClicked);
 
 #ifdef TEST_UI
     for(int i = 0; i < 16; i++) {
@@ -44,4 +46,11 @@ void MyselfWidget::uploadAvatarBtnClicked()
         return ;
     }
     ui->avatarBtn->setIcon(std::move(makeCircleIcon(fileDate, ui->avatarBtn->width() / 2)));
+}
+
+void MyselfWidget::settingBtnClicked()
+{
+    ModifyMyselfDialog* dialog = new ModifyMyselfDialog();
+    dialog->exec();
+    delete dialog;
 }

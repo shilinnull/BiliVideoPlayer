@@ -18,6 +18,7 @@ public:
 private:
     void initUI();
     void uploadAvatarBtnClicked();  // 点击上传头像
+    void settingBtnClicked();       // 点击设置按钮
 private:
     Ui::MyselfWidget *ui;
 };

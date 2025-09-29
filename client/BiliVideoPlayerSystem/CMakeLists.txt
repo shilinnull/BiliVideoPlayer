@@ -25,6 +25,7 @@ qt_add_executable(BiliVideoPlayerSystem
     playspeed.h playspeed.cpp playspeed.ui
     myselfwidget.h myselfwidget.cpp myselfwidget.ui
     avatarbutton.h avatarbutton.cpp
+    modifymyselfdialog.h modifymyselfdialog.cpp modifymyselfdialog.ui
 )
 
 include_directories(
