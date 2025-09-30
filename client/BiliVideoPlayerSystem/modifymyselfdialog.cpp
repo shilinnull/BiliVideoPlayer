@@ -3,6 +3,7 @@
 
 #include <QGraphicsDropShadowEffect>
 #include "util.h"
+#include "newpassworddialog.h"
 
 
 ModifyMyselfDialog::ModifyMyselfDialog(QWidget *parent)
@@ -44,5 +45,8 @@ void ModifyMyselfDialog::onCancelBtnClicked()
 
 void ModifyMyselfDialog::showPasswordDlg()
 {
+    NewPasswordDialog* dialog = new NewPasswordDialog();
+    dialog->exec();
 
+    delete dialog;
 }

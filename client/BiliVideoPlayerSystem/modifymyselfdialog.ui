@@ -198,7 +198,7 @@
 }</string>
    </property>
    <property name="text">
-    <string>视频用户</string>
+    <string>视频用户lin</string>
    </property>
   </widget>
   <widget class="QPushButton" name="submitBtn">
