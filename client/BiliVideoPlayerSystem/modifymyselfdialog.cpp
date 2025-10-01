@@ -16,14 +16,9 @@ ModifyMyselfDialog::ModifyMyselfDialog(QWidget *parent)
 
     setWindowIcon(QIcon(":/images/homePage/logo.png"));
 
-    QGraphicsDropShadowEffect* dropShadow = new QGraphicsDropShadowEffect(this);
-    dropShadow->setColor(Qt::black);
-    dropShadow->setBlurRadius(5);
-    dropShadow->setOffset(0, 0);
-    this->setGraphicsEffect(dropShadow);
-
     connect(ui->submitBtn, &QPushButton::clicked, this, &ModifyMyselfDialog::onSubmitBtnClicked);
     connect(ui->cancelBtn, &QPushButton::clicked, this, &ModifyMyselfDialog::onCancelBtnClicked);
+    connect(ui->passwordBtn, &QPushButton::clicked, this, &ModifyMyselfDialog::showPasswordDlg);
     connect(ui->changePasswordBtn, &QPushButton::clicked, this, &ModifyMyselfDialog::showPasswordDlg);
 
 }
@@ -47,6 +42,17 @@ void ModifyMyselfDialog::showPasswordDlg()
 {
     NewPasswordDialog* dialog = new NewPasswordDialog();
     dialog->exec();
+
+    // 获取修改后的密码
+    QString currentPassword = dialog->getNewPassword();
+    if(currentPassword.isEmpty()) {
+        LOG() << "取消修改密码";
+        return ;
+    }
+    LOG() << "新密码已经设置" << currentPassword;
+
+    ui->passwordBtn->hide();
+    ui->passwordWidget->show();
 
     delete dialog;
 }

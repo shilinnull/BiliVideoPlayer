@@ -137,20 +137,24 @@
    <widget class="QPushButton" name="changePasswordBtn">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>10</y>
+      <x>84</x>
+      <y>0</y>
       <width>19</width>
       <height>19</height>
      </rect>
     </property>
     <property name="styleSheet">
      <string notr="true">#changePasswordBtn{ 
-	background-image: url(:/images/myself/xiugaimima.png);
-	background-color: transparent; border: none; 
+	background-color: transparent; 
+	border: none;
 }</string>
     </property>
     <property name="text">
      <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="build/Desktop_Qt_6_7_3_MSVC2019_64bit-Debug/.qt/rcc/PREFIX.qrc">
+      <normaloff>:/images/myself/xiugaimima.png</normaloff>:/images/myself/xiugaimima.png</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -247,6 +251,8 @@
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="build/Desktop_Qt_6_7_3_MSVC2019_64bit-Debug/.qt/rcc/PREFIX.qrc"/>
+ </resources>
  <connections/>
 </ui>
