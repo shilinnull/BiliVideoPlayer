@@ -27,6 +27,7 @@ qt_add_executable(BiliVideoPlayerSystem
     avatarbutton.h avatarbutton.cpp
     modifymyselfdialog.h modifymyselfdialog.cpp modifymyselfdialog.ui
     newpassworddialog.h newpassworddialog.cpp newpassworddialog.ui
+    uploadvideopage.h uploadvideopage.cpp uploadvideopage.ui
 )
 
 include_directories(

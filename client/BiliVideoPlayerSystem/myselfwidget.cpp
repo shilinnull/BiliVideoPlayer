@@ -2,6 +2,7 @@
 #include "ui_myselfwidget.h"
 #include "videobox.h"
 #include "modifymyselfdialog.h"
+#include "bilivideoplayer.h"
 
 #include <QFileDialog>
 
@@ -18,12 +19,29 @@ MyselfWidget::~MyselfWidget()
     delete ui;
 }
 
+void MyselfWidget::uploadViewBtnClicked()
+{
+    // 1. 打开文件对话框，让用户选择要上传的文件
+    QString videoFilePath = QFileDialog::getOpenFileName(nullptr, "上传视频", "", "Videos (*.mp4 *.rmvb *.avi *.mov)");
+    if(!videoFilePath.isEmpty()) {
+        // 视频限制大小 4G
+        QFileInfo fileInfo(videoFilePath);
+        int64_t fileSize = fileInfo.size();
+        if(fileSize > 4 * 1024 * 1024) {
+            LOG() << "视频文件必须小于4G";
+            return ;
+        }
+        emit switchUploadVideoPage(UploadPage);
+    }
+}
+
 void MyselfWidget::initUI()
 {
     ui->attentionBtn->hide();
 
     connect(ui->avatarBtn, &AvatarButton::clicked, this, &MyselfWidget::uploadAvatarBtnClicked);
     connect(ui->settingBtn, &QPushButton::clicked, this, &MyselfWidget::settingBtnClicked);
+    connect(ui->uploadVideoBtn, &QPushButton::clicked, this, &MyselfWidget::uploadViewBtnClicked);
 
 #ifdef TEST_UI
     for(int i = 0; i < 16; i++) {

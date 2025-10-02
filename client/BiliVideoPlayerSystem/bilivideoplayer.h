@@ -17,7 +17,8 @@ QT_END_NAMESPACE
 enum StackedWidgetPage {
     HomePage = 0,
     MyselfPage = 1,
-    AdminPage = 2
+    AdminPage = 2,
+    UploadPage = 3
 };
 
 class BiliVideoPlayer : public QWidget

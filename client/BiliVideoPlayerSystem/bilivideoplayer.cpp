@@ -43,6 +43,17 @@ void BiliVideoPlayer::connectSignalAndSlot()
     connect(ui->homePageBtn, &PageSwitchButton::switchPage, this, &BiliVideoPlayer::onSwitchStackedWidgetPage);
     connect(ui->myPageBtn, &PageSwitchButton::switchPage, this, &BiliVideoPlayer::onSwitchStackedWidgetPage);
     connect(ui->sysPageBtn, &PageSwitchButton::switchPage, this, &BiliVideoPlayer::onSwitchStackedWidgetPage);
+
+    // 我的页面切换到上传视频页面
+    connect(ui->myPage, &MyselfWidget::switchUploadVideoPage, this, [=](int pageId){
+        LOG() << "切换到上传视频页面";
+        onSwitchStackedWidgetPage(pageId);
+    });
+
+    // 视频上传页面切换到我的页面
+    connect(ui->uploadVideo, &UploadVideoPage::switchMySelfPage, this, [=](int pageId){
+        BiliVideoPlayer::onSwitchStackedWidgetPage(pageId);
+    });
 }
 
 void BiliVideoPlayer::resetSwitchBtnInfo(int pageId)
