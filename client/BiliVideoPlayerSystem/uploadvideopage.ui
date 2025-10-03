@@ -53,7 +53,7 @@ QScrollBar::up-arrow:vertical, QScrollBar::down- arrow:vertical {
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-199</y>
+        <y>0</y>
         <width>1337</width>
         <height>981</height>
        </rect>
@@ -319,7 +319,7 @@ QScrollBar::up-arrow:vertical, QScrollBar::down- arrow:vertical {
               <number>20</number>
              </property>
              <property name="leftMargin">
-              <number>10</number>
+              <number>0</number>
              </property>
              <property name="topMargin">
               <number>0</number>
@@ -400,6 +400,19 @@ QScrollBar::up-arrow:vertical, QScrollBar::down- arrow:vertical {
                <property name="styleSheet">
                 <string notr="true">#imageLabel{ border-image : url(:/images/uploadVideoPage/fengmian.png); }</string>
                </property>
+               <widget class="QLabel" name="imageLabel">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>310</width>
+                  <height>174</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
                <widget class="QPushButton" name="changeButton">
                 <property name="geometry">
                  <rect>
@@ -413,20 +426,7 @@ QScrollBar::up-arrow:vertical, QScrollBar::down- arrow:vertical {
                  <string notr="true">#changeButton { border : none; color : #FFFFFF; background-color : rgba(0, 0, 0, 0.0); }</string>
                 </property>
                 <property name="text">
-                 <string>更改封面</string>
-                </property>
-               </widget>
-               <widget class="QLabel" name="imageLabel">
-                <property name="geometry">
-                 <rect>
-                  <x>0</x>
-                  <y>0</y>
-                  <width>310</width>
-                  <height>174</height>
-                 </rect>
-                </property>
-                <property name="text">
-                 <string/>
+                 <string>更改封面图</string>
                 </property>
                </widget>
               </widget>
@@ -574,11 +574,14 @@ QScrollBar::up-arrow:vertical, QScrollBar::down- arrow:vertical {
                  <number>0</number>
                 </property>
                 <item>
-                 <widget class="QLineEdit" name="videoTitle">
+                 <widget class="QLineEdit" name="videoTittle">
                   <property name="styleSheet">
-                   <string notr="true">#videoTitle{ font-size : 16px; color : #222222; border : none; }</string>
+                   <string notr="true">#videoTittle{ font-size : 16px; color : #222222; border : none; }</string>
                   </property>
                   <property name="text">
+                   <string/>
+                  </property>
+                  <property name="placeholderText">
                    <string>这是视频的描述文字</string>
                   </property>
                  </widget>
@@ -589,7 +592,7 @@ QScrollBar::up-arrow:vertical, QScrollBar::down- arrow:vertical {
                    <string notr="true">#leftWord{ font-size : 16px; color : #999999; }</string>
                   </property>
                   <property name="text">
-                   <string>9/80</string>
+                   <string>0/80</string>
                   </property>
                  </widget>
                 </item>
@@ -684,7 +687,7 @@ QScrollBar::up-arrow:vertical, QScrollBar::down- arrow:vertical {
                  <string notr="true">#briefLeftWord{ color : #999999; }</string>
                 </property>
                 <property name="text">
-                 <string>27/1000</string>
+                 <string>0/1000</string>
                 </property>
                </widget>
               </widget>
