@@ -15,6 +15,12 @@ class MyselfWidget : public QWidget
 public:
     explicit MyselfWidget(QWidget *parent = nullptr);
     ~MyselfWidget();
+
+    void uploadViewBtnClicked();        // 上传视频
+
+signals:
+    void switchUploadVideoPage(int pageIndex);
+
 private:
     void initUI();
     void uploadAvatarBtnClicked();  // 点击上传头像
