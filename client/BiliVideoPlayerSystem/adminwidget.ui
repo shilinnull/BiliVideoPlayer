@@ -198,6 +198,9 @@
             </property>
            </widget>
            <widget class="QWidget" name="roleTable" native="true">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="geometry">
              <rect>
               <x>0</x>
@@ -207,6 +210,8 @@
              </rect>
             </property>
            </widget>
+           <zorder>roleTable</zorder>
+           <zorder>checkTable</zorder>
           </widget>
          </item>
         </layout>

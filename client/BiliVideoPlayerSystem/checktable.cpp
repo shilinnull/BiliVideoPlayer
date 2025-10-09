@@ -21,7 +21,6 @@ CheckTable::CheckTable(QWidget *parent)
     // 创建验证器，验证是否符合
     ui->userIdEdit->setValidator(validator);
 
-
     // 重置按钮点击信号槽绑定
     connect(ui->resetBtn, &QPushButton::clicked, this, &CheckTable::onResetBtnClicked);
     // 查询按钮点击信号槽绑定
@@ -35,7 +34,7 @@ CheckTable::~CheckTable()
 
 void CheckTable::onResetBtnClicked()
 {
-    ui->resetBtn->setStyleSheet("background-color:#3ECEFF;"
+    ui->resetBtn->setStyleSheet("background-color:#FF6699;"
                                 "border-radius:4px;"
                                 "font-family:微软雅黑;"
                                 "font-size:14px;"
@@ -55,7 +54,7 @@ void CheckTable::onResetBtnClicked()
 void CheckTable::onQueryBtnClicked()
 {
     // 设置按钮样式
-    ui->queryBtn->setStyleSheet("background-color:#3ECEFF;"
+    ui->queryBtn->setStyleSheet("background-color:#FF6699;"
                                 "border-radius:4px;"
                                 "font-family:微软雅黑;"
                                 "font-size:14px;"

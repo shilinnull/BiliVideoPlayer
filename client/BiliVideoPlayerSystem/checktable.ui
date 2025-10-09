@@ -449,6 +449,9 @@
               <property name="text">
                <string>视频用户ID</string>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
              </widget>
             </item>
             <item>
@@ -467,6 +470,9 @@
               </property>
               <property name="text">
                <string>用户昵称</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -487,6 +493,9 @@
               <property name="text">
                <string>视频标题</string>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
              </widget>
             </item>
             <item>
@@ -505,6 +514,9 @@
               </property>
               <property name="text">
                <string>视频</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -525,6 +537,9 @@
               <property name="text">
                <string>状态</string>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
              </widget>
             </item>
             <item>
@@ -544,6 +559,9 @@
               <property name="text">
                <string>审核人</string>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
              </widget>
             </item>
             <item>
@@ -562,6 +580,9 @@
               </property>
               <property name="text">
                <string>操作</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -625,6 +646,9 @@ QScrollBar::up-arrow:vertical, QScrollBar::down- arrow:vertical {
 	height: 0px; 
 }
 QScrollBar:horizontal { height: 0px; }</string>
+           </property>
+           <property name="horizontalScrollBarPolicy">
+            <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
            </property>
            <property name="widgetResizable">
             <bool>true</bool>
