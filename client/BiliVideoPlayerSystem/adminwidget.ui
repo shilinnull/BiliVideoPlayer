@@ -128,12 +128,13 @@
                <string notr="true">#checkBtn { 
 	background-color: #FFFFFF; 
 	font-size: 14px; 
-	color: #3ECEFF; 
+	color: #FF6699; 
 	border:none; 
-	border-bottom: 2px solid #3ECEFF ; 
+	border-bottom: 2px solid #FF6699 ; 
 	font-family:微软雅⿊; 
 	font-weight:bold; 
-}</string>
+}
+</string>
               </property>
               <property name="text">
                <string>审核管理</string>
@@ -197,9 +198,9 @@
              </rect>
             </property>
            </widget>
-           <widget class="QWidget" name="roleTable" native="true">
+           <widget class="RoleTable" name="roleTable" native="true">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="geometry">
              <rect>
@@ -210,8 +211,6 @@
              </rect>
             </property>
            </widget>
-           <zorder>roleTable</zorder>
-           <zorder>checkTable</zorder>
           </widget>
          </item>
         </layout>
@@ -227,6 +226,12 @@
    <class>CheckTable</class>
    <extends>QWidget</extends>
    <header location="global">checktable.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>RoleTable</class>
+   <extends>QWidget</extends>
+   <header location="global">roletable.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
