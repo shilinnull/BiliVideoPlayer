@@ -32,6 +32,7 @@ qt_add_executable(BiliVideoPlayerSystem
     checktable.h checktable.cpp checktable.ui
     roletable.h roletable.cpp roletable.ui
     checktableitem.h checktableitem.cpp checktableitem.ui
+    roletableitem.h roletableitem.cpp roletableitem.ui
 )
 
 include_directories(

@@ -22,12 +22,12 @@ CheckTable::CheckTable(QWidget *parent)
     // 创建验证器，验证是否符合
     ui->userIdEdit->setValidator(validator);
 
+    updateCheckTable();     // 默认显示审核页面
+
     // 重置按钮点击信号槽绑定
     connect(ui->resetBtn, &QPushButton::clicked, this, &CheckTable::onResetBtnClicked);
     // 查询按钮点击信号槽绑定
     connect(ui->queryBtn, &QPushButton::clicked, this, &CheckTable::onQueryBtnClicked);
-
-    updateCheckTable();     // 默认显示审核页面
 }
 
 CheckTable::~CheckTable()
@@ -73,7 +73,7 @@ void CheckTable::onQueryBtnClicked()
 
 void CheckTable::updateCheckTable()
 {
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < 11; i++) {
         CheckTableItem* item = new CheckTableItem(this);
         ui->layout->addWidget(item);
     }

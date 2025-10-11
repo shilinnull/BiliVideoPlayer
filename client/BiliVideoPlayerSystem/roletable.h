@@ -22,6 +22,8 @@ private slots:
 private:
     // 初始化样式表
     void initStyleSheet();
+
+    void updateRoleTable();
 private:
     Ui::RoleTable *ui;
 

@@ -1,32 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CheckTableItem</class>
- <widget class="QWidget" name="CheckTableItem">
+ <class>RoleTableItem</class>
+ <widget class="QWidget" name="RoleTableItem">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>1250</width>
-    <height>120</height>
+    <height>66</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>0</width>
-    <height>120</height>
+    <height>66</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>16777215</width>
-    <height>120</height>
+    <height>66</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
-  </property>
-  <property name="styleSheet">
-   <string notr="true"/>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
@@ -45,15 +42,14 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QFrame" name="checkTableItemBg">
+    <widget class="QFrame" name="roleTableItemBg">
      <property name="styleSheet">
-      <string notr="true">#checkTableItemBg { 
+      <string notr="true">#roleTableItemBg { 
 	background-color: #FFFFFF; 
-	border: none; 
-	border-top: 1px solid #EBEDF0; 
+	border: 1px solid #EBEDF0; 
 	color: #222222; 
 }
-*{ font-family : 微软雅黑; font-size : 14px; line-height : 19px; }</string>
+*{ font-family : 微软雅⿊; font-size : 14px; line-height : 19px; }</string>
      </property>
      <property name="frameShape">
       <enum>QFrame::Shape::StyledPanel</enum>
@@ -61,25 +57,14 @@
      <property name="frameShadow">
       <enum>QFrame::Shadow::Raised</enum>
      </property>
-     <widget class="QLineEdit" name="videoUserId">
+     <widget class="QLabel" name="idLabel">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>1</y>
-        <width>150</width>
-        <height>118</height>
+        <y>0</y>
+        <width>174</width>
+        <height>66</height>
        </rect>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>150</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">#videoUserId {
-	border: none;
-}</string>
       </property>
       <property name="text">
        <string>1</string>
@@ -87,134 +72,124 @@
       <property name="alignment">
        <set>Qt::AlignmentFlag::AlignCenter</set>
       </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
      </widget>
-     <widget class="QLabel" name="nickNameLabel">
+     <widget class="QLabel" name="phoneLabel">
       <property name="geometry">
        <rect>
-        <x>150</x>
+        <x>348</x>
         <y>0</y>
-        <width>138</width>
-        <height>120</height>
+        <width>225</width>
+        <height>66</height>
        </rect>
       </property>
       <property name="text">
-       <string>视频用户1</string>
+       <string>18612345678</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignmentFlag::AlignCenter</set>
       </property>
      </widget>
-     <widget class="QLabel" name="videoTitleLabel">
+     <widget class="QLabel" name="nameLabel">
       <property name="geometry">
        <rect>
-        <x>288</x>
+        <x>568</x>
         <y>0</y>
-        <width>265</width>
-        <height>120</height>
+        <width>150</width>
+        <height>66</height>
        </rect>
       </property>
-      <property name="styleSheet">
-       <string notr="true">#videoTitleLabel { padding-left: 34px; padding-right: 34px; }</string>
-      </property>
       <property name="text">
-       <string>【北京旅游攻略】⼀条视频告诉你去了北京</string>
+       <string>管理员</string>
       </property>
-      <property name="wordWrap">
-       <bool>true</bool>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
       </property>
      </widget>
-     <widget class="QPushButton" name="videoBtn">
+     <widget class="QPushButton" name="statusButton">
       <property name="geometry">
        <rect>
-        <x>594</x>
-        <y>16</y>
-        <width>160</width>
-        <height>88</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">#videoBtn { 
-	background-color: transparent; 
-	border: none; 
-	border-image:url(:/images/admin/defaultVideoCover.png); 
-}</string>
-      </property>
-      <property name="text">
-       <string>清空</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="statusBtn">
-      <property name="geometry">
-       <rect>
-        <x>872</x>
-        <y>43</y>
+        <x>777</x>
+        <y>18</y>
         <width>72</width>
         <height>34</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">#statusBtn { 
+       <string notr="true">#statusButton {
+	color: #3686FF; 
 	background-color: #EBF3FF; 
 	border: none; 
 	border-radius: 10px; 
-	color: #3686FF; 
 	font-size: 12px; 
 	line-height: 16px; 
 }</string>
       </property>
       <property name="text">
-       <string>已审核</string>
+       <string>启用</string>
       </property>
      </widget>
-     <widget class="QLabel" name="checkerLabel">
+     <widget class="QLabel" name="commentLabel">
       <property name="geometry">
        <rect>
-        <x>1004</x>
+        <x>906</x>
         <y>0</y>
-        <width>121</width>
-        <height>120</height>
+        <width>188</width>
+        <height>66</height>
        </rect>
       </property>
       <property name="text">
-       <string>张三</string>
+       <string>超管管理员</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignmentFlag::AlignCenter</set>
       </property>
      </widget>
-     <widget class="QPushButton" name="operationBtn">
+     <widget class="QPushButton" name="editBtn">
       <property name="geometry">
        <rect>
-        <x>1156</x>
-        <y>50</y>
-        <width>29</width>
-        <height>18</height>
+        <x>1130</x>
+        <y>25</y>
+        <width>30</width>
+        <height>19</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">#operationBtn { color: #3686FF; border: none; background-color: transparent; }</string>
+       <string notr="true">#editBtn { background-color: transparent; border: none; color: #3686FF; }</string>
       </property>
       <property name="text">
-       <string>通过</string>
+       <string>编辑</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="operationBtn2">
+     <widget class="QPushButton" name="delBtn">
       <property name="geometry">
        <rect>
-        <x>1215</x>
-        <y>50</y>
-        <width>29</width>
-        <height>18</height>
+        <x>1190</x>
+        <y>25</y>
+        <width>30</width>
+        <height>19</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">#operationBtn2 { color: #FD6A6A; border: none; background-color: transparent; }</string>
+       <string notr="true">#delBtn { background-color: transparent; border: none; color: #FD6A6A; }</string>
       </property>
       <property name="text">
-       <string>驳回</string>
+       <string>删除</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="roleLabel">
+      <property name="geometry">
+       <rect>
+        <x>174</x>
+        <y>0</y>
+        <width>174</width>
+        <height>66</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>超级管理员</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
       </property>
      </widget>
     </widget>

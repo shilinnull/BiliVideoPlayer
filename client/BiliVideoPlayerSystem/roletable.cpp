@@ -2,6 +2,7 @@
 #include "ui_roletable.h"
 
 #include "util.h"
+#include "roletableitem.h"
 
 RoleTable::RoleTable(QWidget *parent)
     : QWidget(parent)
@@ -23,6 +24,7 @@ RoleTable::RoleTable(QWidget *parent)
     connect(ui->queryBtn, &QPushButton::clicked, this, &RoleTable::onQueryBtnClicked);
 
     initStyleSheet();
+    updateRoleTable();  // 更新表格元素
 }
 
 RoleTable::~RoleTable()
@@ -61,4 +63,12 @@ void RoleTable::initStyleSheet()
                                 "font-family:微软雅黑;"
                                 "font-size:14px;"
                                 "color:#222222;");
+}
+
+void RoleTable::updateRoleTable()
+{
+    for(int i = 0; i < 11; i++) {
+        RoleTableItem* item = new RoleTableItem(this, i + 1);
+        ui->layout->addWidget(item);
+    }
 }
