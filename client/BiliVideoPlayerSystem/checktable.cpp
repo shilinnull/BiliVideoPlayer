@@ -2,6 +2,7 @@
 #include "ui_checktable.h"
 
 #include "util.h"
+#include "checktableitem.h"
 
 CheckTable::CheckTable(QWidget *parent)
     : QWidget(parent)
@@ -25,6 +26,8 @@ CheckTable::CheckTable(QWidget *parent)
     connect(ui->resetBtn, &QPushButton::clicked, this, &CheckTable::onResetBtnClicked);
     // 查询按钮点击信号槽绑定
     connect(ui->queryBtn, &QPushButton::clicked, this, &CheckTable::onQueryBtnClicked);
+
+    updateCheckTable();     // 默认显示审核页面
 }
 
 CheckTable::~CheckTable()
@@ -66,4 +69,12 @@ void CheckTable::onQueryBtnClicked()
                                 "font-size:14px;"
                                 "color:#222222;");
     LOG()<<"查询按钮点击...";
+}
+
+void CheckTable::updateCheckTable()
+{
+    for(int i = 0; i < 10; i++) {
+        CheckTableItem* item = new CheckTableItem(this);
+        ui->layout->addWidget(item);
+    }
 }

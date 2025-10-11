@@ -21,6 +21,8 @@ private slots:
     void onQueryBtnClicked();
 
 private:
+    void updateCheckTable();    // 更新审核页面
+private:
     Ui::CheckTable *ui;
 };
 
