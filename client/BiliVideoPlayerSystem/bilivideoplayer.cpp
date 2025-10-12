@@ -1,6 +1,16 @@
 #include "bilivideoplayer.h"
 #include "ui_bilivideoplayer.h"
 
+BiliVideoPlayer* BiliVideoPlayer::instance = nullptr;
+
+BiliVideoPlayer *BiliVideoPlayer::getInstance()
+{
+    if(instance == nullptr) {
+        instance = new BiliVideoPlayer();
+    }
+    return instance;
+}
+
 BiliVideoPlayer::BiliVideoPlayer(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::BiliVideoPlayer)

@@ -20,10 +20,9 @@ private slots:
     // 查询按钮点击
     void onQueryBtnClicked();
 private:
-    // 初始化样式表
-    void initStyleSheet();
-
-    void updateRoleTable();
+    void initStyleSheet();          // 初始化样式表
+    void updateRoleTable();         // 角色管理项
+    void onInsertBtnClicked();      // 插入按钮点击
 private:
     Ui::RoleTable *ui;
 

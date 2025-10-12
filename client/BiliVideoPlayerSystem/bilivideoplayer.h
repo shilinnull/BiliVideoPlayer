@@ -26,9 +26,8 @@ class BiliVideoPlayer : public QWidget
     Q_OBJECT
 
 public:
-    BiliVideoPlayer(QWidget *parent = nullptr);
+    static BiliVideoPlayer* getInstance();
     ~BiliVideoPlayer();
-
 private:
     // 初始化UI
     void initUI();
@@ -44,8 +43,10 @@ protected:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
 private:
+    BiliVideoPlayer(QWidget *parent = nullptr);
+private:
     QPoint dragPos;
-
+    static BiliVideoPlayer *instance;
 private:
     Ui::BiliVideoPlayer *ui;
 };

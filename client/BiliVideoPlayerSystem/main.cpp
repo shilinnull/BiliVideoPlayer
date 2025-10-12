@@ -11,7 +11,8 @@ int main(int argc, char *argv[])
     // StartupPage startPage;
     // startPage.exec();
 
-    BiliVideoPlayer w;
-    w.show();
+    BiliVideoPlayer *player = BiliVideoPlayer::getInstance();
+    player->show();
+
     return a.exec();
 }

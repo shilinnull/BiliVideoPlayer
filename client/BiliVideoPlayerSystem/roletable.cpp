@@ -3,6 +3,7 @@
 
 #include "util.h"
 #include "roletableitem.h"
+#include "edituserdialog.h"
 
 RoleTable::RoleTable(QWidget *parent)
     : QWidget(parent)
@@ -22,6 +23,7 @@ RoleTable::RoleTable(QWidget *parent)
 
     connect(ui->resetBtn, &QPushButton::clicked, this, &RoleTable::onResetBtnClicked);
     connect(ui->queryBtn, &QPushButton::clicked, this, &RoleTable::onQueryBtnClicked);
+    connect(ui->insertBtn, &QPushButton::clicked, this, &RoleTable::onInsertBtnClicked);
 
     initStyleSheet();
     updateRoleTable();  // 更新表格元素
@@ -71,4 +73,11 @@ void RoleTable::updateRoleTable()
         RoleTableItem* item = new RoleTableItem(this, i + 1);
         ui->layout->addWidget(item);
     }
+}
+
+void RoleTable::onInsertBtnClicked()
+{
+    EditUserDialog* editUserDlg = new EditUserDialog(nullptr, "新增后台用户");
+    editUserDlg->exec();
+    delete editUserDlg;
 }
