@@ -2,6 +2,7 @@
 #define CHECKTABLE_H
 
 #include <QWidget>
+#include "paginator.h"
 
 namespace Ui {
 class CheckTable;
@@ -21,9 +22,10 @@ private slots:
     void onQueryBtnClicked();
 
 private:
-    void updateCheckTable();    // 更新审核页面
+    void updateCheckTable();            // 更新审核页面
 private:
     Ui::CheckTable *ui;
+    Paginator* paginator = nullptr;     // 分页器指针
 };
 
 #endif // CHECKTABLE_H

@@ -2,6 +2,7 @@
 #define ROLETABLE_H
 
 #include <QWidget>
+#include "paginator.h"
 
 namespace Ui {
 class RoleTable;
@@ -28,6 +29,7 @@ private:
 
     // 保存按钮样式
     QMap<QString, QString> styleSheet;
+    Paginator* paginator = nullptr;  // 分页器指针
 };
 
 #endif // ROLETABLE_H

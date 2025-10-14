@@ -16,6 +16,11 @@ RoleTable::RoleTable(QWidget *parent)
     ui->userStatus->addItem("停用");
     ui->userStatus->setCurrentIndex(0);
 
+    // 创建分页器
+    paginator = new Paginator(10, ui->PaginatorArea);
+    paginator->move(0, 20);
+    paginator->show();
+
     // 限制编辑框只能输入手机号
     QRegularExpression regExp("^1\\d{10}$");
     QValidator* validator = new QRegularExpressionValidator(regExp, this);

@@ -9,6 +9,7 @@ CheckTable::CheckTable(QWidget *parent)
     , ui(new Ui::CheckTable)
 {
     ui->setupUi(this);
+
     ui->videoStatus->addItem("全部分类");
     ui->videoStatus->addItem("待审核");
     ui->videoStatus->addItem("审核通过");
@@ -23,6 +24,11 @@ CheckTable::CheckTable(QWidget *parent)
     ui->userIdEdit->setValidator(validator);
 
     updateCheckTable();     // 默认显示审核页面
+
+    // 创建分页器
+    paginator = new Paginator(10, ui->PaginatorArea);
+    paginator->move(0, 15);
+    paginator->show();
 
     // 重置按钮点击信号槽绑定
     connect(ui->resetBtn, &QPushButton::clicked, this, &CheckTable::onResetBtnClicked);
