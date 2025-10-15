@@ -28,6 +28,7 @@ protected:
 private slots:
     void onVolumeBtnClicked();      // 音量
     void onSpeedBtnClicked();       // 倍速
+    void onLikeImageBtnClicked();   // 点赞
 
 private:
     Ui::PlayerPage *ui;

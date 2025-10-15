@@ -38,6 +38,7 @@ qt_add_executable(BiliVideoPlayerSystem
     edituserdialog.h edituserdialog.cpp edituserdialog.ui
     pagebutton.h pagebutton.cpp
     paginator.h paginator.cpp
+    login.h login.cpp login.ui
 )
 
 include_directories(
