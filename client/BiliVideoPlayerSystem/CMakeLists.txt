@@ -8,6 +8,7 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 qt_standard_project_setup()
 
@@ -39,6 +40,7 @@ qt_add_executable(BiliVideoPlayerSystem
     pagebutton.h pagebutton.cpp
     paginator.h paginator.cpp
     login.h login.cpp login.ui
+    toast.h toast.cpp
 )
 
 include_directories(
@@ -115,6 +117,7 @@ target_link_libraries(BiliVideoPlayerSystem
         Qt::Core
         Qt::Widgets
 )
+target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
 target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
 target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
 target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)

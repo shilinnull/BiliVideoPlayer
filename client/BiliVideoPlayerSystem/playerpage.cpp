@@ -2,6 +2,7 @@
 #include "ui_playerpage.h"
 
 #include "login.h"
+#include "toast.h"
 
 PlayerPage::PlayerPage(QWidget *parent)
     : QWidget(parent)
@@ -76,5 +77,6 @@ void PlayerPage::onLikeImageBtnClicked()
 {
     // 检测用户是否登录，登录才能点赞
     Login* login = new Login();
-    login->show();
+    // login->show();
+    Toast::showMessage("先登录，登录后才能点赞", login);
 }

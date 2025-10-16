@@ -61,7 +61,7 @@ void Login::onPasswordBtnClicked()
     ui->messageBtn->setStyleSheet("QPushButton{"
                                   "color : #222222;"
                                   "border : none;"
-                                  "border-bottom: 2px solid #B5ECFF;}");
+                                  "border-bottom: 2px solid #EC5D85;}");
 
 
 }
@@ -78,6 +78,6 @@ void Login::onMessageBtnClicked()
     ui->passwordBtn->setStyleSheet("QPushButton{"
                                    "color : #222222;"
                                    "border : none;"
-                                   "border-bottom: 2px solid #B5ECFF;}");
+                                   "border-bottom: 2px solid #EC5D85;}");
 
 }
