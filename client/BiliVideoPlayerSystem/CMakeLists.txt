@@ -10,6 +10,8 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
+set(MPV_DLL ${CMAKE_CURRENT_SOURCE_DIR}/mpv/dll/libmpv-2.dll) #设置mpv库⽬录
+
 qt_standard_project_setup()
 
 qt_add_executable(BiliVideoPlayerSystem
@@ -41,6 +43,8 @@ qt_add_executable(BiliVideoPlayerSystem
     paginator.h paginator.cpp
     login.h login.cpp login.ui
     toast.h toast.cpp
+    mpv/mpv/render_gl.h mpv/mpv/stream_cb.h mpv/client.h mpv/render.h mpv/render_gl.h mpv/stream_cb.h
+    mpv/mpvplayer.cpp mpv/mpvplayer.h
 )
 
 include_directories(
@@ -116,7 +120,9 @@ target_link_libraries(BiliVideoPlayerSystem
     PRIVATE
         Qt::Core
         Qt::Widgets
+        Qt${QT_VERSION_MAJOR}::Widgets ${MPV_DLL}
 )
+
 target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
 target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
 target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)

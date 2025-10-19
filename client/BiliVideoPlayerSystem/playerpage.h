@@ -6,6 +6,7 @@
 
 #include "volume.h"
 #include "playspeed.h"
+#include "mpv/mpvplayer.h"
 
 namespace Ui {
 class PlayerPage;
@@ -20,6 +21,7 @@ public:
     ~PlayerPage();
 
     void moveWindows(const QPoint& point);
+    void startPlaying(const QString &videoFilePath);
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;
@@ -36,6 +38,7 @@ private:
 
     Volume* volume;                 // 音量调节
     PlaySpeed* playSpeed;           // 播放速度
+    MpvPlayer* mpvPlayer = nullptr; // 封装mpv库，控制播放视频
 };
 
 #endif // PLAYERPAGE_H

@@ -37,6 +37,12 @@ void PlayerPage::moveWindows(const QPoint &point)
     playSpeed->move(newPoint);
 }
 
+void PlayerPage::startPlaying(const QString &videoFilePath)
+{
+    mpvPlayer = new MpvPlayer(ui->screen, this/*, ui->screen*/);
+    mpvPlayer->startPlay(videoFilePath);
+}
+
 void PlayerPage::mousePressEvent(QMouseEvent *event)
 {
     QPoint point = event->position().toPoint();
