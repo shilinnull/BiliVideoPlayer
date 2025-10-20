@@ -31,6 +31,7 @@ private slots:
     void onVolumeBtnClicked();      // 音量
     void onSpeedBtnClicked();       // 倍速
     void onLikeImageBtnClicked();   // 点赞
+    void onplayBtnClicked();        // 播放视频
 
 private:
     Ui::PlayerPage *ui;
@@ -39,6 +40,7 @@ private:
     Volume* volume;                 // 音量调节
     PlaySpeed* playSpeed;           // 播放速度
     MpvPlayer* mpvPlayer = nullptr; // 封装mpv库，控制播放视频
+    bool isPlay = false;          // 默认情况下暂停
 };
 
 #endif // PLAYERPAGE_H

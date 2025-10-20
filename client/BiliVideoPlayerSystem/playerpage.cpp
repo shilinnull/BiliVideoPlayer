@@ -20,6 +20,7 @@ PlayerPage::PlayerPage(QWidget *parent)
     connect(ui->volumeBtn, &QPushButton::clicked, this, &PlayerPage::onVolumeBtnClicked);
     connect(ui->speedBtn, &QPushButton::clicked, this, &PlayerPage::onSpeedBtnClicked);
     connect(ui->likeImageBtn, &QPushButton::clicked, this, &PlayerPage::onLikeImageBtnClicked);
+    connect(ui->playBtn, &QPushButton::clicked, this, &PlayerPage::onplayBtnClicked);
 }
 
 PlayerPage::~PlayerPage()
@@ -41,6 +42,9 @@ void PlayerPage::startPlaying(const QString &videoFilePath)
 {
     mpvPlayer = new MpvPlayer(ui->screen, this/*, ui->screen*/);
     mpvPlayer->startPlay(videoFilePath);
+
+    // 视频加载后会立即播放，默认需要先暂停，让用户点击播放按钮进行播放
+    mpvPlayer->pause();
 }
 
 void PlayerPage::mousePressEvent(QMouseEvent *event)
@@ -85,4 +89,18 @@ void PlayerPage::onLikeImageBtnClicked()
     Login* login = new Login();
     // login->show();
     Toast::showMessage("先登录，登录后才能点赞", login);
+}
+
+void PlayerPage::onplayBtnClicked()
+{
+    isPlay = !isPlay;
+    if(isPlay) {
+        // 播放
+        ui->playBtn->setStyleSheet("border-image: url(:/images/PlayPage/bofang.png)");
+        mpvPlayer->play();
+    } else {
+        // 暂停
+        ui->playBtn->setStyleSheet("border-image: url(:/images/PlayPage/zanting.png)");
+        mpvPlayer->pause();
+    }
 }
