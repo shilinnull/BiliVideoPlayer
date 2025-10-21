@@ -21,6 +21,7 @@ PlayerPage::PlayerPage(QWidget *parent)
     connect(ui->speedBtn, &QPushButton::clicked, this, &PlayerPage::onSpeedBtnClicked);
     connect(ui->likeImageBtn, &QPushButton::clicked, this, &PlayerPage::onLikeImageBtnClicked);
     connect(ui->playBtn, &QPushButton::clicked, this, &PlayerPage::onplayBtnClicked);
+    connect(playSpeed, &PlaySpeed::setPlaySpeed, this, &PlayerPage::onPlaySpeedChanged);
 }
 
 PlayerPage::~PlayerPage()
@@ -40,7 +41,7 @@ void PlayerPage::moveWindows(const QPoint &point)
 
 void PlayerPage::startPlaying(const QString &videoFilePath)
 {
-    mpvPlayer = new MpvPlayer(ui->screen, this/*, ui->screen*/);
+    mpvPlayer = new MpvPlayer(ui->screen, this);
     mpvPlayer->startPlay(videoFilePath);
 
     // 视频加载后会立即播放，默认需要先暂停，让用户点击播放按钮进行播放
@@ -103,4 +104,9 @@ void PlayerPage::onplayBtnClicked()
         ui->playBtn->setStyleSheet("border-image: url(:/images/PlayPage/zanting.png)");
         mpvPlayer->pause();
     }
+}
+
+void PlayerPage::onPlaySpeedChanged(double speed)
+{
+    mpvPlayer->setPlaySpeed(speed);
 }

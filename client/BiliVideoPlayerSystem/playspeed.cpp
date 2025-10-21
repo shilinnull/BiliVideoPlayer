@@ -24,20 +24,20 @@ PlaySpeed::~PlaySpeed()
 
 void PlaySpeed::onPlay05Speed()
 {
-    LOG() << "0.5 倍速";
+    emit setPlaySpeed(0.5);
 }
 
 void PlaySpeed::onPlay10Speed()
 {
-    LOG() << "1.0 倍速";
+    emit setPlaySpeed(1.0);
 }
 
 void PlaySpeed::onPlay15Speed()
 {
-    LOG() << "1.5 倍速";
+    emit setPlaySpeed(1.5);
 }
 
 void PlaySpeed::onPlay20Speed()
 {
-    LOG() << "2.0 倍速";
+    emit setPlaySpeed(2.0);
 }
