@@ -3,6 +3,7 @@
 
 #include "login.h"
 #include "toast.h"
+#include "volume.h"
 
 PlayerPage::PlayerPage(QWidget *parent)
     : QWidget(parent)
@@ -22,6 +23,7 @@ PlayerPage::PlayerPage(QWidget *parent)
     connect(ui->likeImageBtn, &QPushButton::clicked, this, &PlayerPage::onLikeImageBtnClicked);
     connect(ui->playBtn, &QPushButton::clicked, this, &PlayerPage::onplayBtnClicked);
     connect(playSpeed, &PlaySpeed::setPlaySpeed, this, &PlayerPage::onPlaySpeedChanged);
+    connect(volume, &Volume::setVolume, this, &PlayerPage::setVolume);
 }
 
 PlayerPage::~PlayerPage()
@@ -109,4 +111,9 @@ void PlayerPage::onplayBtnClicked()
 void PlayerPage::onPlaySpeedChanged(double speed)
 {
     mpvPlayer->setPlaySpeed(speed);
+}
+
+void PlayerPage::setVolume(int volumeRatio)
+{
+    mpvPlayer->setVolume(volumeRatio);
 }

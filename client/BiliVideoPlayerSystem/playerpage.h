@@ -33,6 +33,7 @@ private slots:
     void onLikeImageBtnClicked();           // 点赞
     void onplayBtnClicked();                // 播放视频
     void onPlaySpeedChanged(double speed);  // 倍速播放
+    void setVolume(int volumeRatio);        // 音量调整
 
 private:
     Ui::PlayerPage *ui;
