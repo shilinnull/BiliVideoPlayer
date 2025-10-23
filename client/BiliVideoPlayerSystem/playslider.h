@@ -20,6 +20,7 @@ public:
     void mouseReleaseEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
 
+    void setPlayStep(double stepRatio);
 private:
     void moveSlider();
 

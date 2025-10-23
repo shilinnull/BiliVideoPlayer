@@ -1,6 +1,7 @@
 #include "playerpage.h"
 #include "ui_playerpage.h"
 
+#include "util.h"
 #include "login.h"
 #include "toast.h"
 #include "volume.h"
@@ -23,12 +24,14 @@ PlayerPage::PlayerPage(QWidget *parent)
     connect(ui->likeImageBtn, &QPushButton::clicked, this, &PlayerPage::onLikeImageBtnClicked);
     connect(ui->playBtn, &QPushButton::clicked, this, &PlayerPage::onplayBtnClicked);
     connect(playSpeed, &PlaySpeed::setPlaySpeed, this, &PlayerPage::onPlaySpeedChanged);
-    connect(volume, &Volume::setVolume, this, &PlayerPage::setVolume);
+    connect(volume, &Volume::setVolume, this, &PlayerPage::setVolume);      // 设置音量
+    connect(mpvPlayer, &MpvPlayer::playPositionChanged, this, &PlayerPage::onPlayPositionChanged);	// bug
 }
 
 PlayerPage::~PlayerPage()
 {
     delete ui;
+    delete mpvPlayer;
 }
 
 void PlayerPage::moveWindows(const QPoint &point)
@@ -100,20 +103,45 @@ void PlayerPage::onplayBtnClicked()
     if(isPlay) {
         // 播放
         ui->playBtn->setStyleSheet("border-image: url(:/images/PlayPage/bofang.png)");
-        mpvPlayer->play();
+        if(mpvPlayer) mpvPlayer->play();
     } else {
         // 暂停
         ui->playBtn->setStyleSheet("border-image: url(:/images/PlayPage/zanting.png)");
-        mpvPlayer->pause();
+        if(mpvPlayer) mpvPlayer->pause();
     }
 }
 
 void PlayerPage::onPlaySpeedChanged(double speed)
 {
-    mpvPlayer->setPlaySpeed(speed);
+    if(mpvPlayer) mpvPlayer->setPlaySpeed(speed);
 }
 
 void PlayerPage::setVolume(int volumeRatio)
 {
-    mpvPlayer->setVolume(volumeRatio);
+    if(mpvPlayer) mpvPlayer->setVolume(volumeRatio);
+}
+
+void PlayerPage::onPlayPositionChanged(int64_t playTime)
+{
+    // 先测试10秒的视频时长 后续需要到服务器进行获取
+    this->playTime = playTime;
+    QString curPlayTime = secondToTime(this->playTime);
+    QString totalTime = secondToTime(10);
+    ui->videoDuration->setText(curPlayTime + "/" + totalTime);
+
+    // 修改进度条
+    ui->videoSlider->setPlayStep((double)this->playTime / 10);
+}
+
+QString PlayerPage::secondToTime(int64_t second)
+{
+    QString time;
+    time.reserve(20);
+    // 小时
+    if(second / 60 / 60) {
+        time += QString::asprintf("%02lld:", second / 60 / 60);
+    }
+    // 分钟
+    time += QString::asprintf("%02lld:%02lld", second / 60, second % 60);
+    return time;
 }

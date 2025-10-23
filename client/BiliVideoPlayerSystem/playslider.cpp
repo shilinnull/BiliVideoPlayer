@@ -63,6 +63,13 @@ void PlaySlider::mouseMoveEvent(QMouseEvent *event)
     return QWidget::mouseMoveEvent(event);
 }
 
+void PlaySlider::setPlayStep(double stepRatio)
+{
+    playGrogress = stepRatio * ui->inLine->width();
+    LOG() << "播放进度：" << playGrogress;
+    moveSlider();
+}
+
 void PlaySlider::moveSlider()
 {
     ui->outLine->setGeometry(ui->outLine->x(), ui->outLine->y(), playGrogress, ui->outLine->height());
