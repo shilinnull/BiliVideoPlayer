@@ -308,7 +308,7 @@ QPushButton{ border : none; }</string>
             <item>
              <widget class="QLabel" name="videoDuration">
               <property name="text">
-               <string>28:58/39:32</string>
+               <string>00:00/00:00</string>
               </property>
              </widget>
             </item>

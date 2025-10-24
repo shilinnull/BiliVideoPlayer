@@ -20,13 +20,15 @@ public:
     void mouseReleaseEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
 
+    void setPlayStep(double stepRatio);
 private:
     void moveSlider();
-
+signals:
+    void setPlayProgress(double playRatio);		// 设置播放信号
 private:
     Ui::PlaySlider *ui;
 
-    int playGrogress;       // 记录当前播放长度
+    int playProgress;       // 记录当前播放长度
 };
 
 #endif // PLAYSLIDER_H
