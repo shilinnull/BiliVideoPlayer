@@ -14,8 +14,9 @@ PlayerPage::PlayerPage(QWidget *parent)
     setWindowFlag(Qt::FramelessWindowHint);
     // setAttribute(Qt::WA_ShowModal, true);       // 设置窗口为模态
 
-    volume = new Volume(this);
-    playSpeed = new PlaySpeed(this);
+    volume = new Volume(this);						// 音量
+    playSpeed = new PlaySpeed(this);				// 倍速
+    mpvPlayer = new MpvPlayer(ui->screen, this);	// 视频
 
     connect(ui->minBtn, &QPushButton::clicked, this, &QWidget::showMinimized);
     connect(ui->quitBtn, &QPushButton::clicked, this, &QWidget::close);
@@ -24,8 +25,8 @@ PlayerPage::PlayerPage(QWidget *parent)
     connect(ui->likeImageBtn, &QPushButton::clicked, this, &PlayerPage::onLikeImageBtnClicked);
     connect(ui->playBtn, &QPushButton::clicked, this, &PlayerPage::onplayBtnClicked);
     connect(playSpeed, &PlaySpeed::setPlaySpeed, this, &PlayerPage::onPlaySpeedChanged);
-    connect(volume, &Volume::setVolume, this, &PlayerPage::setVolume);      // 设置音量
-    connect(mpvPlayer, &MpvPlayer::playPositionChanged, this, &PlayerPage::onPlayPositionChanged);	// bug
+    connect(volume, &Volume::setVolume, this, &PlayerPage::setVolume);
+    connect(mpvPlayer, &MpvPlayer::playPositionChanged, this, &PlayerPage::onPlayPositionChanged);
 }
 
 PlayerPage::~PlayerPage()
@@ -46,8 +47,7 @@ void PlayerPage::moveWindows(const QPoint &point)
 
 void PlayerPage::startPlaying(const QString &videoFilePath)
 {
-    mpvPlayer = new MpvPlayer(ui->screen, this);
-    mpvPlayer->startPlay(videoFilePath);
+    mpvPlayer->startPlay(videoFilePath);	// 加载视频
 
     // 视频加载后会立即播放，默认需要先暂停，让用户点击播放按钮进行播放
     mpvPlayer->pause();
@@ -123,6 +123,7 @@ void PlayerPage::setVolume(int volumeRatio)
 
 void PlayerPage::onPlayPositionChanged(int64_t playTime)
 {
+    LOG() << playTime;
     // 先测试10秒的视频时长 后续需要到服务器进行获取
     this->playTime = playTime;
     QString curPlayTime = secondToTime(this->playTime);

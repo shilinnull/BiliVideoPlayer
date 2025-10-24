@@ -95,21 +95,8 @@ void MpvPlayer::handleMpvEvent(mpv_event *event)
         }
 
         if(0 == strcmp(eventProperty->name, "time-pos")){
-            // 获取当前分片的起始播放时间
-            double segmentStartTime = 0;
-            mpv_get_property(mpv, "demuxer-start-time", MPV_FORMAT_DOUBLE, &segmentStartTime);
-
-            // 获取当前分片内的播放时间
-            double segmentCurrentTime = 0;
-            mpv_get_property(mpv, "time-pos", MPV_FORMAT_DOUBLE, &segmentCurrentTime);
-
-            curPlayTime = (int64_t)(segmentStartTime + segmentCurrentTime);
-
-            // 发生信号，通知界面更新当前播放时间
-            emit playPositionChanged(curPlayTime);
-        }else if(0 == strcmp(eventProperty->name, "duration")){
-            int64_t duration = (int64_t)*(double*)eventProperty->data;
-            emit durationChanged(duration);
+            int64_t seconds = *((int64_t*)eventProperty->data);
+            emit playPositionChanged(seconds);
         }
         break;
     }
