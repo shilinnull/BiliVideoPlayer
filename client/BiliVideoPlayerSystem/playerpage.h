@@ -41,7 +41,7 @@ private:
 private:
     Ui::PlayerPage *ui;
     QPoint dragPos;
-
+    QString videoFilePath;			// 视频路径
     Volume* volume;                 // 音量调节
     PlaySpeed* playSpeed;           // 播放速度
     MpvPlayer* mpvPlayer = nullptr; // 封装mpv库，控制播放视频

@@ -47,6 +47,7 @@ void PlayerPage::moveWindows(const QPoint &point)
 
 void PlayerPage::startPlaying(const QString &videoFilePath)
 {
+    this->videoFilePath = videoFilePath;
     mpvPlayer->startPlay(videoFilePath);	// 加载视频
 
     // 视频加载后会立即播放，默认需要先暂停，让用户点击播放按钮进行播放
@@ -109,6 +110,13 @@ void PlayerPage::onplayBtnClicked()
         ui->playBtn->setStyleSheet("border-image: url(:/images/PlayPage/zanting.png)");
         if(mpvPlayer) mpvPlayer->pause();
     }
+
+    // 播放完毕后再次点击播放重新开始播放
+    if(playTime >= 10 && isPlay) {
+        this->playTime = 0;
+        startPlaying(videoFilePath);
+        mpvPlayer->play();
+    }
 }
 
 void PlayerPage::onPlaySpeedChanged(double speed)
@@ -132,6 +140,11 @@ void PlayerPage::onPlayPositionChanged(int64_t playTime)
 
     // 修改进度条
     ui->videoSlider->setPlayStep((double)this->playTime / 10);
+
+    if(this->playTime == 10) {
+        isPlay = false;
+        ui->playBtn->setStyleSheet("border-image: url(:/images/PlayPage/zanting.png)");
+    }
 }
 
 QString PlayerPage::secondToTime(int64_t second)
