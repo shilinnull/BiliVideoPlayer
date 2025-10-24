@@ -5,6 +5,8 @@
 #include "login.h"
 #include "toast.h"
 #include "volume.h"
+#include <QShortcut>
+#include <QKeySequence>
 
 PlayerPage::PlayerPage(QWidget *parent)
     : QWidget(parent)
@@ -18,6 +20,14 @@ PlayerPage::PlayerPage(QWidget *parent)
     playSpeed = new PlaySpeed(this);				// 倍速
     mpvPlayer = new MpvPlayer(ui->screen, this);	// 视频
 
+    // 设置快捷键空格
+    QShortcut* shortCut = new QShortcut(ui->playBtn);
+    QKeySequence keySqeuence(" ");
+    shortCut->setKey(keySqeuence);
+    connect(shortCut, &QShortcut::activated, this, [=]{
+        ui->playBtn->animateClick();
+    });
+
     connect(ui->minBtn, &QPushButton::clicked, this, &QWidget::showMinimized);
     connect(ui->quitBtn, &QPushButton::clicked, this, &QWidget::close);
     connect(ui->volumeBtn, &QPushButton::clicked, this, &PlayerPage::onVolumeBtnClicked);
@@ -26,6 +36,7 @@ PlayerPage::PlayerPage(QWidget *parent)
     connect(ui->playBtn, &QPushButton::clicked, this, &PlayerPage::onplayBtnClicked);
     connect(playSpeed, &PlaySpeed::setPlaySpeed, this, &PlayerPage::onPlaySpeedChanged);
     connect(volume, &Volume::setVolume, this, &PlayerPage::setVolume);
+    connect(ui->videoSlider, &PlaySlider::setPlayProgress, this, &PlayerPage::setPlayProgress);
     connect(mpvPlayer, &MpvPlayer::playPositionChanged, this, &PlayerPage::onPlayPositionChanged);
 }
 
@@ -145,6 +156,13 @@ void PlayerPage::onPlayPositionChanged(int64_t playTime)
         isPlay = false;
         ui->playBtn->setStyleSheet("border-image: url(:/images/PlayPage/zanting.png)");
     }
+}
+
+void PlayerPage::setPlayProgress(double playRatio)
+{
+    // 更新播放时间
+    playTime = 10 * playRatio;
+    mpvPlayer->setCurrentPlayPositon(playTime);
 }
 
 QString PlayerPage::secondToTime(int64_t second)

@@ -35,6 +35,7 @@ private slots:
     void onPlaySpeedChanged(double speed);          // 倍速播放
     void setVolume(int volumeRatio);                // 音量调整
     void onPlayPositionChanged(int64_t playTime);   // 播放位置改变
+    void setPlayProgress(double playRatio);			// 设置播放进度
 private:
     QString secondToTime(int64_t second);           // 转换时间
 
