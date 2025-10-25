@@ -20,6 +20,8 @@ PlayerPage::PlayerPage(QWidget *parent)
     playSpeed = new PlaySpeed(this);				// 倍速
     mpvPlayer = new MpvPlayer(ui->screen, this);	// 视频
 
+    initBarrageArea();								// 初始化弹幕布局
+
     // 设置快捷键空格
     QShortcut* shortCut = new QShortcut(ui->playBtn);
     QKeySequence keySqeuence(" ");
@@ -176,4 +178,42 @@ QString PlayerPage::secondToTime(int64_t second)
     // 分钟
     time += QString::asprintf("%02lld:%02lld", second / 60, second % 60);
     return time;
+}
+
+void PlayerPage::initBarrageArea()
+{
+    // 创建弹幕显示区域的对话框，没有边框，背景透明
+    barrageArea = new QDialog(this);
+    barrageArea->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
+    barrageArea->setAttribute(Qt::WA_TranslucentBackground);
+    barrageArea->setMinimumSize(this->width(), 38 * 3);
+
+    // 垂直布局
+    QVBoxLayout* layout = new QVBoxLayout(barrageArea);
+    barrageArea->setLayout(layout);
+
+    // 在弹幕区域添加用来显示三行弹幕的控件
+    top = new QFrame(this);
+    top->setFixedSize(this->width(), 38);
+    top->setStyleSheet("background-color: rgba(255, 255, 0, 0.3);");
+
+    middle = new QFrame(this);
+    middle->setFixedSize(this->width(), 38);
+    middle->setStyleSheet("background-color: rgba(255, 200, 0, 0.3);");
+
+    bottom = new QFrame(this);
+    bottom->setFixedSize(this->width(), 38);
+    bottom->setStyleSheet("background-color: rgba(255, 100, 0, 0.3);");
+
+    layout->addWidget(top);
+    layout->addWidget(middle);
+    layout->addWidget(bottom);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+
+    // 移动弹幕窗口到head下
+    QPoint point = mapToGlobal(QPoint(0, 0));
+    point.setY(point.y() + ui->playHead->height());
+    barrageArea->move(point);
+    barrageArea->show();
 }

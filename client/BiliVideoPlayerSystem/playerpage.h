@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QMouseEvent>
+#include <QDialog>
+#include <QFrame>
 
 #include "volume.h"
 #include "playspeed.h"
@@ -38,6 +40,7 @@ private slots:
     void setPlayProgress(double playRatio);			// 设置播放进度
 private:
     QString secondToTime(int64_t second);           // 转换时间
+    void initBarrageArea();							// 弹幕区域布局
 
 private:
     Ui::PlayerPage *ui;
@@ -48,6 +51,12 @@ private:
     MpvPlayer* mpvPlayer = nullptr; // 封装mpv库，控制播放视频
     bool isPlay = false;            // 默认情况下暂停
     int64_t playTime = 0;           // 当前播放时长
+
+    // 弹幕相关信息
+    QDialog* barrageArea;
+    QFrame* top;
+    QFrame* middle;
+    QFrame* bottom;
 };
 
 #endif // PLAYERPAGE_H
