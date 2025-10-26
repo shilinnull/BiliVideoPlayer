@@ -368,7 +368,18 @@ QPushButton{ border : none; }</string>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="bulletScreenText"/>
+             <widget class="BarrageEdit" name="bulletScreenText">
+              <property name="styleSheet">
+               <string notr="true">#bulletScreenText{ 
+	font-family : 微软雅⿊; 
+	font-size : 14px; 
+	background-color : #4D4D4D; 
+	color : #DEDEDE; 
+	border : none; 
+	border-radius : 4px;
+}</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -767,6 +778,11 @@ QPushButton{ border : none; }</string>
    <extends>QWidget</extends>
    <header location="global">playslider.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>BarrageEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">barrageedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -2,6 +2,12 @@
 
 #include <QHBoxLayout>
 
+BulletScreenInfo::BulletScreenInfo(const QString &userId, int64_t playTime, const QString &text)
+    : userId(userId)
+    , playTime(playTime)
+    , text(text)
+{}
+
 BulletScreenItem::BulletScreenItem(QWidget *parent)
     : QFrame{parent}
 {
@@ -42,14 +48,14 @@ void BulletScreenItem::setBulletScreenIcon(QPixmap &pixmap)
     imageLabel->show();
     setStyleSheet("#bulletScreenWnd{"
                   "border: 1px solid #3ECEFE;"
-                  "border-radius: 19px;");
+                  "border-radius: 19px;}");
 }
 
 void BulletScreenItem::setBulletScreenAnimal(int x, int duration)
 {
-    animal = new QPropertyAnimation(this);
+    animal = new QPropertyAnimation(this, "pos");
     animal->setDuration(duration);
-    animal->setStartValue(QPoint(0, 0));
+    animal->setStartValue(QPoint(x, 0));
     animal->setEndValue(QPoint(0 - this->width(), 0));
 
     connect(animal, &QPropertyAnimation::finished, this, [&]{

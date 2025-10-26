@@ -5,6 +5,17 @@
 #include <QLabel>
 #include <QPropertyAnimation>
 
+class BulletScreenInfo
+{
+public:
+    QString userId;
+    QString videoId;
+    int64_t playTime;
+    QString text;
+    BulletScreenInfo(const QString& userId = "", int64_t playTime = 0,const QString& text = "");
+};
+
+
 class BulletScreenItem : public QFrame
 {
     Q_OBJECT

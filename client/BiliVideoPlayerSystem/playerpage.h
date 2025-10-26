@@ -9,6 +9,7 @@
 #include "volume.h"
 #include "playspeed.h"
 #include "mpv/mpvplayer.h"
+#include "bulletscreenitem.h"
 
 namespace Ui {
 class PlayerPage;
@@ -24,6 +25,8 @@ public:
 
     void moveWindows(const QPoint& point);
     void startPlaying(const QString &videoFilePath);
+    void loadBulletScreenData();					// 加载弹幕数据
+    void showBulletScreen();						// 显示弹幕
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;
@@ -38,6 +41,8 @@ private slots:
     void setVolume(int volumeRatio);                // 音量调整
     void onPlayPositionChanged(int64_t playTime);   // 播放位置改变
     void setPlayProgress(double playRatio);			// 设置播放进度
+    void onBulletScreenClicked();					// 弹幕开关控制
+    void onSendBulletScreenBtnClicked(const QString& text);// 发送弹幕
 private:
     QString secondToTime(int64_t second);           // 转换时间
     void initBarrageArea();							// 弹幕区域布局
@@ -57,6 +62,8 @@ private:
     QFrame* top;
     QFrame* middle;
     QFrame* bottom;
+    QMap<int64_t, QList<BulletScreenInfo>> bulletScreenLists;	// 临时保存弹幕数据
+    bool isStartBS = true;
 };
 
 #endif // PLAYERPAGE_H
