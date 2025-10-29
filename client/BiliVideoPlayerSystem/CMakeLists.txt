@@ -11,6 +11,7 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Core)
 
 set(MPV_DLL ${CMAKE_CURRENT_SOURCE_DIR}/mpv/dll/libmpv-2.dll) #设置mpv库⽬录
 
@@ -49,6 +50,9 @@ qt_add_executable(BiliVideoPlayerSystem
     mpv/mpvplayer.cpp mpv/mpvplayer.h
     bulletscreenitem.h bulletscreenitem.cpp
     barrageedit.h barrageedit.cpp
+    model/datacenter.h model/datacenter.cpp
+    model/data.h
+    model/data.cpp
 )
 
 include_directories(
@@ -136,6 +140,7 @@ target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
 target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
 target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
 target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
+target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Core)
 
 include(GNUInstallDirs)
 
