@@ -12,6 +12,14 @@ DataCenter *DataCenter::getInstance()
     return instance;
 }
 
+const KindAndTag *DataCenter::getKindAndTagsClassPtr()
+{
+    if(nullptr == kindsAndTags) {
+        kindsAndTags = new KindAndTag();
+    }
+    return kindsAndTags;
+}
+
 DataCenter::DataCenter(QObject *parent)
     : QObject{parent}
 {}

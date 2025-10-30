@@ -11,6 +11,7 @@ namespace model{
 class KindAndTag {
 public:
     KindAndTag();
+    ~KindAndTag();
     const QList<QString> getAllKinds() const; 						// 获取所有分类
     const QHash<QString, int> getTagsByKind(QString kind) const;	// 获取一个分类下的所有id
     int getKindId(QString kind) const;								// 获取分类的id

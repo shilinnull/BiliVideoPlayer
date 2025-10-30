@@ -33,6 +33,11 @@ KindAndTag::KindAndTag()
     }
 }
 
+KindAndTag::~KindAndTag()
+{
+    delete kindsAndTags;
+}
+
 const QList<QString> KindAndTag::getAllKinds() const
 {
     return kindIds.keys();
