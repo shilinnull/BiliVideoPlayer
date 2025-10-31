@@ -1,6 +1,8 @@
 #include "uploadvideopage.h"
 #include "ui_uploadvideopage.h"
 #include "bilivideoplayer.h"
+#include "model/datacenter.h"
+#include "util.h"
 
 #include <QFileDialog>
 
@@ -10,15 +12,27 @@ UploadVideoPage::UploadVideoPage(QWidget *parent)
 {
     ui->setupUi(this);
 
+    // 获取所有分类，并且更新到页面
+    auto dataCenter = model::DataCenter::getInstance();
+    auto kindAndTag = dataCenter->getKindAndTagsClassPtr();
+    ui->kinds->addItems(kindAndTag->getAllKinds());
+    ui->kinds->setCurrentIndex(-1);		// 默认设置不选中
+
     connect(ui->commitBtn, &QPushButton::clicked, this, &UploadVideoPage::onCommitBtnClicked);
     connect(ui->videoTittle, &QLineEdit::textChanged, this, &UploadVideoPage::onLineEditTextChanged);
     connect(ui->plainTextEdit, &QPlainTextEdit::textChanged, this, &UploadVideoPage::onPlainEditTextChanged);
     connect(ui->changeButton, &QPushButton::clicked, this, &UploadVideoPage::onChangeBtnClicked);
+    connect(ui->kinds, &QComboBox::currentTextChanged, this, &UploadVideoPage::onUpDateTags);
 }
 
 UploadVideoPage::~UploadVideoPage()
 {
     delete ui;
+}
+
+void UploadVideoPage::addTagsByKind(const QString &kind)
+{
+
 }
 
 void UploadVideoPage::onCommitBtnClicked()
@@ -81,4 +95,9 @@ void UploadVideoPage::onChangeBtnClicked()
     ui->imageLabel->setPixmap(pixmap);
 
     repaint();
+}
+
+void UploadVideoPage::onUpDateTags(const QString &kind)
+{
+    addTagsByKind(kind);
 }

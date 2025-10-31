@@ -22,7 +22,7 @@ private:
 
 private:
     Ui::VideoBox *ui;
-    PlayerPage* playPage;
+    static PlayerPage* playPage;
 };
 
 #endif // VIDEOBOX_H

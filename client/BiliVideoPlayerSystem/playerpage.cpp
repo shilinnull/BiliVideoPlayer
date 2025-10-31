@@ -14,7 +14,8 @@ PlayerPage::PlayerPage(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowFlag(Qt::FramelessWindowHint);
-    // setAttribute(Qt::WA_ShowModal, true);       // 设置窗口为模态
+    setWindowTitle("Bili视频播放器");
+    setWindowIcon(QIcon(":/images/homePage/logo.png"));
 
     volume = new Volume(this);						// 音量
     playSpeed = new PlaySpeed(this);				// 倍速

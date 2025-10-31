@@ -32,8 +32,6 @@ private slots:
 
 private:
     Ui::HomePageWidget *ui;
-
-    QHash<QString, QList<QString>> tags;
 };
 
 #endif // HomePageWidget_H

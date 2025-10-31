@@ -26,7 +26,7 @@ HomePageWidget::~HomePageWidget()
 void HomePageWidget::initKindsAndTags()
 {
     // 创建分类按钮
-    QPushButton* kindBtn = buildSelectBtn(ui->classifys, clicked_text_color, "分类");
+    QPushButton* kindBtn = buildSelectBtn(ui->classifys, "#FF6699", "分类");
     ui->classifyHLayout->addWidget(kindBtn);
 
     // 到数据中心获取所有分类数据
@@ -36,7 +36,7 @@ void HomePageWidget::initKindsAndTags()
 
     for(auto &kind : kinds)
     {
-        QPushButton* kindBtn = buildSelectBtn(ui->classifys, default_text_color, kind);
+        QPushButton* kindBtn = buildSelectBtn(ui->classifys, "#666666", kind);
         ui->classifyHLayout->addWidget(kindBtn);
         connect(kindBtn, &QPushButton::clicked, this, [=](){
             onKindBtnClicked(kindBtn);      // 分类按钮点击
@@ -106,13 +106,13 @@ QPushButton *HomePageWidget::buildSelectBtn(QWidget *parent, const QString &colo
 void HomePageWidget::resetTags(const QList<QString> &tags)
 {
     // 创建标签
-    QPushButton* tag = buildSelectBtn(ui->labels, clicked_text_color, "标签");
+    QPushButton* tag = buildSelectBtn(ui->labels, "#FF6699", "标签");
     ui->labelHLayout->addWidget(tag);
 
     // 创建具体标签的按钮
     for(auto &tagText : tags)
     {
-        QPushButton* labelBtn = buildSelectBtn(ui->labels, default_text_color, tagText);
+        QPushButton* labelBtn = buildSelectBtn(ui->labels, "#666666", tagText);
         ui->labelHLayout->addWidget(labelBtn);
         connect(labelBtn, &QPushButton::clicked, this, [=](){
             onTagBtnClicked(labelBtn);      // 标签按钮点击
@@ -124,15 +124,15 @@ void HomePageWidget::resetTags(const QList<QString> &tags)
 void HomePageWidget::onKindBtnClicked(QPushButton *clickKindBtn)
 {
 
-    clickKindBtn->setStyleSheet("background-color: " + clicked_background_color + ";"
-                                "color: " + clicked_text_color +";");
+    clickKindBtn->setStyleSheet("background-color: #FFECF1;"
+                                "color: #FF6699;");
 
     // 清除旧颜色
     QList<QPushButton*> kindBtns = ui->classifys->findChildren<QPushButton*>();
     for(auto &kindBtn : kindBtns)
     {
         if(kindBtn != clickKindBtn && kindBtn->text() != "分类")
-            kindBtn->setStyleSheet("color: " + default_text_color);
+            kindBtn->setStyleSheet("color: #666666");
     }
 
     // 销毁之前的标签
@@ -152,14 +152,14 @@ void HomePageWidget::onKindBtnClicked(QPushButton *clickKindBtn)
 void HomePageWidget::onTagBtnClicked(QPushButton *clickLabelBtn)
 {
 
-    clickLabelBtn->setStyleSheet("background-color: " + clicked_background_color + ";"
-                                "color: " + clicked_text_color +";");
+    clickLabelBtn->setStyleSheet("background-color: #FFECF1;"
+                                "color: #FF6699;");
     // 清除旧颜色
     QList<QPushButton*> tagBtns = ui->labels->findChildren<QPushButton*>();
     for(auto &tagBtn : tagBtns)
     {
         if(tagBtn != clickLabelBtn && tagBtn->text() != "标签")
-            tagBtn->setStyleSheet("color: " + default_text_color);
+            tagBtn->setStyleSheet("color: #666666;");
     }
 }
 

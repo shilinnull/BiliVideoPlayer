@@ -3,6 +3,8 @@
 #include "util.h"
 #include <QDir>
 
+PlayerPage* VideoBox::playPage = nullptr;
+
 VideoBox::VideoBox(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::VideoBox)
@@ -12,8 +14,6 @@ VideoBox::VideoBox(QWidget *parent)
 
     ui->imageBox->installEventFilter(this);
     ui->videoTitle->installEventFilter(this);
-
-    playPage = new PlayerPage();
 }
 
 VideoBox::~VideoBox()
@@ -35,6 +35,20 @@ bool VideoBox::eventFilter(QObject *watched, QEvent *event)
 
 void VideoBox::onPlayBtnClicked()
 {
+    // 如果已经有一个播放器窗口存在，则先销毁它
+    if(playPage)
+    {
+        // The connected lambda will set playPage to nullptr upon destruction.
+        delete playPage;
+    }
+
+    // 创建一个新的播放器实例
+    playPage = new PlayerPage();
+    // 当窗口被销毁（例如用户关闭）时，将静态指针重置为nullptr
+    connect(playPage, &PlayerPage::destroyed, this, [=](){
+        playPage = nullptr;
+    });
+    
     playPage->show();
 
     // mpv测试
