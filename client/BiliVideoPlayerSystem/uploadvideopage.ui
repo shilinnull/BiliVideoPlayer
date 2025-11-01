@@ -46,6 +46,9 @@ QScrollBar::up-arrow:vertical, QScrollBar::down- arrow:vertical {
 	border:none; width: 0px; height: 0px; 
 }</string>
      </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+     </property>
      <property name="widgetResizable">
       <bool>true</bool>
      </property>
@@ -53,7 +56,7 @@ QScrollBar::up-arrow:vertical, QScrollBar::down- arrow:vertical {
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-199</y>
         <width>1337</width>
         <height>981</height>
        </rect>
@@ -689,6 +692,9 @@ QScrollBar::up-arrow:vertical, QScrollBar::down- arrow:vertical {
                 <property name="text">
                  <string>0/1000</string>
                 </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
+                </property>
                </widget>
               </widget>
              </item>
@@ -935,7 +941,7 @@ QComboBox::down-arrow{
                 </size>
                </property>
                <property name="styleSheet">
-                <string notr="true">#commitBtn{ background-color : #00A1D6; color : #FFFFFF; border-radius:4px; }</string>
+                <string notr="true">#commitBtn{ background-color : #FF6699; color : #FFFFFF; border-radius:4px; }</string>
                </property>
                <property name="text">
                 <string>提交</string>

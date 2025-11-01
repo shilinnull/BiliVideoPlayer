@@ -32,7 +32,50 @@ UploadVideoPage::~UploadVideoPage()
 
 void UploadVideoPage::addTagsByKind(const QString &kind)
 {
+    // 0. 先清空之前的标签
+    QList<QPushButton*> tagBtnList = ui->tagWidget->findChildren<QPushButton*>();
+    for(auto &tagBtn : tagBtnList) {
+        ui->tagLayout->removeWidget(tagBtn);
+        delete tagBtn;
+    }
+    // 将添加的弹簧删除
+    QLayoutItem* item = ui->tagLayout->itemAt(ui->tagLayout->count() - 1);
+    ui->tagLayout->removeItem(item);
 
+    // 1. 判断是否为空
+    if(kind.isEmpty()) {
+        return ;
+    }
+
+    // 2. 根据kind获取标签
+    auto kindAndTagPtr = model::DataCenter::getInstance()->getKindAndTagsClassPtr();
+    auto kinds = model::DataCenter::getInstance()->getKindAndTagsClassPtr()->getAllKinds();
+    auto tags = kindAndTagPtr->getTagsByKind(kind);
+
+    // 3. 创建对应的QPushButton
+    for(auto &tag : tags.keys()) {
+        QPushButton* tagBtn = new QPushButton(ui->tagContent);
+        tagBtn->setFixedSize(98, 49);
+        tagBtn->setText(tag);
+        tagBtn->setCheckable(true);		// 设置按钮选中或者未选中状态
+        tagBtn->setStyleSheet("QPushButton{"
+                              "border: 1px solid #FF6699;"
+                              "border-radius: 4px;"
+                              "color: #FF6699;"
+                              "font-family: 微软雅黑;"
+                              "font-size: 16px;"
+                              "background-color: #FFFFFF;}"
+                              "QPushButton:checked{"
+                              "background-color: #FF6699;"
+                              "color: #FFFFFF;}"
+                              "QPushButton:unchecked{"
+                              "background-color: #FFFFFF;"
+                              "color: #FF6699;}");
+        ui->tagLayout->addWidget(tagBtn);
+    }
+    // 插入一个空白间距
+    ui->tagLayout->insertSpacing(tags.size(), ui->tagContent->width() - (98 + 20) * tags.size());
+    ui->tagLayout->setSpacing(20);
 }
 
 void UploadVideoPage::onCommitBtnClicked()

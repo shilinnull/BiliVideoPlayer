@@ -14,6 +14,7 @@ PlayerPage::PlayerPage(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowFlag(Qt::FramelessWindowHint);
+    setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Bili视频播放器");
     setWindowIcon(QIcon(":/images/homePage/logo.png"));
 
@@ -288,15 +289,12 @@ void PlayerPage::initBarrageArea()
     // 在弹幕区域添加用来显示三行弹幕的控件
     top = new QFrame(this);
     top->setFixedSize(this->width(), 38);
-    // top->setStyleSheet("background-color: rgba(255, 255, 0, 0.3);");
 
     middle = new QFrame(this);
     middle->setFixedSize(this->width(), 38);
-    // middle->setStyleSheet("background-color: rgba(255, 200, 0, 0.3);");
 
     bottom = new QFrame(this);
     bottom->setFixedSize(this->width(), 38);
-    // bottom->setStyleSheet("background-color: rgba(255, 100, 0, 0.3);");
 
     layout->addWidget(top);
     layout->addWidget(middle);

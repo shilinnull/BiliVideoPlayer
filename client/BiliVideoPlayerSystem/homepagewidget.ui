@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1350</width>
+    <width>1340</width>
     <height>787</height>
    </rect>
   </property>
@@ -323,7 +323,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>1330</width>
+           <width>1320</width>
            <height>680</height>
           </rect>
          </property>
@@ -350,7 +350,11 @@
            <number>0</number>
           </property>
           <item>
-           <layout class="QGridLayout" name="videoGLayout"/>
+           <layout class="QGridLayout" name="videoGLayout">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+           </layout>
           </item>
          </layout>
         </widget>
