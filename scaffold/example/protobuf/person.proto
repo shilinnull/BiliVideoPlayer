@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package person;
+
+// 生成对应的rpc代码
+option cc_generic_services = true;
+
+enum SexType {
+    unKnown = 0;
+    male = 1;
+    female = 2;
+}
+
+message Student {
+    int32 sn = 1;
+    string name = 2;
+    SexType sex = 3;
+    repeated float score = 4;
+    map<int32, string> other = 5;
+};
+
+message PersonRequest {
+    int32 id = 1;
+}
+
+message PersonResponse {
+    Student id = 1;
+}
+
+service PersonService {
+    rpc GetPerson(PersonRequest) returns (PersonResponse);
+}
