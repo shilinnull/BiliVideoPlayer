@@ -53,6 +53,7 @@ qt_add_executable(BiliVideoPlayerSystem
     model/datacenter.h model/datacenter.cpp
     model/data.h
     model/data.cpp
+    test/testJson.h
 )
 
 include_directories(
