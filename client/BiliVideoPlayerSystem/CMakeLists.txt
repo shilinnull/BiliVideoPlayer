@@ -1,16 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 project(BiliVideoPlayerSystem LANGUAGES CXX)
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets)
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets Network)
 find_package(Qt6 REQUIRED COMPONENTS Core)
 
 set(MPV_DLL ${CMAKE_CURRENT_SOURCE_DIR}/mpv/dll/libmpv-2.dll) #设置mpv库⽬录
@@ -51,9 +42,9 @@ qt_add_executable(BiliVideoPlayerSystem
     bulletscreenitem.h bulletscreenitem.cpp
     barrageedit.h barrageedit.cpp
     model/datacenter.h model/datacenter.cpp
-    model/data.h
-    model/data.cpp
+    model/data.h model/data.cpp
     test/testJson.h
+    netclient/netclient.h netclient/netclient.cpp
 )
 
 include_directories(
@@ -132,15 +123,12 @@ target_link_libraries(BiliVideoPlayerSystem
         Qt${QT_VERSION_MAJOR}::Widgets ${MPV_DLL}
 )
 
-target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
-target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
-target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
-target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
-target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
-target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
-target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
-target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
-target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Widgets)
+target_link_libraries(BiliVideoPlayerSystem
+    PRIVATE
+    Qt6::Widgets
+    Qt6::Core
+    Qt6::Network
+)
 target_link_libraries(BiliVideoPlayerSystem PRIVATE Qt6::Core)
 
 include(GNUInstallDirs)
