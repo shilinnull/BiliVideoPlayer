@@ -43,8 +43,9 @@ qt_add_executable(BiliVideoPlayerSystem
     barrageedit.h barrageedit.cpp
     model/datacenter.h model/datacenter.cpp
     model/data.h model/data.cpp
-    test/testJson.h
+    test/TestJson.h
     netclient/netclient.h netclient/netclient.cpp
+    test/TestHttp.h
 )
 
 include_directories(

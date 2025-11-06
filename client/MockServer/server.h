@@ -19,6 +19,7 @@ private:
     static MockServer* instance;
     QHttpServer httpServer;
 private:
-    QHttpServerResponse hello(const QHttpServerRequest& req);
+    QHttpServerResponse hello(const QHttpServerRequest& req);	// 测试方法
+    QHttpServerResponse ping(const QHttpServerRequest& req);
 };
 #endif // SERVER_H

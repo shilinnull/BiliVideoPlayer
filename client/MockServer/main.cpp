@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 
     // 启动http服务器
     MockServer* httpServer = MockServer::getInstance();
-    if(!httpServer) {
+    if(!httpServer->init()) {
         LOG() << "HTTP服务启动失败";
         return -1;
     }

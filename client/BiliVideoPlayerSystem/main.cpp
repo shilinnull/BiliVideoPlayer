@@ -3,7 +3,9 @@
 
 #include <QApplication>
 
-#include "test/testJson.h"
+#include "test/TestJson.h"
+#include "test/TestHttp.h"
+#include "netclient/netclient.h"
 
 int main(int argc, char *argv[])
 {
@@ -12,8 +14,12 @@ int main(int argc, char *argv[])
     // 显示启动页面
     // StartupPage startPage;
     // startPage.exec();
-    QByteArray str = serialize();
-    Deserialize(str);
+    // QByteArray str = serialize();
+    // Deserialize(str);
+    netclient::NetClient httpClient;
+
+    TestHelloRequest(httpClient);
+    TestPingRequest(httpClient);
 
     BiliVideoPlayer *player = BiliVideoPlayer::getInstance();
     player->show();

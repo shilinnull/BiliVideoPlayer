@@ -6,17 +6,18 @@
 
 namespace netclient {
 
-class netclient : public QObject
+class NetClient : public QObject
 {
     Q_OBJECT
 public:
-    netclient(QObject *parent = nullptr);
-    void hello();	// 	发送hello请求
+    NetClient(QObject *parent = nullptr);
+    void hello();	// 发送hello请求
+    void ping();	// ping请求
+
 private:
     static QString makeRequeId();
 private:
     const QString HTTP_URL = "http://127.0.0.1:8000";
-
     QNetworkAccessManager httpClient;
 };
 
