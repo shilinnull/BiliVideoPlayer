@@ -16,6 +16,8 @@ public:
 
 private:
     static QString makeRequeId();
+    QNetworkReply* sendHttpRequest(const QString& resourcePath, QJsonObject& jsonBody);
+    QJsonObject handleHttpResponse(QNetworkReply* httpResp, bool* ok, QString *reason);
 private:
     const QString HTTP_URL = "http://127.0.0.1:8000";
     QNetworkAccessManager httpClient;

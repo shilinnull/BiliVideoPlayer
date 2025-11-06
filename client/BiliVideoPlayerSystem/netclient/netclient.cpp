@@ -16,46 +16,22 @@ void NetClient::hello()
 {
     // 1. 构造请求体 body
     QJsonObject reqBody;
-    reqBody["requestId"] = makeRequeId();
 
     // 2. 发送请求
-    QNetworkRequest httpReq;
-    httpReq.setUrl(HTTP_URL + "/hello");
-    httpReq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf8");
-
-    QJsonDocument document(reqBody);
-    QNetworkReply* httpResp = httpClient.post(httpReq, document.toJson());	// 发送
+    QNetworkReply* httpResp = sendHttpRequest("/hello", reqBody);
 
     // 3. 异步响应处理
     connect(httpResp, &QNetworkReply::finished, this, [=]{
-        if(httpResp->error() != QNetworkReply::NoError) {
-            LOG() << httpResp->errorString();
-            httpResp->deleteLater();
-            return ;
-        }
-        // 获取响应到的body
-        QByteArray respBody = httpResp->readAll();
-
-        // 针对body反序列化
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(respBody);
-        if(jsonDoc.isNull()) {
-            LOG() << "解析Json失败! Json文件格式有误!";
-            httpResp->deleteLater();
+        bool ok = false;
+        QString reason;
+        QJsonObject respObj = handleHttpResponse(httpResp, &ok, &reason);
+        if(!ok) {
+            LOG() << "hello 请求出错, reason: " << reason;
             return ;
         }
 
-        // 判定业务逻辑
-        QJsonObject respObj = jsonDoc.object();
-        if(0 != respObj["errorCode"].toInt()) {
-            LOG() << respObj["errorMsg"].toString();
-            httpResp->deleteLater();
-            return ;
-        }
-
-        // 解析响应数据
         QJsonObject resoBody = respObj["data"].toObject();
         LOG() << resoBody["hello"].toString();
-        httpResp->deleteLater();
     });
 }
 
@@ -65,53 +41,74 @@ void NetClient::ping()
     QJsonObject reqBody;
 
     // 2. 发送请求
-    QNetworkRequest httpReq;
-    httpReq.setUrl(HTTP_URL + "/ping");
-    httpReq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf8");
-
-    // 设置请求id
-    reqBody["requestId"] = makeRequeId();
-
-    QJsonDocument document(reqBody);
-    QNetworkReply* httpResp = httpClient.post(httpReq, document.toJson());
+    QNetworkReply* httpResp = sendHttpRequest("/ping", reqBody);
 
     // 3. 异步响应处理
     connect(httpResp, &QNetworkReply::finished, this, [=]{
-        // 判定Http层面是否出错
-        if(httpResp->error() != QNetworkReply::NoError) {
-            LOG() << httpResp->errorString();
-            httpResp->deleteLater();
+        bool ok = false;
+        QString reason;
+        QJsonObject respObj = handleHttpResponse(httpResp, &ok, &reason);
+        if(!ok) {
+            LOG() << "ping 请求出错, reason: " << reason;
             return ;
         }
 
-        // 获取到响应的body
-        QByteArray respBody = httpResp->readAll();
-
-        // 针对body反序列化
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(respBody);
-        if(jsonDoc.isNull()) {
-            LOG() << "解析 Json 文件失败！Json文件格式有错误！";
-            httpResp->deleteLater();
-            return ;
-        }
-        // 判断业务逻辑
-        QJsonObject respObj = jsonDoc.object();
-        if(0 != respObj["errorCode"].toInt()) {
-            LOG() << respObj["errorMsg"].toString();
-            httpResp->deleteLater();
-            return ;
-        }
-
-        // 解析响应数据
         QJsonObject resoBody = respObj["data"].toObject();
         LOG() << resoBody["ping"].toString();
-        httpResp->deleteLater();
     });
 }
 
 QString NetClient::makeRequeId()
 {
-    return "R" + QUuid::createUuid().toString().sliced(24, 12);
+    return "R" + QUuid::createUuid().toString().sliced(25, 12);
+}
+
+QNetworkReply *NetClient::sendHttpRequest(const QString &resourcePath, QJsonObject &jsonBody)
+{
+    QNetworkRequest httpReq;
+    httpReq.setUrl(QUrl(HTTP_URL + resourcePath));
+    httpReq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf8");
+
+    // 设置请求id
+    jsonBody["requestId"] = makeRequeId();
+
+    QJsonDocument document(jsonBody);
+    QNetworkReply* httpResp = httpClient.post(httpReq, document.toJson());
+    return httpResp;
+}
+
+QJsonObject NetClient::handleHttpResponse(QNetworkReply *httpResp, bool *ok, QString *reason)
+{
+    // 1. 判断是否会出错
+    if(httpResp->error() != QNetworkReply::NoError) {
+        *ok = false;
+        *reason = httpResp->errorString();
+        httpResp->deleteLater();
+        return QJsonObject();
+    }
+    // 2. 获取响应的body
+    QByteArray respBody = httpResp->readAll();
+    // 3. 针对body进行反序列化
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(respBody);
+    if(jsonDoc.isNull()) {
+        *ok = false;
+        *reason = "解析 Json 文件失败！ Json 文件格式有错误!";
+        httpResp->deleteLater();
+        return QJsonObject();
+    }
+
+    QJsonObject respObj = jsonDoc.object();
+    // 4. 判断业务上的结果是否正确
+    // 错误码为0表示没有错误
+    if(0 != respObj["errorCode"].toInt()) {
+        *ok = false;
+        *reason = respObj["errorMsg"].toString();
+        httpResp->deleteLater();
+        return respObj;
+    }
+    *ok = true;
+    httpResp->deleteLater();
+    return respObj;
 }
 
 } // end netclient
