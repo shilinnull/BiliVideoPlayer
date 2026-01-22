@@ -12,6 +12,8 @@ public:
     explicit StartupPage(QDialog *parent = nullptr);
 
     void startTimer();
+private:
+    bool loginSuccess = false;		// 标记临时用户登录是否成功
 };
 
 #endif // STARTUPPAGE_H

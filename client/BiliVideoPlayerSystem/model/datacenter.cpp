@@ -20,6 +20,21 @@ const KindAndTag *DataCenter::getKindAndTagsClassPtr()
     return kindsAndTags;
 }
 
+const QString &DataCenter::getLoginSessionId() const
+{
+    return loginSessionId;
+}
+
+void DataCenter::setSessionId(const QString &sessionId)
+{
+    loginSessionId = sessionId;
+}
+
+void DataCenter::loginTempUserAsync()
+{
+    netClient.tempLogin();
+}
+
 DataCenter::DataCenter(QObject *parent)
     : QObject{parent}
 {}

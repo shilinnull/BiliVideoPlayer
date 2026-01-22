@@ -1,4 +1,5 @@
 #include "startuppage.h"
+#include "./model/datacenter.h"
 
 StartupPage::StartupPage(QDialog *parent)
     : QDialog{parent}
@@ -23,17 +24,27 @@ StartupPage::StartupPage(QDialog *parent)
 
     // 设置定时销毁
     startTimer();
+
+    // 绑定信号和槽临时用户登录成功
+    auto dataCenter = model::DataCenter::getInstance();
+    connect(dataCenter, &model::DataCenter::loginTempUserDone, this, [=]{
+        loginSuccess = true;
+    });
 }
 
 void StartupPage::startTimer()
 {
     QTimer* timer = new QTimer();
+    timer->setSingleShot(true);		// 设置为周期定时
     connect(timer, &QTimer::timeout, this, [this, timer]{
-        timer->stop();
-        delete timer;
-        close();
+        if(loginSuccess) {	// 用户登录成功才删除该启动页
+            timer->stop();
+            delete timer;
+            close();
+        }
     });
     timer->start(2000); // 两秒钟后触发
 
-    // 获取信息 TODO
+    auto dataCenter = model::DataCenter::getInstance();
+    dataCenter->loginTempUserAsync();
 }

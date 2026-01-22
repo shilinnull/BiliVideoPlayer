@@ -5,57 +5,40 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include "../util.h"
+#include "../model/datacenter.h"
 
-namespace netclient {
+namespace network {
 
 NetClient::NetClient(QObject *parent)
     : QObject{parent}
 {}
 
-void NetClient::hello()
+void NetClient::tempLogin()
 {
-    // 1. 构造请求体 body
-    QJsonObject reqBody;
-
+    // 1. 构造请求
+    QJsonObject reqJsonObj;
     // 2. 发送请求
-    QNetworkReply* httpResp = sendHttpRequest("/hello", reqBody);
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/tempLogin", reqJsonObj);
 
-    // 3. 异步响应处理
-    connect(httpResp, &QNetworkReply::finished, this, [=]{
+    connect(httpReply, &QNetworkReply::finished, this, [=]{
+        // 1. 解析响应
         bool ok = false;
         QString reason;
-        QJsonObject respObj = handleHttpResponse(httpResp, &ok, &reason);
-        if(!ok) {
-            LOG() << "hello 请求出错, reason: " << reason;
+        // 处理
+        QJsonObject bodyObject = handleHttpResponse(httpReply, &ok, &reason);
+        // 2. 判断是否会出错
+        if(!ok){
+            LOG() << "tempLogin 请求出错, reason: " << reason << ", requestId=" << bodyObject["requestId"].toString();
             return ;
         }
-
-        QJsonObject resoBody = respObj["data"].toObject();
-        LOG() << resoBody["hello"].toString();
+        // 3. 解析sessionId
+        QJsonObject sessionJson = bodyObject["result"].toObject();
+        auto dataCenter = model::DataCenter::getInstance();
+        dataCenter->setSessionId(sessionJson["sessionId"].toString());
+        LOG() << "tempLogin	登录成功, requestId=" << bodyObject["requestId"].toString();
+        emit dataCenter->loginTempUserDone();
     });
-}
 
-void NetClient::ping()
-{
-    // 1. 构造请求体 body
-    QJsonObject reqBody;
-
-    // 2. 发送请求
-    QNetworkReply* httpResp = sendHttpRequest("/ping", reqBody);
-
-    // 3. 异步响应处理
-    connect(httpResp, &QNetworkReply::finished, this, [=]{
-        bool ok = false;
-        QString reason;
-        QJsonObject respObj = handleHttpResponse(httpResp, &ok, &reason);
-        if(!ok) {
-            LOG() << "ping 请求出错, reason: " << reason;
-            return ;
-        }
-
-        QJsonObject resoBody = respObj["data"].toObject();
-        LOG() << resoBody["ping"].toString();
-    });
 }
 
 QString NetClient::makeRequeId()

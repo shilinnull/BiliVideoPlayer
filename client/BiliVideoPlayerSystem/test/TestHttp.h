@@ -3,12 +3,12 @@
 
 #include "../netclient/netclient.h"
 
-void TestHelloRequest(netclient::NetClient& httpClient)
+void TestHelloRequest(network::NetClient& httpClient)
 {
     httpClient.hello();
 }
 
-void TestPingRequest(netclient::NetClient& httpClient)
+void TestPingRequest(network::NetClient& httpClient)
 {
     httpClient.ping();
 }

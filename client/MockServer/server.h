@@ -6,6 +6,13 @@
 #include <QHttpServerResponse>
 #include <QHttpServerRequest>
 
+enum RoleType{
+    SuperAdmin = 1, // 超级管理员
+    Admin,			// 管理员
+    User, 			// 用户
+    TempUser		// 临时用户
+};
+
 class MockServer: public QObject
 {
     Q_OBJECT
@@ -14,12 +21,14 @@ public:
 public:
     bool init();
     static MockServer* getInstance();
+
+private:
+    QHttpServerResponse tempLogin(const QHttpServerRequest& req);	// 临时用户登录响应
 private:
     MockServer();
     static MockServer* instance;
     QHttpServer httpServer;
-private:
-    QHttpServerResponse hello(const QHttpServerRequest& req);	// 测试方法
-    QHttpServerResponse ping(const QHttpServerRequest& req);
+    RoleType roleType = TempUser;
+
 };
 #endif // SERVER_H

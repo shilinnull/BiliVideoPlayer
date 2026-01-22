@@ -4,16 +4,14 @@
 #include <QObject>
 #include <QNetworkAccessManager>
 
-namespace netclient {
+namespace network {
 
 class NetClient : public QObject
 {
     Q_OBJECT
 public:
     NetClient(QObject *parent = nullptr);
-    void hello();	// 发送hello请求
-    void ping();	// ping请求
-
+    void tempLogin();	// 临时用户登录请求
 private:
     static QString makeRequeId();
     QNetworkReply* sendHttpRequest(const QString& resourcePath, QJsonObject& jsonBody);
