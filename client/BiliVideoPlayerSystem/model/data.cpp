@@ -64,4 +64,74 @@ const KindAndTag *KindAndTag::getKindAndTagsClassPtr()
         kindsAndTags = new KindAndTag();
     return kindsAndTags;
 }
+
+void VideoInfo::loadVideoInfo(const QJsonObject &jsonObj)
+{
+    videoId = jsonObj.value("videoId").toString();
+    userId = jsonObj.value("userId").toString();
+    userAvatarId = jsonObj.value("userAvatarId").toString();
+    nickName = jsonObj.value("nickname").toString();
+    videoFileId = jsonObj.value("videoFileId").toString();
+    photoFileId = jsonObj.value("photoFileId").toString();
+    likeCount = jsonObj.value("likeCount").toInt();
+    playCount = jsonObj.value("playCount").toInt();
+    videoSize = jsonObj.value("videoSize").toInt();
+    videoDesc = jsonObj.value("videoDesc").toString();
+    videoTitle = jsonObj.value("videoTitle").toString();
+    videoDuration = jsonObj.value("videoDuration").toInt();
+    videoUpTime = jsonObj.value("videoUpTime").toString();
+}
+
+VideoList::VideoList()
+    : pageIndex(1)
+    , videoTotalCount(0)
+{
+}
+
+void VideoList::setPageIndex(int pageIndex)
+{
+    this->pageIndex = pageIndex;
+}
+
+int VideoList::getPageIndex() const
+{
+    return pageIndex;
+}
+
+int VideoList::getVideoCount() const
+{
+    return videoInfos.size();
+}
+
+void VideoList::setVideoTotalCount(int videoTotalCount)
+{
+    this->videoTotalCount = videoTotalCount;
+}
+
+int VideoList::getVideoTotalCount() const
+{
+    return videoTotalCount;
+}
+
+void VideoList::addVideo(const VideoInfo &videoInfo)
+{
+    videoInfos.append(videoInfo);
+}
+
+const QList<VideoInfo> &VideoList::getVideoList() const
+{
+    return videoInfos;
+}
+
+void VideoList::clearVideoList()
+{
+    videoInfos.clear();
+    videoTotalCount = 0;
+    pageIndex = 1;
+}
+
+
+
+
+
 }
