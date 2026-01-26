@@ -76,4 +76,12 @@ static inline QIcon makeCircleIcon(const QByteArray& byteArray, int radius) {
     return icon;
 }
 
+static QString intToString(int value) {
+    if(value < 10000) {
+        return QString::number(value);
+    }else {
+        return QString::asprintf("%.1lf万", value / 10000.0);
+    }
+}
+
 #endif // UTIL_H

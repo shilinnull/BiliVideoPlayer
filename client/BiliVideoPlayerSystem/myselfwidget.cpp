@@ -45,7 +45,8 @@ void MyselfWidget::initUI()
 
 #ifdef TEST_UI
     for(int i = 0; i < 16; i++) {
-        VideoBox* videoBox = new VideoBox();
+        model::VideoInfo videoInfo;
+        VideoBox* videoBox = new VideoBox(videoInfo);
         ui->layout->addWidget(videoBox, i / 4, i % 4);
     }
 #endif

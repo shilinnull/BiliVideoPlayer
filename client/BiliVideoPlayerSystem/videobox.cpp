@@ -5,15 +5,18 @@
 
 PlayerPage* VideoBox::playPage = nullptr;
 
-VideoBox::VideoBox(QWidget *parent)
+VideoBox::VideoBox(model::VideoInfo videoInfo, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::VideoBox)
+    , videoInfo(videoInfo)
 {
     ui->setupUi(this);
     ui->delVideoBtn->hide();    // 默认是隐藏的
 
     ui->imageBox->installEventFilter(this);
     ui->videoTitle->installEventFilter(this);
+
+    updateVideoInfoUI();		// 设置视频信息到界面
 }
 
 VideoBox::~VideoBox()
@@ -31,6 +34,19 @@ bool VideoBox::eventFilter(QObject *watched, QEvent *event)
         }
     }
     return QObject::eventFilter(watched, event);
+}
+
+void VideoBox::updateVideoInfoUI()
+{
+    ui->videoTitle->setText(videoInfo.videoTitle);
+    ui->likeNum->setText(intToString(videoInfo.likeCount));
+    ui->playNum->setText(intToString(videoInfo.playCount));
+    ui->userNikeName->setText(videoInfo.nickName);
+    ui->loadupTime->setText(videoInfo.videoUpTime);
+    setVideoDuration(videoInfo.videoDuration);
+
+    // setVideoImage(videoInfo.photoFileId);
+    // setUserIcon(videoInfo.userAvatarId);
 }
 
 void VideoBox::onPlayBtnClicked()
@@ -58,4 +74,14 @@ void VideoBox::onPlayBtnClicked()
     QString videoPath = dir.absolutePath();
     videoPath += "/videos/111.mp4";
     playPage->startPlaying(videoPath);
+}
+
+void VideoBox::setVideoDuration(int64_t duration)
+{
+    QString time;
+    if(duration / 60 / 60) {
+        time += QString::asprintf("%02lld:", duration / 60 / 60);
+    }
+    time += QString::asprintf("%02lld:%02lld", duration / 60, duration % 60);
+    ui->videoDuration->setText(time);
 }

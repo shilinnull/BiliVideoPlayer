@@ -130,8 +130,4 @@ void VideoList::clearVideoList()
     pageIndex = 1;
 }
 
-
-
-
-
 }

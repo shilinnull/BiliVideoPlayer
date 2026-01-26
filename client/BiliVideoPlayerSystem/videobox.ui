@@ -180,7 +180,7 @@ QLabel
             <item>
              <widget class="QLabel" name="playNum">
               <property name="text">
-               <string>31.6万</string>
+               <string/>
               </property>
              </widget>
             </item>
@@ -245,7 +245,7 @@ QLabel
             <item>
              <widget class="QLabel" name="likeNum">
               <property name="text">
-               <string>1266</string>
+               <string/>
               </property>
              </widget>
             </item>
@@ -286,7 +286,7 @@ QLabel
             <item>
              <widget class="QLabel" name="videoDuration">
               <property name="text">
-               <string>25:26</string>
+               <string/>
               </property>
              </widget>
             </item>
@@ -341,7 +341,7 @@ QLabel
 }</string>
         </property>
         <property name="text">
-         <string>【北京旅游攻略】一条视频告诉你去了北京该怎么玩</string>
+         <string/>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -405,14 +405,14 @@ QLabel
       <item>
        <widget class="QLabel" name="userNikeName">
         <property name="text">
-         <string>用户昵称：</string>
+         <string/>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="loadupTime">
         <property name="text">
-         <string>9-16</string>
+         <string/>
         </property>
        </widget>
       </item>

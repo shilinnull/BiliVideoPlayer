@@ -16,11 +16,20 @@ HomePageWidget::HomePageWidget(QWidget *parent)
     initKindsAndTags();     // 初始化分类和标签按钮
     initRefreshAndTop();    // 初始化刷新和置顶按钮
     initVideos();           // 初始化视频列表
+    connectSignalAndSlot();
 }
 
 HomePageWidget::~HomePageWidget()
 {
     delete ui;
+}
+
+void HomePageWidget::connectSignalAndSlot()
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    connect(dataCenter, &model::DataCenter::getAllVideoListDone, this,[=]{
+        this->updateVideoList();
+    });
 }
 
 void HomePageWidget::initKindsAndTags()
@@ -87,11 +96,12 @@ void HomePageWidget::initRefreshAndTop()
 
 void HomePageWidget::initVideos()
 {
-    for(int i = 0; i < 16; i++)
-    {
-        VideoBox* video = new VideoBox();
-        ui->videoGLayout->addWidget(video, i / 4, i % 4);
-    }
+    // 左上角对齐
+    // ui->videoGLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+
+    // 从服务器上获取所有视频，默认20个
+    auto dataCenter = model::DataCenter::getInstance();
+    dataCenter->getAllVideoListAsync();
 }
 
 QPushButton *HomePageWidget::buildSelectBtn(QWidget *parent, const QString &color, const QString &text)
@@ -171,4 +181,18 @@ void HomePageWidget::onRefreshBtnClicked()
 void HomePageWidget::onTopBtnClicked()
 {
     LOG() << "置顶按钮点击了";
+}
+
+void HomePageWidget::updateVideoList()
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    auto videoIdList = dataCenter->getVideoListPtr()->getVideoList();
+    LOG() << "从服务器上获取了：" << videoIdList.size() << "个视频";
+    int videoIndex = ui->videoGLayout->count();
+    for(int i = videoIndex; i < videoIdList.size(); i++) {
+        VideoBox* videoBox = new VideoBox(videoIdList[i]);
+        ui->videoGLayout->addWidget(videoBox, videoIndex / 4, videoIndex % 4);
+        videoIndex++;
+    }
+    LOG()<<"添加到layout中视频个数："<<ui->videoGLayout->count();
 }

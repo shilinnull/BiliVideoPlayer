@@ -16,6 +16,7 @@ public:
     explicit HomePageWidget(QWidget *parent = nullptr);
     ~HomePageWidget();
 
+    void connectSignalAndSlot();
     void initKindsAndTags();            // 初始化分类和标签
     void initRefreshAndTop();           // 初始化刷新和置顶按钮
     void initVideos();                  // 初始化视频列表
@@ -29,6 +30,7 @@ private slots:
     void onTagBtnClicked(QPushButton* clickLabelBtn);   // 标签按钮点击
     void onRefreshBtnClicked();                         // 刷新按钮点击
     void onTopBtnClicked();                             // 置顶按钮点击
+    void updateVideoList();								// 更新视频列表
 
 private:
     Ui::HomePageWidget *ui;

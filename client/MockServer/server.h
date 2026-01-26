@@ -24,6 +24,8 @@ public:
 
 private:
     QHttpServerResponse tempLogin(const QHttpServerRequest& req);	// 临时用户登录响应
+    QHttpServerResponse allVideoList(const QHttpServerRequest& req);// 获取所有视频列表
+
 private:
     MockServer();
     static MockServer* instance;
