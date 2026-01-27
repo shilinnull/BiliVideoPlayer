@@ -6,6 +6,7 @@
 #include "./model/datacenter.h"
 
 #include <QVBoxLayout>
+#include <QScrollBar>
 
 HomePageWidget::HomePageWidget(QWidget *parent)
     : QWidget(parent)
@@ -13,10 +14,11 @@ HomePageWidget::HomePageWidget(QWidget *parent)
 {
     ui->setupUi(this);
 
+    connectSignalAndSlot();
     initKindsAndTags();     // 初始化分类和标签按钮
     initRefreshAndTop();    // 初始化刷新和置顶按钮
     initVideos();           // 初始化视频列表
-    connectSignalAndSlot();
+
 }
 
 HomePageWidget::~HomePageWidget()
@@ -28,6 +30,9 @@ void HomePageWidget::connectSignalAndSlot()
 {
     auto dataCenter = model::DataCenter::getInstance();
     connect(dataCenter, &model::DataCenter::getAllVideoListDone, this,[=]{
+        this->updateVideoList();
+    });
+    connect(dataCenter, &model::DataCenter::getAllVideoInKindDone, this,[=]{
         this->updateVideoList();
     });
 }
@@ -54,13 +59,11 @@ void HomePageWidget::initKindsAndTags()
 
     ui->classifyHLayout->setSpacing(8);
 
-    // 获取分类下的标签，默认显示第0个标签
-    auto tags = kindAndTagPtr->getTagsByKind(kinds[0]).keys();
-    // 默认显示历史标签
-    resetTags(tags);
-    // 默认选中第一个标签
-    QList<QPushButton*> kindBtns = ui->classifys->findChildren<QPushButton*>();
-    onKindBtnClicked(kindBtns[1]);
+    // 启动时默认显示第一个分类的标签，但不触发分类请求
+    if(!kinds.isEmpty()) {
+        auto tags = kindAndTagPtr->getTagsByKind(kinds[0]).keys();
+        resetTags(tags);
+    }
 }
 
 void HomePageWidget::initRefreshAndTop()
@@ -97,11 +100,28 @@ void HomePageWidget::initRefreshAndTop()
 void HomePageWidget::initVideos()
 {
     // 左上角对齐
-    // ui->videoGLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    ui->videoGLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
     // 从服务器上获取所有视频，默认20个
     auto dataCenter = model::DataCenter::getInstance();
     dataCenter->getAllVideoListAsync();
+}
+
+void HomePageWidget::clearLayoutVideos()
+{
+    LOG() << "清空首页中旧视频个数: " << ui->videoGLayout->count();
+    QLayoutItem* videoItem = nullptr;
+    while((videoItem = ui->videoGLayout->takeAt(0)) != nullptr) {
+        if (videoItem->widget()) {
+            delete videoItem->widget();
+        }
+        delete videoItem;
+    }
+    repaint();
+    // 清空dataCenter中视频列表
+    auto dataCenter = model::DataCenter::getInstance();
+    dataCenter->getVideoListPtr()->clearVideoList();
+    ui->videoScroll->verticalScrollBar()->setValue(0);  // 视频清空之后，将滚动条恢复到最上面
 }
 
 QPushButton *HomePageWidget::buildSelectBtn(QWidget *parent, const QString &color, const QString &text)
@@ -133,6 +153,11 @@ void HomePageWidget::resetTags(const QList<QString> &tags)
 
 void HomePageWidget::onKindBtnClicked(QPushButton *clickKindBtn)
 {
+    const QString kindText = clickKindBtn->text();
+    if(curKind == kindText)
+        return ;
+    curKind = kindText;
+
 
     clickKindBtn->setStyleSheet("background-color: #FFECF1;"
                                 "color: #FF6699;");
@@ -157,6 +182,10 @@ void HomePageWidget::onKindBtnClicked(QPushButton *clickKindBtn)
     auto dataCenter = model::DataCenter::getInstance();
     auto kindAndTagPtr = dataCenter->getKindAndTagsClassPtr();
     resetTags(kindAndTagPtr->getTagsByKind(clickKindBtn->text()).keys());
+
+    // 从服务器上获取该分类的所有视频
+    clearLayoutVideos();    // 先清除旧的数据
+    dataCenter->getAllVideoInKindAsync(kindAndTagPtr->getKindId(kindText));
 }
 
 void HomePageWidget::onTagBtnClicked(QPushButton *clickLabelBtn)
@@ -188,11 +217,10 @@ void HomePageWidget::updateVideoList()
     auto dataCenter = model::DataCenter::getInstance();
     auto videoIdList = dataCenter->getVideoListPtr()->getVideoList();
     LOG() << "从服务器上获取了：" << videoIdList.size() << "个视频";
-    int videoIndex = ui->videoGLayout->count();
-    for(int i = videoIndex; i < videoIdList.size(); i++) {
-        VideoBox* videoBox = new VideoBox(videoIdList[i]);
-        ui->videoGLayout->addWidget(videoBox, videoIndex / 4, videoIndex % 4);
-        videoIndex++;
+    for(int i = ui->videoGLayout->count(); i < videoIdList.size(); ++i){
+        // 构建视频显示框VideoBox
+        VideoBox* videoBox = new VideoBox(videoIdList[i], this);
+        ui->videoGLayout->addWidget(videoBox, i/4, i%4);
     }
     LOG()<<"添加到layout中视频个数："<<ui->videoGLayout->count();
 }

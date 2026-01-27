@@ -67,7 +67,38 @@ void NetClient::getAllVideoList()
         dataCenter->setVideoList(resultObject["result"].toObject());
         // 发送信号，通知界面进行更新
         emit dataCenter->getAllVideoListDone();
-        LOG() << "allVideoList请求结束，获取视频列表成功, requestId: " << resultObject["requestId"].toString();
+        LOG() << "allVideoList 请求结束，获取视频列表成功, requestId: " << resultObject["requestId"].toString();
+    });
+}
+
+void NetClient::getAllVideosInKind(int kindId)
+{
+    // 1. 构造请求
+    auto dataCenter = model::DataCenter::getInstance();
+    auto videoListPtr = dataCenter->getVideoListPtr();	// 获取视频列表的指针
+    QJsonObject reqJsonObj;
+    reqJsonObj["sessionId"] = dataCenter->getLoginSessionId();
+    reqJsonObj["videoTypeId"] = kindId;			// 添加Id
+    reqJsonObj["pageIndex"] = videoListPtr->getPageIndex();
+    reqJsonObj["pageCount"] = model::VideoList::PAGE_COUNT;
+    videoListPtr->setPageIndex(videoListPtr->getPageIndex() + 1);
+    // 2. 发送请求
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/typeVideoList", reqJsonObj);
+    // 3. 异步处理响应
+    connect(httpReply, &QNetworkReply::finished, this, [=]{
+        bool ok = false;
+        QString reason;
+        QJsonObject resultObject = handleHttpResponse(httpReply, &ok, &reason);
+        if(!ok) {
+            LOG()<<"typeVideoList 请求出错: reason"<<reason;
+            return ;
+        }
+
+        // 保存获取到的视频到数据中心
+        dataCenter->setVideoList(resultObject["result"].toObject());
+        // 发送信号，通知界面进行更新
+        emit dataCenter->getAllVideoInKindDone();
+        LOG() << "typeVideoList 请求结束，获取视频列表成功, requestId: " << resultObject["requestId"].toString();
     });
 }
 
@@ -123,5 +154,7 @@ QJsonObject NetClient::handleHttpResponse(QNetworkReply *httpResp, bool *ok, QSt
     httpResp->deleteLater();
     return respObj;
 }
+
+
 
 } // end netclient

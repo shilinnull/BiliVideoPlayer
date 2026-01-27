@@ -50,7 +50,7 @@ public:
     QList<VideoInfo> videoInfos;	// 从服务器上获取下来的视频数据
     int64_t pageIndex;				// 页面索引
     int64_t videoTotalCount;		// 当前模式下的视频个数
-    const static int PAGE_COUNT = 21;
+    const static int PAGE_COUNT = 20;
 };
 
 class KindAndTag {

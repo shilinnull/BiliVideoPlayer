@@ -3,6 +3,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QtGlobal>
 #include "util.h"
 
 MockServer::MockServer()
@@ -26,6 +27,10 @@ bool MockServer::init()
         return this->allVideoList(req);
     });
 
+    // 获取分类有视频列表
+    httpServer.route("/HttpService/typeVideoList", [=](const QHttpServerRequest& req){
+        return this->typeVideoList(req);
+    });
 
     return 8000 == ret;
 }
@@ -67,59 +72,117 @@ QHttpServerResponse MockServer::tempLogin(const QHttpServerRequest &req)
     return httpResp;
 }
 
-QHttpServerResponse MockServer::allVideoList(const QHttpServerRequest &req)
+QHttpServerResponse MockServer::allVideoList(const QHttpServerRequest &request)
 {
-    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    // 1. 获取到请求中数据
+    QJsonDocument docReq = QJsonDocument::fromJson(request.body());
     const QJsonObject& jsonReq = docReq.object();
-    LOG() << "[allVideoList] 收到 allVideoList 请求, requestId=" << jsonReq["requestId"].toString();
+    LOG()<<"[allVideoList] 收到 allVideoList 请求， requestId = "<<jsonReq["requestId"].toString();
 
-    // 构造正文
-    QJsonObject jsonBody;
-    jsonBody["requestId"] = jsonReq["requestId"].toString();
-    jsonBody["errorCode"] = 0;
-    jsonBody["errorMsg"] = "";
+    // 2. 构造响应体
+    QJsonObject jsonResp;
+    jsonResp["requestId"] = jsonReq["requestId"].toString();
+    jsonResp["errorCode"] = 0;
+    jsonResp["errorMsg"] = "";
 
-    // 构造result部分
     int pageCount = jsonReq["pageCount"].toInt();
-    QJsonObject allVideoResultObj;
-    allVideoResultObj["totalCount"] = pageCount;
+    QJsonObject resultJsonObj;
+    resultJsonObj["totalCount"] = 100;
 
     int videoId = 10000;
     int userId = 10000;
-    int resourceId = 1000;
-    int fileId = 10000;
-
+    int resourceId = 10000;
     QJsonArray videoLists;
-    for (int i = 0; i < pageCount; ++i) {
+    for(int i = 0; i < pageCount; ++i){
         QJsonObject videoJsonObj;
         videoJsonObj["videoId"] = QString::number(videoId++);
         videoJsonObj["userId"] = QString::number(userId++);
-        videoJsonObj["nickname"] = "这是一个用户名";
         videoJsonObj["userAvatarId"] = QString::number(resourceId++);
+        videoJsonObj["nickname"] = "用户昵称";
         videoJsonObj["photoFileId"] = QString::number(resourceId++);
-        videoJsonObj["videoFileId"] = QString::number(fileId++);
+        videoJsonObj["videoFileId"] = QString::number(resourceId++);
         videoJsonObj["likeCount"] = 1234;
-        videoJsonObj["playCount"] = 23456;
+        videoJsonObj["playCount"] = 3456;
         videoJsonObj["videoSize"] = 10240;
         videoJsonObj["videoDesc"] = "【北京旅游攻略】一条视频告诉你去了北京该怎么玩"
-                                    "【北京旅游攻略】一条视频告诉你去了北京该怎么玩"
-                                    "【北京旅游攻略】一条视频告诉你去了北京该怎么玩"
-                                    "【北京旅游攻略】一条视频告诉你去了北京该怎么玩";
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩~";
         videoJsonObj["videoTitle"] = "【北京旅游攻略】一条视频告诉你去了北京该怎么玩";
         videoJsonObj["videoDuration"] = 10;
         videoJsonObj["videoUpTime"] = "9-16 12:28:58";
 
-        // 将视频对象添加到数组中
         videoLists.append(videoJsonObj);
     }
-    allVideoResultObj["videoList"] = videoLists;
-    jsonBody["result"] = allVideoResultObj;
+    resultJsonObj["videoList"] = videoLists;
+    jsonResp["result"] = resultJsonObj;
 
+    // 3. 返回响应
     QJsonDocument docResp;
-    docResp.setObject(jsonBody);
+    docResp.setObject(jsonResp);
 
-    // 构造HTTP响应
     QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
-    httpResp.setHeader("Content-type", "application/json; charset=utf-8");
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::typeVideoList(const QHttpServerRequest &request)
+{
+    // 1. 获取到请求中数据
+    QJsonDocument docReq = QJsonDocument::fromJson(request.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG()<<"[typeVideoList] 收到 typeVideoList 请求， requestId = "<<jsonReq["requestId"].toString();
+
+    // 2. 构造响应体
+    QJsonObject jsonResp;
+    jsonResp["requestId"] = jsonReq["requestId"].toString();
+    jsonResp["errorCode"] = 0;
+    jsonResp["errorMsg"] = "";
+
+    int pageCount = jsonReq["pageCount"].toInt();
+    pageCount = 10;
+    QJsonObject resultJsonObj;
+    resultJsonObj["totalCount"] = 100;
+
+    int videoId = 20000;
+    int userId = 20000;
+    int resourceId = 20000;
+    QJsonArray videoLists;
+    for(int i = 0; i < pageCount; ++i){
+        QJsonObject videoJsonObj;
+        videoJsonObj["videoId"] = QString::number(videoId++);
+        videoJsonObj["userId"] = QString::number(userId++);
+        videoJsonObj["userAvatarId"] = QString::number(resourceId++);
+        videoJsonObj["nickname"] = "用户昵称";
+        videoJsonObj["photoFileId"] = QString::number(resourceId++);
+        videoJsonObj["videoFileId"] = QString::number(resourceId++);
+        videoJsonObj["likeCount"] = 1234;
+        videoJsonObj["playCount"] = 23456;
+        videoJsonObj["videoSize"] = 10240;
+        videoJsonObj["videoDesc"] = "【北京旅游攻略】一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩~";
+        videoJsonObj["videoTitle"] = "【北京旅游攻略】一条视频告诉你去了北京该怎么玩";
+        videoJsonObj["videoDuration"] = 10;
+        videoJsonObj["videoUpTime"] = "9-16 12:28:58";
+
+        videoLists.append(videoJsonObj);
+    }
+    resultJsonObj["videoList"] = videoLists;
+    jsonResp["result"] = resultJsonObj;
+
+    // 3. 返回响应
+    QJsonDocument docResp;
+    docResp.setObject(jsonResp);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
     return httpResp;
 }

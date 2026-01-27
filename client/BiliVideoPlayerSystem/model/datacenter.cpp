@@ -66,6 +66,11 @@ VideoList *DataCenter::getVideoListPtr()
     return videoListPtr;
 }
 
+void DataCenter::getAllVideoInKindAsync(int kindId)
+{
+    netClient.getAllVideosInKind(kindId);
+}
+
 DataCenter::DataCenter(QObject *parent)
     : QObject{parent}
 {}
