@@ -46,7 +46,7 @@ SearchLineEdit::SearchLineEdit(QWidget *parent)
 
 void SearchLineEdit::searchBtnClicked()
 {
-    LOG() << "搜索按钮点击搜索视频";
+    emit searchVideos(this->text());
 }
 
 bool SearchLineEdit::eventFilter(QObject *watched, QEvent *event)

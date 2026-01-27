@@ -27,6 +27,7 @@ private:
     QHttpServerResponse allVideoList(const QHttpServerRequest& req);	// 获取所有视频列表
     QHttpServerResponse typeVideoList(const QHttpServerRequest& req);	// 获取分类视频列表
     QHttpServerResponse tagVideoList(const QHttpServerRequest& req);    // 获取标签视频列表
+    QHttpServerResponse keyVideoList(const QHttpServerRequest& req);    // 根据搜索文本获取视频内容
 private:
     MockServer();
     static MockServer* instance;

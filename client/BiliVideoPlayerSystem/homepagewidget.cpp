@@ -38,6 +38,12 @@ void HomePageWidget::connectSignalAndSlot()
     connect(dataCenter, &model::DataCenter::getAllVideoInTagDone, this,[=]{
         this->updateVideoList();
     });
+
+    // 点击搜索按钮或者在输入框回车
+    connect(ui->search, &SearchLineEdit::searchVideos, this, &HomePageWidget::onSearchVideos);
+    connect(dataCenter, &model::DataCenter::getAllVideoListSearchTextDone, this, [=]{
+        this->updateVideoList();
+    });
 }
 
 void HomePageWidget::initKindsAndTags()
@@ -125,6 +131,14 @@ void HomePageWidget::clearLayoutVideos()
     auto dataCenter = model::DataCenter::getInstance();
     dataCenter->getVideoListPtr()->clearVideoList();
     ui->videoScroll->verticalScrollBar()->setValue(0);  // 视频清空之后，将滚动条恢复到最上面
+}
+
+void HomePageWidget::onSearchVideos(const QString &searchText)
+{
+    clearLayoutVideos();
+    // 在服务器上进行模糊搜索进行返回
+    auto dataCenter = model::DataCenter::getInstance();
+    dataCenter->getVideosBySearchTextAsync(searchText);
 }
 
 QPushButton *HomePageWidget::buildSelectBtn(QWidget *parent, const QString &color, const QString &text)

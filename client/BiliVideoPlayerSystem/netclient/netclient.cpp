@@ -142,6 +142,46 @@ void NetClient::getAllVideosInTag(int tagId)
     });
 }
 
+void NetClient::getVideosBySearchText(const QString &searchText)
+{
+    // 1. 构造请求体
+    auto dataCenter = model::DataCenter::getInstance();
+    auto videoListPtr = dataCenter->getVideoListPtr();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["searchKey"] = searchText;
+    reqBody["pageIndex"] = videoListPtr->getPageIndex();
+    reqBody["pageCount"] = model::VideoList::PAGE_COUNT;
+
+    videoListPtr->setPageIndex(videoListPtr->getPageIndex()+1);
+
+    // 2. 发送请求
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/keyVideoList", reqBody);
+
+    // 3. 异步处理keyVideoList请求的响应
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        // a. 解析Http响应
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        // b. 判定响应是否出错
+        if(!ok){
+            LOG()<<"keyVideoList 请求出错，reason = "<<reason;
+            return;
+        }
+
+        // c. 解析响应体中服务端交给客户端的具体数据
+        QJsonObject resultObj = replyObj["result"].toObject();
+        // 将获取到的视频信息保存到视频列表
+        dataCenter->setVideoList(resultObj);
+
+        // d. 统计界面显示视频信息
+        emit dataCenter->getAllVideoListSearchTextDone();
+        LOG()<<"keyVideoList 成功, resquestId = "<<replyObj["requestId"].toString();
+    });
+}
+
 QString NetClient::makeRequeId()
 {
     return "R" + QUuid::createUuid().toString().sliced(25, 12);

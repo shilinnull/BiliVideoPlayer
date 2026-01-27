@@ -15,6 +15,7 @@ public:
     void getAllVideoList();					// 获取所有视频
     void getAllVideosInKind(int kindId);	// 获取分类下的所有视频
     void getAllVideosInTag(int tagId);      // 获取标签下的所有视频
+    void getVideosBySearchText(const QString& searchText);  // 根据文本获取视频
 private:
     static QString makeRequeId();
     QNetworkReply* sendHttpRequest(const QString& resourcePath, QJsonObject& jsonBody);

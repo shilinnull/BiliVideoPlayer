@@ -76,6 +76,11 @@ void DataCenter::getAllVideoInTagAsync(int tagId)
     netClient.getAllVideosInTag(tagId);
 }
 
+void DataCenter::getVideosBySearchTextAsync(const QString &searchText)
+{
+    netClient.getVideosBySearchText(searchText);
+}
+
 DataCenter::DataCenter(QObject *parent)
     : QObject{parent}
 {}

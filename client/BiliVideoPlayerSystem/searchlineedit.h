@@ -19,7 +19,8 @@ private slots:
 protected:
     bool eventFilter(QObject *watched, QEvent *event);
 signals:
-
+    // 发送搜索信号给首页
+    void searchVideos(const QString& searchText);
 private:
     QLabel* searchImg;
     QPushButton* searchBtn;
