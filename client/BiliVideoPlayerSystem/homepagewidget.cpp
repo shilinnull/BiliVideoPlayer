@@ -35,6 +35,9 @@ void HomePageWidget::connectSignalAndSlot()
     connect(dataCenter, &model::DataCenter::getAllVideoInKindDone, this,[=]{
         this->updateVideoList();
     });
+    connect(dataCenter, &model::DataCenter::getAllVideoInTagDone, this,[=]{
+        this->updateVideoList();
+    });
 }
 
 void HomePageWidget::initKindsAndTags()
@@ -59,7 +62,7 @@ void HomePageWidget::initKindsAndTags()
 
     ui->classifyHLayout->setSpacing(8);
 
-    // 启动时默认显示第一个分类的标签，但不触发分类请求
+    // 启动时默认显示第一个分类的标签
     if(!kinds.isEmpty()) {
         auto tags = kindAndTagPtr->getTagsByKind(kinds[0]).keys();
         resetTags(tags);
@@ -157,7 +160,7 @@ void HomePageWidget::onKindBtnClicked(QPushButton *clickKindBtn)
     if(curKind == kindText)
         return ;
     curKind = kindText;
-
+    curTag = "";
 
     clickKindBtn->setStyleSheet("background-color: #FFECF1;"
                                 "color: #FF6699;");
@@ -190,6 +193,10 @@ void HomePageWidget::onKindBtnClicked(QPushButton *clickKindBtn)
 
 void HomePageWidget::onTagBtnClicked(QPushButton *clickLabelBtn)
 {
+    const QString tagText = clickLabelBtn->text();
+    if(tagText == curTag)
+        return ;
+    curTag = tagText;
 
     clickLabelBtn->setStyleSheet("background-color: #FFECF1;"
                                 "color: #FF6699;");
@@ -200,6 +207,14 @@ void HomePageWidget::onTagBtnClicked(QPushButton *clickLabelBtn)
         if(tagBtn != clickLabelBtn && tagBtn->text() != "标签")
             tagBtn->setStyleSheet("color: #666666;");
     }
+    clearLayoutVideos();
+    auto dataCenter = model::DataCenter::getInstance();
+    auto kindAndTagPtr = dataCenter->getKindAndTagsClassPtr();
+    auto kinds = kindAndTagPtr->getAllKinds();
+    if(kinds.isEmpty()) {
+        curKind = kinds[0];
+    }
+    dataCenter->getAllVideoInTagAsync(kindAndTagPtr->getTagId(curKind, tagText));
 }
 
 void HomePageWidget::onRefreshBtnClicked()

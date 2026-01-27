@@ -36,6 +36,7 @@ private slots:
 private:
     Ui::HomePageWidget *ui;
     QString curKind;
+    QString curTag;
 };
 
 #endif // HomePageWidget_H

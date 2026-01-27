@@ -14,6 +14,7 @@ public:
     void tempLogin();						// 临时用户登录请求
     void getAllVideoList();					// 获取所有视频
     void getAllVideosInKind(int kindId);	// 获取分类下的所有视频
+    void getAllVideosInTag(int tagId);      // 获取标签下的所有视频
 private:
     static QString makeRequeId();
     QNetworkReply* sendHttpRequest(const QString& resourcePath, QJsonObject& jsonBody);

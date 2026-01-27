@@ -71,6 +71,11 @@ void DataCenter::getAllVideoInKindAsync(int kindId)
     netClient.getAllVideosInKind(kindId);
 }
 
+void DataCenter::getAllVideoInTagAsync(int tagId)
+{
+    netClient.getAllVideosInTag(tagId);
+}
+
 DataCenter::DataCenter(QObject *parent)
     : QObject{parent}
 {}

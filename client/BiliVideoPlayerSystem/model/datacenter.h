@@ -20,6 +20,7 @@ public:
     void setVideoList(const QJsonObject& videoListJsonObj);	// 解析响应中的所有视频对象，放到videoList
     VideoList* getVideoListPtr();						// 通过这个指针将视频信息更新到界面
     void getAllVideoInKindAsync(int kindId);			// 获取分类视频列表
+    void getAllVideoInTagAsync(int tagId);              // 获取标签视频列表
 private:
     explicit DataCenter(QObject *parent = nullptr);
     static DataCenter* instance;
@@ -31,6 +32,7 @@ signals:
     void loginTempUserDone();						// 临时用户登录
     void getAllVideoListDone();						// 获取所有视频信息处理完毕
     void getAllVideoInKindDone();					// 获取分类下所有视频信息处理完毕
+    void getAllVideoInTagDone();					// 获取标签下所有视频信息处理完毕
 };
 
 }	// namespace model
