@@ -25,4 +25,16 @@ static inline QByteArray loadFileToByteArray(const QString& path) {
     return content;
 }
 
+static inline void writeByteArrayToFile(const QString& path, const QByteArray& content) {
+    QFile file(path);
+    bool ok = file.open(QFile::WriteOnly);
+    if (!ok) {
+        LOG() << "文件打开失败!";
+        return;
+    }
+    file.write(content);
+    file.flush();
+    file.close();
+}
+
 #endif // UTIL_H

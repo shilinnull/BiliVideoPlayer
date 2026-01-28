@@ -56,12 +56,7 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">#imageBox
-{
-	border-image:url(:/images/homePage/videoImage.png);
-}
-
-QLabel
+      <string notr="true">QLabel
 {
 	color: #FFFFFF;
 	border: none;

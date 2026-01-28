@@ -182,6 +182,39 @@ void NetClient::getVideosBySearchText(const QString &searchText)
     });
 }
 
+void NetClient::downloadPhoto(const QString &photoFileId)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    // 1. 构造请求
+    QString queryStr;
+    queryStr += "requestId=";
+    queryStr += makeRequeId();
+    queryStr += "&";
+    queryStr += "sessionId=";
+    queryStr += dataCenter->getLoginSessionId();
+    queryStr += "&";
+    queryStr += "fileId=";
+    queryStr += photoFileId;
+
+    // 2. 发送请求
+    QNetworkRequest httpReq;
+    httpReq.setUrl(QUrl(HTTP_URL + "/HttpService/downloadPhoto?" + queryStr));
+    QNetworkReply* httpReply = httpClient.get(httpReq);
+
+    // 3. 异步响应处理
+    connect(httpReply, &QNetworkReply::finished, this, [=]{
+        if(httpReply->error() != QNetworkReply::NoError) {
+            LOG() << httpReply->errorString();
+            httpReply->deleteLater();
+            return ;
+        }
+        // 获取图片数据，发送信号通知界面显示
+        QByteArray imageData = httpReply->readAll();
+        emit dataCenter->downloadPhotoDone(photoFileId, imageData);
+        httpReply->deleteLater();
+    });
+}
+
 QString NetClient::makeRequeId()
 {
     return "R" + QUuid::createUuid().toString().sliced(25, 12);

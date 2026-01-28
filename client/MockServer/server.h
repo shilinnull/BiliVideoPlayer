@@ -28,11 +28,14 @@ private:
     QHttpServerResponse typeVideoList(const QHttpServerRequest& req);	// 获取分类视频列表
     QHttpServerResponse tagVideoList(const QHttpServerRequest& req);    // 获取标签视频列表
     QHttpServerResponse keyVideoList(const QHttpServerRequest& req);    // 根据搜索文本获取视频内容
+    void buildResponseData();
+    QHttpServerResponse downloadPhoto(const QHttpServerRequest& req);   // 下载图片
+
 private:
     MockServer();
     static MockServer* instance;
     QHttpServer httpServer;
     RoleType roleType = TempUser;
-
+    QMap<QString, QString> idPathTable;
 };
 #endif // SERVER_H

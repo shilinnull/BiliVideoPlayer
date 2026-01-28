@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QtGlobal>
+#include <QDir>
 #include "util.h"
 
 MockServer::MockServer()
@@ -40,6 +41,13 @@ bool MockServer::init()
     // 根据搜索文本获取视频列表
     httpServer.route("/HttpService/keyVideoList", [=](const QHttpServerRequest& req){
         return this->keyVideoList(req);
+    });
+
+    // 先构造数据
+    buildResponseData();
+    // 获取图片
+    httpServer.route("/HttpService/downloadPhoto", [=](const QHttpServerRequest& req){
+        return this->downloadPhoto(req);
     });
     return 8000 == ret;
 }
@@ -310,5 +318,46 @@ QHttpServerResponse MockServer::keyVideoList(const QHttpServerRequest &req)
 
     QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
     httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+void MockServer::buildResponseData()
+{
+    int resourceId = 10000;
+    for(int i = 0; i < 100; i++) {
+        idPathTable.insert(QString::number(resourceId++), "/images/touxiang.png");
+        idPathTable.insert(QString::number(resourceId++), "/images/videoImage.png");
+    }
+    resourceId = 20000;
+    for(int i = 0; i < 100; i++) {
+        idPathTable.insert(QString::number(resourceId++), "/images/touxiang1.png");
+        idPathTable.insert(QString::number(resourceId++), "/images/videoImage1.png");
+    }
+    resourceId = 30000;
+    for(int i = 0; i < 100; i++) {
+        idPathTable.insert(QString::number(resourceId++), "/images/touxiang2.png");
+        idPathTable.insert(QString::number(resourceId++), "/images/videoImage2.png");
+    }
+    resourceId = 40000;
+    for(int i = 0; i < 100; i++) {
+        idPathTable.insert(QString::number(resourceId++), "/images/touxiang3.png");
+        idPathTable.insert(QString::number(resourceId++), "/images/videoImage3.png");
+    }
+}
+
+QHttpServerResponse MockServer::downloadPhoto(const QHttpServerRequest &req)
+{
+    QUrlQuery query(QUrl(req.url()));
+    QString requestId = query.queryItemValue("requestId");
+    QString fileId = query.queryItemValue("fileId");
+    LOG() << "[downloadPhoto] 收到 downloadPhoto 请求, requestId=" << requestId;
+    QDir dir(QDir::currentPath());
+    dir.cdUp(); dir.cdUp();
+    QString imagePath = dir.absolutePath();
+    imagePath += idPathTable[fileId];
+    LOG()<<"图片ID："<<fileId<<"--"<<imagePath;
+    QByteArray imageData = loadFileToByteArray(imagePath);
+    QHttpServerResponse httpResp(imageData, QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/octet-stream");
     return httpResp;
 }

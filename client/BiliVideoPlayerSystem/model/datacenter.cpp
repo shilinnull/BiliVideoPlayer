@@ -81,6 +81,11 @@ void DataCenter::getVideosBySearchTextAsync(const QString &searchText)
     netClient.getVideosBySearchText(searchText);
 }
 
+void DataCenter::downloadPhotoAsync(const QString &photoFileId)
+{
+    netClient.downloadPhoto(photoFileId);
+}
+
 DataCenter::DataCenter(QObject *parent)
     : QObject{parent}
 {}

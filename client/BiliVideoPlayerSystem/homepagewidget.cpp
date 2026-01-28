@@ -84,7 +84,7 @@ void HomePageWidget::initRefreshAndTop()
     refreshTopWidget->setStyleSheet("QPushButton{"
                                     "border-radius: 21px;"
                                     "border: none;"
-                                    "background-color: #61666D;}"
+                                    "background-color: rgba(97, 102, 109, 0.3);}"
                                     "QPushButton:hover{background-color: #FF6699;}");
 
     QVBoxLayout* layout = new QVBoxLayout(refreshTopWidget);
@@ -147,10 +147,11 @@ void HomePageWidget::onSearchVideos(const QString &searchText)
 
 void HomePageWidget::onScrollAreaValueChanged(int value)
 {
-    if(value == 0)
-        return ;
     auto dataCenter = model::DataCenter::getInstance();
     auto videoList = dataCenter->getVideoListPtr();
+    // 滚动条为0或者视频个数小于20个就不加载
+    if(value == 0 || videoList->getVideoCount() < model::VideoList::PAGE_COUNT)
+        return ;
     if(videoList->getVideoCount() == videoList->getVideoTotalCount()) {
         return ;
     }
@@ -269,12 +270,32 @@ void HomePageWidget::onTagBtnClicked(QPushButton *clickLabelBtn)
 
 void HomePageWidget::onRefreshBtnClicked()
 {
-    LOG() << "刷新按钮点击了";
+    clearLayoutVideos();
+
+    auto dataCenter = model::DataCenter::getInstance();
+    auto kindAndTagPtr = dataCenter->getKindAndTagsClassPtr();
+
+    switch(videoListStyle) {
+    case AllStyle:
+        dataCenter->getAllVideoListAsync();
+        break;
+    case KindStyle:
+        dataCenter->getAllVideoInKindAsync(kindAndTagPtr->getKindId(curKind));
+        break;
+    case TagStyle:
+        dataCenter->getAllVideoInTagAsync(kindAndTagPtr->getTagId(curKind, curTag));
+        break;
+    case SearchStyle:
+        dataCenter->getVideosBySearchTextAsync(ui->search->text());
+        break;
+    default:
+        LOG() << "暂不支持的数据类型";
+    }
 }
 
 void HomePageWidget::onTopBtnClicked()
 {
-    LOG() << "置顶按钮点击了";
+    ui->videoScroll->verticalScrollBar()->setValue(0);
 }
 
 void HomePageWidget::updateVideoList()

@@ -22,6 +22,7 @@ public:
     void getAllVideoInKindAsync(int kindId);                    // 获取分类视频列表
     void getAllVideoInTagAsync(int tagId);                      // 获取标签视频列表
     void getVideosBySearchTextAsync(const QString& searchText); // 获取搜索视频列表
+    void downloadPhotoAsync(const QString& photoFileId);        // 下载图片
 private:
     explicit DataCenter(QObject *parent = nullptr);
     static DataCenter* instance;
@@ -35,6 +36,8 @@ signals:
     void getAllVideoInKindDone();					// 获取分类下所有视频信息处理完毕
     void getAllVideoInTagDone();					// 获取标签下所有视频信息处理完毕
     void getAllVideoListSearchTextDone();			// 根据搜索内容获取视频处理完毕
+    void downloadPhotoDone(const QString& imageId,
+                           QByteArray imageData);   // 下载图片处理完毕
 
 };
 

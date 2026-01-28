@@ -133,7 +133,11 @@ void UploadVideoPage::onChangeBtnClicked()
         return;
     }
 
-    QPixmap pixmap(coverImagePath);
+    QPixmap pixmap;
+    if(!pixmap.load(coverImagePath) || pixmap.isNull()){
+        LOG()<<"封面图加载失败:"<<coverImagePath;
+        return;
+    }
     pixmap = pixmap.scaled(ui->imageLabel->size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     ui->imageLabel->setPixmap(pixmap);
 

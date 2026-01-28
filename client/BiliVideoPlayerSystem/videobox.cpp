@@ -1,7 +1,9 @@
 #include "videobox.h"
 #include "ui_videobox.h"
 #include "util.h"
+#include "model/datacenter.h"
 #include <QDir>
+#include <QPixmap>
 
 PlayerPage* VideoBox::playPage = nullptr;
 
@@ -15,6 +17,9 @@ VideoBox::VideoBox(model::VideoInfo videoInfo, QWidget *parent)
 
     ui->imageBox->installEventFilter(this);
     ui->videoTitle->installEventFilter(this);
+
+    auto dataCenter = model::DataCenter::getInstance();
+    connect(dataCenter, &model::DataCenter::downloadPhotoDone, this, &VideoBox::getVideoImageDone);
 
     updateVideoInfoUI();		// 设置视频信息到界面
 }
@@ -45,7 +50,7 @@ void VideoBox::updateVideoInfoUI()
     ui->loadupTime->setText(videoInfo.videoUpTime);
     setVideoDuration(videoInfo.videoDuration);
 
-    // setVideoImage(videoInfo.photoFileId);
+    setVideoImage(videoInfo.photoFileId);
     // setUserIcon(videoInfo.userAvatarId);
 }
 
@@ -85,3 +90,34 @@ void VideoBox::setVideoDuration(int64_t duration)
     time += QString::asprintf("%02lld:%02lld", duration / 60, duration % 60);
     ui->videoDuration->setText(time);
 }
+
+void VideoBox::setVideoImage(const QString &photoFileId)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    dataCenter->downloadPhotoAsync(photoFileId);
+}
+
+void VideoBox::paintEvent(QPaintEvent *event)
+{
+    // 绘制图片
+    ui->imageBox->setAutoFillBackground(true);
+    videoCoverImage = videoCoverImage.scaled(ui->imageBox->size(),
+                               Qt::KeepAspectRatioByExpanding,
+                               Qt::SmoothTransformation);
+    QPalette palette = ui->imageBox->palette();
+    QBrush brush(videoCoverImage);
+    palette.setBrush(QPalette::Window, brush);
+    ui->imageBox->setPalette(palette);
+}
+
+void VideoBox::getVideoImageDone(const QString &imageId, QByteArray imageData)
+{
+    if(videoInfo.photoFileId != imageId)
+        return ;
+    videoCoverImage.loadFromData(imageData);
+    repaint();
+
+
+}
+
+
