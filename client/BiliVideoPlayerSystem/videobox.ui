@@ -393,13 +393,10 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">#userIcon
-{ 
-	border-image: url(&quot;:/images/homePage/touxiang.png&quot;); 
-}</string>
+         <string notr="true"/>
         </property>
         <property name="text">
-         <string>TextLabel</string>
+         <string/>
         </property>
        </widget>
       </item>

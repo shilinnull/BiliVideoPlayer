@@ -18,8 +18,12 @@ VideoBox::VideoBox(model::VideoInfo videoInfo, QWidget *parent)
     ui->imageBox->installEventFilter(this);
     ui->videoTitle->installEventFilter(this);
 
+    // 获取视频封面和用户头像
     auto dataCenter = model::DataCenter::getInstance();
-    connect(dataCenter, &model::DataCenter::downloadPhotoDone, this, &VideoBox::getVideoImageDone);
+    connect(dataCenter, &model::DataCenter::downloadPhotoDone,
+            this, &VideoBox::getVideoImageDone);
+    connect(dataCenter, &model::DataCenter::downloadPhotoDone,
+            this, &VideoBox::getUserImageDone);
 
     updateVideoInfoUI();		// 设置视频信息到界面
 }
@@ -49,9 +53,8 @@ void VideoBox::updateVideoInfoUI()
     ui->userNikeName->setText(videoInfo.nickName);
     ui->loadupTime->setText(videoInfo.videoUpTime);
     setVideoDuration(videoInfo.videoDuration);
-
     setVideoImage(videoInfo.photoFileId);
-    // setUserIcon(videoInfo.userAvatarId);
+    setUserIcon(videoInfo.userAvatarId);
 }
 
 void VideoBox::onPlayBtnClicked()
@@ -97,6 +100,16 @@ void VideoBox::setVideoImage(const QString &photoFileId)
     dataCenter->downloadPhotoAsync(photoFileId);
 }
 
+void VideoBox::setUserIcon(const QString &userAvatarId)
+{
+    if(userAvatarId.isEmpty()) {
+        ui->userIcon->setStyleSheet("border-image: url(:/images/myself/defaultAvatar.png);");
+    } else {
+        auto dataCenter = model::DataCenter::getInstance();
+        dataCenter->downloadPhotoAsync(userAvatarId);
+    }
+}
+
 void VideoBox::paintEvent(QPaintEvent *event)
 {
     // 绘制图片
@@ -116,8 +129,16 @@ void VideoBox::getVideoImageDone(const QString &imageId, QByteArray imageData)
         return ;
     videoCoverImage.loadFromData(imageData);
     repaint();
+}
 
-
+void VideoBox::getUserImageDone(const QString &imageId, QByteArray imageData)
+{
+    if(videoInfo.userAvatarId != imageId)
+        return ;
+    // 制作圆心头像设置到界面上
+    userPixmap = makeCircleIcon(imageData,
+                                ui->userIcon->width() / 2).pixmap(ui->userIcon->size());
+    ui->userIcon->setPixmap(userPixmap);
 }
 
 
