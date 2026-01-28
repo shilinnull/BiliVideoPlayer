@@ -44,6 +44,7 @@ void HomePageWidget::connectSignalAndSlot()
     connect(dataCenter, &model::DataCenter::getAllVideoListSearchTextDone, this, [=]{
         this->updateVideoList();
     });
+    connect(ui->videoScroll->verticalScrollBar(), &QScrollBar::valueChanged, this, &HomePageWidget::onScrollAreaValueChanged);
 }
 
 void HomePageWidget::initKindsAndTags()
@@ -110,6 +111,7 @@ void HomePageWidget::initVideos()
 {
     // 左上角对齐
     ui->videoGLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    videoListStyle = AllStyle;
 
     // 从服务器上获取所有视频，默认20个
     auto dataCenter = model::DataCenter::getInstance();
@@ -135,10 +137,42 @@ void HomePageWidget::clearLayoutVideos()
 
 void HomePageWidget::onSearchVideos(const QString &searchText)
 {
+    videoListStyle = SearchStyle;
+
     clearLayoutVideos();
     // 在服务器上进行模糊搜索进行返回
     auto dataCenter = model::DataCenter::getInstance();
     dataCenter->getVideosBySearchTextAsync(searchText);
+}
+
+void HomePageWidget::onScrollAreaValueChanged(int value)
+{
+    if(value == 0)
+        return ;
+    auto dataCenter = model::DataCenter::getInstance();
+    auto videoList = dataCenter->getVideoListPtr();
+    if(videoList->getVideoCount() == videoList->getVideoTotalCount()) {
+        return ;
+    }
+    if(value == ui->videoScroll->verticalScrollBar()->maximum()) {
+        auto kindAndTagPtr = dataCenter->getKindAndTagsClassPtr();
+        switch(videoListStyle) {
+        case AllStyle:
+            dataCenter->getAllVideoListAsync();
+            break;
+        case KindStyle:
+            dataCenter->getAllVideoInKindAsync(kindAndTagPtr->getKindId(curKind));
+            break;
+        case TagStyle:
+            dataCenter->getAllVideoInTagAsync(kindAndTagPtr->getTagId(curKind, curTag));
+            break;
+        case SearchStyle:
+            dataCenter->getVideosBySearchTextAsync(ui->search->text());
+            break;
+        default:
+            LOG() << "暂不支持的数据类型";
+        }
+    }
 }
 
 QPushButton *HomePageWidget::buildSelectBtn(QWidget *parent, const QString &color, const QString &text)
@@ -170,6 +204,7 @@ void HomePageWidget::resetTags(const QList<QString> &tags)
 
 void HomePageWidget::onKindBtnClicked(QPushButton *clickKindBtn)
 {
+    videoListStyle = KindStyle;
     const QString kindText = clickKindBtn->text();
     if(curKind == kindText)
         return ;
@@ -207,6 +242,7 @@ void HomePageWidget::onKindBtnClicked(QPushButton *clickKindBtn)
 
 void HomePageWidget::onTagBtnClicked(QPushButton *clickLabelBtn)
 {
+    videoListStyle = TagStyle;
     const QString tagText = clickLabelBtn->text();
     if(tagText == curTag)
         return ;

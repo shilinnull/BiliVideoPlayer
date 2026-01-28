@@ -8,6 +8,13 @@ namespace Ui {
 class HomePageWidget;
 }
 
+enum VideoListStyle{
+    AllStyle,           // 所有视频列表
+    KindStyle,          // 分类视频列表
+    TagStyle,           // 标签视频列表
+    SearchStyle         // 搜索视频列表
+};
+
 class HomePageWidget : public QWidget
 {
     Q_OBJECT
@@ -22,6 +29,7 @@ public:
     void initVideos();                  // 初始化视频列表
     void clearLayoutVideos();           // 清空视频列表
     void onSearchVideos(const QString& searchText);     // 搜索视频
+    void onScrollAreaValueChanged(int value);          // 滚动条检测
 
     // 创建按钮函数
     QPushButton* buildSelectBtn(QWidget *parent, const QString &color, const QString &text);
@@ -38,6 +46,8 @@ private:
     Ui::HomePageWidget *ui;
     QString curKind;
     QString curTag;
+
+    VideoListStyle videoListStyle;
 };
 
 #endif // HomePageWidget_H
