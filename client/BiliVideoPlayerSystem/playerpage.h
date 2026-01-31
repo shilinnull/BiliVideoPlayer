@@ -10,6 +10,7 @@
 #include "playspeed.h"
 #include "mpv/mpvplayer.h"
 #include "bulletscreenitem.h"
+#include "model/datacenter.h"
 
 namespace Ui {
 class PlayerPage;
@@ -20,12 +21,12 @@ class PlayerPage : public QWidget
     Q_OBJECT
 
 public:
-    explicit PlayerPage(QWidget *parent = nullptr);
+    explicit PlayerPage(const model::VideoInfo& videoInfo, QWidget *parent = nullptr);
     ~PlayerPage();
 
     void moveWindows(const QPoint& point);
-    void startPlaying(const QString &videoFilePath);
-    void loadBulletScreenData();					// 加载弹幕数据
+    void startPlaying();
+    void buildBulletScreenData();                   // 加载弹幕数据
     void showBulletScreen();						// 显示弹幕
 
 protected:
@@ -40,7 +41,8 @@ private slots:
     void onPlaySpeedChanged(double speed);          // 倍速播放
     void setVolume(int volumeRatio);                // 音量调整
     void onPlayPositionChanged(int64_t playTime);   // 播放位置改变
-    void setPlayProgress(double playRatio);			// 设置播放进度
+    void onEndOfPlayList();                         // 所有视频分片播放结束
+    void onSetPlayProgress(double playRatio);			// 设置播放进度
     void onBulletScreenClicked();					// 弹幕开关控制
     void onSendBulletScreenBtnClicked(const QString& text);// 发送弹幕
 private:
@@ -50,20 +52,19 @@ private:
 private:
     Ui::PlayerPage *ui;
     QPoint dragPos;
-    QString videoFilePath;			// 视频路径
     Volume* volume;                 // 音量调节
     PlaySpeed* playSpeed;           // 播放速度
     MpvPlayer* mpvPlayer = nullptr; // 封装mpv库，控制播放视频
     bool isPlay = false;            // 默认情况下暂停
-    int64_t playTime = 0;           // 当前播放时长
+    model::VideoInfo videoInfo;     // 保存视频信息
 
     // 弹幕相关信息
     QDialog* barrageArea;
     QFrame* top;
     QFrame* middle;
     QFrame* bottom;
-    QMap<int64_t, QList<BulletScreenInfo>> bulletScreenLists;	// 临时保存弹幕数据
     bool isStartBS = true;
+    QHash<int64_t, QList<model::BarrageInfo>> bulletScreens;    // 获取当前播放下的所有数据
 };
 
 #endif // PLAYERPAGE_H

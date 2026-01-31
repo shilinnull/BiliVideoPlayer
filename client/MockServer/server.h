@@ -13,6 +13,20 @@ enum RoleType{
     TempUser		// 临时用户
 };
 
+class BarrageInfo {
+public:
+    QString barrageId;      // 弹幕id
+    QString userId;         // 发送弹幕用户
+    int64_t playTime;       // 发送弹幕时播放时间
+    QString text;           // 弹幕内容
+
+    BarrageInfo(const QString& userId = "", int64_t playTime = 0, const QString& text = "")
+        : userId(userId)
+        , playTime(playTime)
+        , text(text)
+    {}
+};
+
 class MockServer: public QObject
 {
     Q_OBJECT
@@ -30,6 +44,9 @@ private:
     QHttpServerResponse keyVideoList(const QHttpServerRequest& req);    // 根据搜索文本获取视频内容
     void buildResponseData();
     QHttpServerResponse downloadPhoto(const QHttpServerRequest& req);   // 下载图片
+    QHttpServerResponse downloadVideo(const QHttpServerRequest& req);   // 下载视频
+    QHttpServerResponse downloadVideoSegmentation(const QString& fileName);   // 下载视频分片
+    QHttpServerResponse getBarrage(const QHttpServerRequest& req);      // 获取弹幕数据
 
 private:
     MockServer();
@@ -37,5 +54,6 @@ private:
     QHttpServer httpServer;
     RoleType roleType = TempUser;
     QMap<QString, QString> idPathTable;
+    QHash<int64_t, QList<BarrageInfo>> barrages;
 };
 #endif // SERVER_H

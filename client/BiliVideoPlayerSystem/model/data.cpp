@@ -130,4 +130,12 @@ void VideoList::clearVideoList()
     pageIndex = 1;
 }
 
+void BarrageInfo::loadBarrageInfo(QJsonObject &barrageJson)
+{
+    barrageId = barrageJson["barrageId"].toString();
+    userId = barrageJson["userId"].toString();
+    playTime = barrageJson["barrageTime"].toInt();
+    text = barrageJson["barrageContent"].toString();
+}
+
 }

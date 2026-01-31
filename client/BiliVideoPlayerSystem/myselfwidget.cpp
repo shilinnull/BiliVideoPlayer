@@ -44,8 +44,18 @@ void MyselfWidget::initUI()
     connect(ui->uploadVideoBtn, &QPushButton::clicked, this, &MyselfWidget::uploadViewBtnClicked);
 
 #ifdef TEST_UI
+    int resourceId = 10000;
     for(int i = 0; i < 16; i++) {
         model::VideoInfo videoInfo;
+        videoInfo.userAvatarId = "";
+        videoInfo.photoFileId = QString::number(resourceId++);
+        videoInfo.videoFileId = QString::number(resourceId++);
+        videoInfo.nickName="用户昵称";
+        videoInfo.likeCount = 1234;
+        videoInfo.playCount = 23456;
+        videoInfo.videoTitle="【北京旅游攻略】一条视频告诉你去了北京该怎么玩";
+        videoInfo.videoDuration = 10;
+        videoInfo.videoUpTime = "9-16 12:28:58";
         VideoBox* videoBox = new VideoBox(videoInfo);
         ui->layout->addWidget(videoBox, i / 4, i % 4);
     }

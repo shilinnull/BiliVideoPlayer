@@ -70,6 +70,17 @@ private:
     static int id;
 };
 
+class BarrageInfo {
+public:
+    QString barrageId;      // 弹幕id
+    QString userId;         // 发送弹幕用户
+    int64_t playTime;       // 发送弹幕时播放时间
+    QString text;           // 弹幕内容
+
+    void loadBarrageInfo(QJsonObject& barrageJson);
+};
+
+
 };
 
 #endif // DATA_H

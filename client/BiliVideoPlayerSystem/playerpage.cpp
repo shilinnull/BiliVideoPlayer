@@ -8,9 +8,10 @@
 #include <QShortcut>
 #include <QKeySequence>
 
-PlayerPage::PlayerPage(QWidget *parent)
+PlayerPage::PlayerPage(const model::VideoInfo& videoInfo, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::PlayerPage)
+    , videoInfo(videoInfo)
 {
     ui->setupUi(this);
     setWindowFlag(Qt::FramelessWindowHint);
@@ -40,12 +41,13 @@ PlayerPage::PlayerPage(QWidget *parent)
     connect(ui->playBtn, &QPushButton::clicked, this, &PlayerPage::onplayBtnClicked);
     connect(playSpeed, &PlaySpeed::setPlaySpeed, this, &PlayerPage::onPlaySpeedChanged);
     connect(volume, &Volume::setVolume, this, &PlayerPage::setVolume);
-    connect(ui->videoSlider, &PlaySlider::setPlayProgress, this, &PlayerPage::setPlayProgress);
+    connect(ui->videoSlider, &PlaySlider::setPlayProgress, this, &PlayerPage::onSetPlayProgress);
     connect(mpvPlayer, &MpvPlayer::playPositionChanged, this, &PlayerPage::onPlayPositionChanged);
+    connect(mpvPlayer, &MpvPlayer::endOfPlaylist, this, &PlayerPage::onEndOfPlayList);
     connect(ui->bulletScreenBtn, &QPushButton::clicked, this, &PlayerPage::onBulletScreenClicked);
     connect(ui->bulletScreenText, &BarrageEdit::onSendScreenBtn, this, &PlayerPage::onSendBulletScreenBtnClicked);
 
-    loadBulletScreenData();
+    // buildBulletScreenData();
 }
 
 PlayerPage::~PlayerPage()
@@ -64,29 +66,25 @@ void PlayerPage::moveWindows(const QPoint &point)
     playSpeed->move(newPoint);
 }
 
-void PlayerPage::startPlaying(const QString &videoFilePath)
+void PlayerPage::startPlaying()
 {
-    this->videoFilePath = videoFilePath;
-    mpvPlayer->startPlay(videoFilePath);	// 加载视频
+    buildBulletScreenData();
+    auto dataCenter = model::DataCenter::getInstance();
+    QString m3u8FileUrl = dataCenter->getServerUrl();
+    m3u8FileUrl += "/HttpService/downloadVideo?fileId=";
+    m3u8FileUrl += videoInfo.videoFileId;
+    mpvPlayer->startPlay(m3u8FileUrl);
+    // isUpdatePlayNum = false;
 
-    // 视频加载后会立即播放，默认需要先暂停，让用户点击播放按钮进行播放
+    ui->videoSlider->setPlayStep(0);
+    // 视频加载成功之后会立马播放，初始时先将其设置为暂停状态，当用户点击播放按钮之后再让视频播放起来
     mpvPlayer->pause();
 }
 
-void PlayerPage::loadBulletScreenData()
+void PlayerPage::buildBulletScreenData()
 {
-    QList<BulletScreenInfo> bulletScreenList;
-    for(int i = 0; i < 3; i++) {
-        BulletScreenInfo bsItem("10001", i + 1, "我是弹幕" + QString::number(i));
-        bulletScreenList.append(bsItem);
-        bulletScreenLists.insert(bsItem.playTime, bulletScreenList);
-        bulletScreenList.clear();
-    }
-    for(int i = 0; i < 4; i++) {
-        BulletScreenInfo bsItem("10001", 5, "我是弹幕" + QString::number(i));
-        bulletScreenList.append(bsItem);
-    }
-    bulletScreenLists.insert(bulletScreenList[0].playTime, bulletScreenList);
+    auto dataCenter = model::DataCenter::getInstance();
+    bulletScreens = dataCenter->getBarragesData();
 }
 
 void PlayerPage::showBulletScreen()
@@ -94,13 +92,13 @@ void PlayerPage::showBulletScreen()
     if(!isStartBS) return ;
 
     // 通过时间获取弹幕数据
-    QList<BulletScreenInfo> bulletScreenList = bulletScreenLists.value(playTime);
+    QList<model::BarrageInfo> bulletScreenList = bulletScreens.value(mpvPlayer->getPlayTime());
     // 显示弹幕
     int xTop, xMid, xBottom;
     xTop = xMid = xBottom = top->width();
     BulletScreenItem* bs = nullptr;
     for(int i = 0; i < bulletScreenList.size(); i++) {
-        BulletScreenInfo& bsInfo = bulletScreenList[i];
+        model::BarrageInfo& bsInfo = bulletScreenList[i];
         if(0 == i % 3) {
             // 显示第一行
             bs = new BulletScreenItem(top);
@@ -189,12 +187,6 @@ void PlayerPage::onplayBtnClicked()
         barrageArea->hide();	// 弹幕隐藏
     }
 
-    // 播放完毕后再次点击播放重新开始播放
-    if(playTime >= 10 && isPlay) {
-        this->playTime = 0;
-        startPlaying(videoFilePath);
-        mpvPlayer->play();
-    }
 }
 
 void PlayerPage::onPlaySpeedChanged(double speed)
@@ -209,28 +201,29 @@ void PlayerPage::setVolume(int volumeRatio)
 
 void PlayerPage::onPlayPositionChanged(int64_t playTime)
 {
-    LOG() << playTime;
-    // 先测试10秒的视频时长 后续需要到服务器进行获取
-    this->playTime = playTime;
-    QString curPlayTime = secondToTime(this->playTime);
-    QString totalTime = secondToTime(10);
+    QString curPlayTime = secondToTime(playTime);
+    QString totalTime = secondToTime(videoInfo.videoDuration);
     ui->videoDuration->setText(curPlayTime + "/" + totalTime);
 
     // 修改进度条
-    ui->videoSlider->setPlayStep((double)this->playTime / 10);
+    ui->videoSlider->setPlayStep((double)playTime / videoInfo.videoDuration);
 
-    if(this->playTime == 10) {
-        isPlay = false;
-        ui->playBtn->setStyleSheet("border-image: url(:/images/PlayPage/zanting.png)");
-    }
-
-    showBulletScreen();		// 需要随着播放时间的继续，需要实时更新弹幕
+    // 更新弹幕数据
+    showBulletScreen();
 }
 
-void PlayerPage::setPlayProgress(double playRatio)
+void PlayerPage::onEndOfPlayList()
+{
+    isPlay = false;
+    ui->playBtn->setStyleSheet("border-image: url(:/images/PlayPage/zanting.png);");
+    // 重新点击播放按钮进行播放视频
+    startPlaying();
+}
+
+void PlayerPage::onSetPlayProgress(double playRatio)
 {
     // 更新播放时间
-    playTime = 10 * playRatio;
+    int playTime = playRatio * videoInfo.videoDuration;
     mpvPlayer->setCurrentPlayPositon(playTime);
 }
 

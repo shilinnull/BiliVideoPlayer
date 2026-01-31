@@ -26,6 +26,8 @@ VideoBox::VideoBox(model::VideoInfo videoInfo, QWidget *parent)
             this, &VideoBox::getUserImageDone);
 
     updateVideoInfoUI();		// 设置视频信息到界面
+    connect(dataCenter, &model::DataCenter::getVideoBarrageDone,
+            this, &VideoBox::getVideoBarrageSuccess);
 }
 
 VideoBox::~VideoBox()
@@ -61,13 +63,10 @@ void VideoBox::onPlayBtnClicked()
 {
     // 如果已经有一个播放器窗口存在，则先销毁它
     if(playPage)
-    {
-        // The connected lambda will set playPage to nullptr upon destruction.
         delete playPage;
-    }
 
     // 创建一个新的播放器实例
-    playPage = new PlayerPage();
+    playPage = new PlayerPage(videoInfo);
     // 当窗口被销毁（例如用户关闭）时，将静态指针重置为nullptr
     connect(playPage, &PlayerPage::destroyed, this, [=](){
         playPage = nullptr;
@@ -75,13 +74,16 @@ void VideoBox::onPlayBtnClicked()
     
     playPage->show();
 
-    // mpv测试
-    QDir dir = QDir::current();
-    dir.cdUp();
-    dir.cdUp();
-    QString videoPath = dir.absolutePath();
-    videoPath += "/videos/111.mp4";
-    playPage->startPlaying(videoPath);
+    auto dataCenter = model::DataCenter::getInstance();
+    dataCenter->downloadVideoAsync(videoInfo.videoFileId);  // 获取视频
+    dataCenter->getVideoBarrageAsync(videoInfo.videoId);    // 获取弹幕
+    connect(dataCenter, &model::DataCenter::downloadVideoDone, this,
+            [=](const QString& videoFilePath, const QString& videoFileId){
+        if(videoInfo.videoFileId != videoFileId)
+            return;
+        playPage->startPlaying();  // 开始播放
+    });
+
 }
 
 void VideoBox::setVideoDuration(int64_t duration)
@@ -139,6 +141,14 @@ void VideoBox::getUserImageDone(const QString &imageId, QByteArray imageData)
     userPixmap = makeCircleIcon(imageData,
                                 ui->userIcon->width() / 2).pixmap(ui->userIcon->size());
     ui->userIcon->setPixmap(userPixmap);
+}
+
+void VideoBox::getVideoBarrageSuccess(const QString &videoId)
+{
+    if(videoId != videoInfo.videoId)
+        return;
+    playPage->show();
+    playPage->startPlaying();
 }
 
 

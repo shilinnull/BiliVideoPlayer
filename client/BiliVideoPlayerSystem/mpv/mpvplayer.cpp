@@ -96,6 +96,7 @@ void MpvPlayer::handleMpvEvent(mpv_event *event)
 
         if(0 == strcmp(eventProperty->name, "time-pos")){
             int64_t seconds = *((int64_t*)eventProperty->data);
+            curPlayTime = seconds;
             emit playPositionChanged(seconds);
         }
         break;
@@ -110,7 +111,7 @@ void MpvPlayer::handleMpvEvent(mpv_event *event)
             mpv_get_property(mpv, "playlist-count", MPV_FORMAT_INT64, &playlistCount);
             mpv_get_property(mpv, "playlist-pos", MPV_FORMAT_INT64, &playlistPos);
 
-            if(playlistCount > 0 && playlistPos == playlistCount-1){
+            if(playlistCount > 0 && playlistPos == playlistCount - 1){
                 LOG()<<"整个视频播放结束";
                 emit endOfPlaylist();
             }else{

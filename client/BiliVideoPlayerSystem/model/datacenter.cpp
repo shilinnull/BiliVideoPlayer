@@ -14,6 +14,11 @@ DataCenter *DataCenter::getInstance()
     return instance;
 }
 
+QString &DataCenter::getServerUrl()
+{
+    return serverURL;
+}
+
 const KindAndTag *DataCenter::getKindAndTagsClassPtr()
 {
     if(nullptr == kindsAndTags) {
@@ -86,7 +91,43 @@ void DataCenter::downloadPhotoAsync(const QString &photoFileId)
     netClient.downloadPhoto(photoFileId);
 }
 
+void DataCenter::downloadVideoAsync(const QString &videoFileId)
+{
+    netClient.downloadVideo(videoFileId);
+}
+
+void DataCenter::getVideoBarrageAsync(const QString &videoId)
+{
+    netClient.getVideoBarrage(videoId);
+}
+
+void DataCenter::setBarragesData(const QJsonArray &barrageArray)
+{
+    barrages.clear();   // 清空之前的
+    QList<BarrageInfo> barrageList;
+    for(int i = 0; i < barrageArray.size(); i++) {
+        QJsonObject barrageObj = barrageArray[i].toObject();
+        BarrageInfo barrageInfo; barrageInfo.loadBarrageInfo(barrageObj);
+        // 该条弹幕是该时间下的第一条弹幕
+        //此时将上个时间点的弹幕先保存起来，然后处理新的弹幕
+        if(!barrageList.isEmpty() && barrageList[0].playTime != barrageInfo.playTime) {
+            barrages.insert(barrageList[0].playTime, barrageList);
+            barrageList.clear();
+        }
+        barrageList.append(barrageInfo);
+    }
+    if(!barrageList.isEmpty())
+        barrages.insert(barrageList[0].playTime, barrageList);
+}
+
+QHash<int64_t, QList<BarrageInfo>> &DataCenter::getBarragesData()
+{
+    return barrages;
+}
+
 DataCenter::DataCenter(QObject *parent)
     : QObject{parent}
-{}
+{
+    netClient.setServerUrl(serverURL);
+}
 }	// namespace model

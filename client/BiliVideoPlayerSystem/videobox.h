@@ -17,7 +17,7 @@ public:
     explicit VideoBox(model::VideoInfo videoInfo, QWidget *parent = nullptr);
     ~VideoBox();
 
-    bool eventFilter(QObject* watched, QEvent* event);
+    bool eventFilter(QObject* watched, QEvent* event) override;
     void updateVideoInfoUI();
 private:
     void onPlayBtnClicked();
@@ -30,6 +30,7 @@ protected:
 private slots:
     void getVideoImageDone(const QString& imageId, QByteArray imageData);
     void getUserImageDone(const QString& imageId, QByteArray imageData);
+    void getVideoBarrageSuccess(const QString& videoId);
 private:
     Ui::VideoBox *ui;
     static PlayerPage* playPage;

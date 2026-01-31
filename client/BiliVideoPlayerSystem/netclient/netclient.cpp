@@ -3,15 +3,23 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QJsonDocument>
+#include <QStandardPaths>
 #include "../util.h"
-#include "../model/datacenter.h"
+#include "model/datacenter.h"
 
 namespace network {
 
 NetClient::NetClient(QObject *parent)
     : QObject{parent}
-{}
+{
+}
+
+void NetClient::setServerUrl(const QString &url)
+{
+    HTTP_URL = url;
+}
 
 void NetClient::tempLogin()
 {
@@ -184,8 +192,8 @@ void NetClient::getVideosBySearchText(const QString &searchText)
 
 void NetClient::downloadPhoto(const QString &photoFileId)
 {
-    auto dataCenter = model::DataCenter::getInstance();
     // 1. 构造请求
+    auto dataCenter = model::DataCenter::getInstance();
     QString queryStr;
     queryStr += "requestId=";
     queryStr += makeRequeId();
@@ -212,6 +220,69 @@ void NetClient::downloadPhoto(const QString &photoFileId)
         QByteArray imageData = httpReply->readAll();
         emit dataCenter->downloadPhotoDone(photoFileId, imageData);
         httpReply->deleteLater();
+    });
+}
+
+void NetClient::downloadVideo(const QString &videoFileId)
+{
+    // 1. 构造请求
+    QString queryString;
+    queryString += "fileId=";
+    queryString += videoFileId;
+
+    // 2. 发送请求
+    QNetworkRequest httpReq;
+    httpReq.setUrl(QUrl(HTTP_URL + "/HttpService/downloadVideo?" + queryString));
+    QNetworkReply* httpReply = httpClient.get(httpReq);
+
+    connect(httpReply, &QNetworkReply::finished, this, [=]{
+        if(httpReply->error() != QNetworkReply::NoError) {
+            LOG() << httpReply->errorString();
+            httpReply->deleteLater();
+            return ;
+        }
+        QByteArray videoFileContent = httpReply->readAll(); // 读取内容
+
+        QString videoFilePath = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+        videoFilePath += "/";
+        videoFilePath += videoFileId;
+        videoFilePath += ".m3u8";
+        LOG() << "文件路径"<<videoFilePath;
+        writeByteArrayToFile(videoFilePath, videoFileContent);  // 写入文件
+        auto dataCenter = model::DataCenter::getInstance();
+        emit dataCenter->downloadVideoDone(videoFilePath, videoFileId);
+        LOG() << "downloadVideo 请求结束，视频下载成功";
+    });
+
+}
+
+void NetClient::getVideoBarrage(const QString &videoId)
+{
+    // 1. 构造请求体
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["videoId"] = videoId;
+
+    // 2. 发送请求
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/getBarrage", reqBody);
+
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject resultObject = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"getBarrage 请求出错，reason = "<<reason;
+            return;
+        }
+
+        QJsonObject resultObj = resultObject["result"].toObject();
+        dataCenter->setBarragesData(resultObj["barrageList"].toArray());
+
+        // d. 统计界面显示视频信息
+        emit dataCenter->getVideoBarrageDone(videoId);
+        LOG()<<"getBarrage 成功, resquestId = "<<resultObj["requestId"].toString();
     });
 }
 
