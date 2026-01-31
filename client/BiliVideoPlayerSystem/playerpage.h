@@ -9,8 +9,8 @@
 #include "volume.h"
 #include "playspeed.h"
 #include "mpv/mpvplayer.h"
-#include "bulletscreenitem.h"
 #include "model/datacenter.h"
+#include "model/data.h"
 
 namespace Ui {
 class PlayerPage;
@@ -28,6 +28,7 @@ public:
     void startPlaying();
     void buildBulletScreenData();                   // 加载弹幕数据
     void showBulletScreen();						// 显示弹幕
+    void setUserIcon(QPixmap& userPixmap);          // 设置用户头像
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;
@@ -48,6 +49,7 @@ private slots:
 private:
     QString secondToTime(int64_t second);           // 转换时间
     void initBarrageArea();							// 弹幕区域布局
+    void updateVideoInfoUI();                       // 设置视频信息
 
 private:
     Ui::PlayerPage *ui;

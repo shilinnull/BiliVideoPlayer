@@ -71,7 +71,7 @@ void VideoBox::onPlayBtnClicked()
     connect(playPage, &PlayerPage::destroyed, this, [=](){
         playPage = nullptr;
     });
-    
+
     playPage->show();
 
     auto dataCenter = model::DataCenter::getInstance();
@@ -147,6 +147,7 @@ void VideoBox::getVideoBarrageSuccess(const QString &videoId)
 {
     if(videoId != videoInfo.videoId)
         return;
+    playPage->setUserIcon(userPixmap);  // 设置用户头像
     playPage->show();
     playPage->startPlaying();
 }

@@ -5,6 +5,7 @@
 #include "login.h"
 #include "toast.h"
 #include "volume.h"
+#include "bulletscreenitem.h"
 #include <QShortcut>
 #include <QKeySequence>
 
@@ -24,6 +25,7 @@ PlayerPage::PlayerPage(const model::VideoInfo& videoInfo, QWidget *parent)
     mpvPlayer = new MpvPlayer(ui->screen, this);	// 视频
 
     initBarrageArea();								// 初始化弹幕布局
+    updateVideoInfoUI();
 
     // 设置快捷键空格
     QShortcut* shortCut = new QShortcut(ui->playBtn);
@@ -46,8 +48,6 @@ PlayerPage::PlayerPage(const model::VideoInfo& videoInfo, QWidget *parent)
     connect(mpvPlayer, &MpvPlayer::endOfPlaylist, this, &PlayerPage::onEndOfPlayList);
     connect(ui->bulletScreenBtn, &QPushButton::clicked, this, &PlayerPage::onBulletScreenClicked);
     connect(ui->bulletScreenText, &BarrageEdit::onSendScreenBtn, this, &PlayerPage::onSendBulletScreenBtnClicked);
-
-    // buildBulletScreenData();
 }
 
 PlayerPage::~PlayerPage()
@@ -123,6 +123,11 @@ void PlayerPage::showBulletScreen()
         }
         bs->startAnimal();
     }
+}
+
+void PlayerPage::setUserIcon(QPixmap& userPixmap)
+{
+    ui->userAvatar->setIcon(QIcon(userPixmap));
 }
 
 void PlayerPage::mousePressEvent(QMouseEvent *event)
@@ -301,3 +306,17 @@ void PlayerPage::initBarrageArea()
     barrageArea->move(point);
     barrageArea->show();
 }
+
+void PlayerPage::updateVideoInfoUI()
+{
+    ui->videoTittle->setText(videoInfo.videoTitle);
+    ui->userNikeName->setText(videoInfo.nickName);
+    ui->loadupTime->setText(videoInfo.videoUpTime);
+    ui->likeNum->setText(intToString(videoInfo.likeCount));
+    ui->playNum->setText(intToString(videoInfo.playCount));
+    QString curPlayTime = secondToTime(0);
+    QString totalTime = secondToTime(videoInfo.videoDuration);
+    ui->videoDuration->setText(curPlayTime + "/" + totalTime);
+    ui->videoDesc->setText(videoInfo.videoDesc);
+}
+

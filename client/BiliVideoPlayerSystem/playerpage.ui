@@ -74,7 +74,7 @@ QPushButton{ border : none; }</string>
          <string notr="true">#videoTittle{ font-size : 24px; }</string>
         </property>
         <property name="text">
-         <string>【北京旅游攻略】一条视频告诉你去了北京该怎么玩</string>
+         <string/>
         </property>
        </widget>
       </item>
@@ -308,7 +308,7 @@ QPushButton{ border : none; }</string>
             <item>
              <widget class="QLabel" name="videoDuration">
               <property name="text">
-               <string>00:00/00:00</string>
+               <string/>
               </property>
              </widget>
             </item>
@@ -563,7 +563,7 @@ QPushButton{ border : none; }</string>
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">#userAvatar{ border-image : url(&quot;:/images/PlayPage/touxiang.png&quot;); }</string>
+               <string notr="true"/>
               </property>
               <property name="text">
                <string/>
@@ -588,14 +588,14 @@ QPushButton{ border : none; }</string>
                <string notr="true">#userNikeName{ font-size : 18px; font-weight : bold; }</string>
               </property>
               <property name="text">
-               <string>昵称名称用户名</string>
+               <string/>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QLabel" name="loadupTime">
               <property name="text">
-               <string>9-16 12:28:58</string>
+               <string/>
               </property>
              </widget>
             </item>
@@ -657,7 +657,7 @@ QPushButton{ border : none; }</string>
             <item>
              <widget class="QLabel" name="playNum">
               <property name="text">
-               <string>26.1万</string>
+               <string/>
               </property>
              </widget>
             </item>
@@ -720,7 +720,7 @@ QPushButton{ border : none; }</string>
             <item>
              <widget class="QLabel" name="likeNum">
               <property name="text">
-               <string>1226万</string>
+               <string/>
               </property>
              </widget>
             </item>
@@ -757,7 +757,7 @@ QPushButton{ border : none; }</string>
             <string notr="true">#videoDesc{ font-size : 14px; }</string>
            </property>
            <property name="text">
-            <string>【北京旅游攻略】条视频告诉你去了北京该怎么条视频告诉你去了北京该怎么条视频告诉你去了北京该怎么条视频告诉你去了北京该怎么条视频告诉你去了北京该怎么条视频告诉你去了北京该怎么条视频告诉你去了北京该怎么条视频告诉你去了北京该怎么条视频告诉你去了北京该怎么条视频告诉你去了北京该怎么条视频告诉你去了北京该怎么一条视频告诉你去了北京该怎么玩</string>
+            <string/>
            </property>
            <property name="wordWrap">
             <bool>true</bool>

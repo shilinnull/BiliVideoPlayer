@@ -135,7 +135,7 @@ QHttpServerResponse MockServer::allVideoList(const QHttpServerRequest &request)
         videoJsonObj["photoFileId"] = QString::number(resourceId++);
         videoJsonObj["videoFileId"] = QString::number(resourceId++);
         videoJsonObj["likeCount"] = 1234;
-        videoJsonObj["playCount"] = 3456;
+        videoJsonObj["playCount"] = 24567;
         videoJsonObj["videoSize"] = 10240;
         videoJsonObj["videoDesc"] = "【北京旅游攻略】一条视频告诉你去了北京该怎么玩"
                                     "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
