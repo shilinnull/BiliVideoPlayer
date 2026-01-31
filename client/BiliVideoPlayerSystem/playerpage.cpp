@@ -74,8 +74,8 @@ void PlayerPage::startPlaying()
     m3u8FileUrl += "/HttpService/downloadVideo?fileId=";
     m3u8FileUrl += videoInfo.videoFileId;
     mpvPlayer->startPlay(m3u8FileUrl);
-    // isUpdatePlayNum = false;
 
+    isUpdatePlayNum = false;
     ui->videoSlider->setPlayStep(0);
     // 视频加载成功之后会立马播放，初始时先将其设置为暂停状态，当用户点击播放按钮之后再让视频播放起来
     mpvPlayer->pause();
@@ -191,7 +191,9 @@ void PlayerPage::onplayBtnClicked()
         if(mpvPlayer) mpvPlayer->pause();
         barrageArea->hide();	// 弹幕隐藏
     }
-
+    // 在本次播放中，视频的播放数未更新时再更新播放数
+    if(!isUpdatePlayNum)
+        updataPlayCount();
 }
 
 void PlayerPage::onPlaySpeedChanged(double speed)
@@ -318,5 +320,25 @@ void PlayerPage::updateVideoInfoUI()
     QString totalTime = secondToTime(videoInfo.videoDuration);
     ui->videoDuration->setText(curPlayTime + "/" + totalTime);
     ui->videoDesc->setText(videoInfo.videoDesc);
+}
+
+void PlayerPage::updataPlayCount()
+{
+    // 判断是否有效点击
+    if(isUpdatePlayNum)
+        return;
+    videoInfo.playCount++;
+    ui->playNum->setText(intToString(videoInfo.playCount));
+    auto dataCenter = model::DataCenter::getInstance();
+    auto videoList = dataCenter->getVideoListPtr();
+    videoList->incrementPlayNum(videoInfo.videoId);
+    // 我的页面视频列表
+
+    // 更新服务器上的该视频播放数
+    dataCenter->setPlayNumberAsync(videoInfo.videoId);
+
+    // 通知videobox更新界面上的播放数
+    emit increasePlayCount(videoInfo.videoId);
+    isUpdatePlayNum = true;
 }
 

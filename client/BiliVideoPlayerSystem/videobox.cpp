@@ -28,6 +28,7 @@ VideoBox::VideoBox(model::VideoInfo videoInfo, QWidget *parent)
     updateVideoInfoUI();		// 设置视频信息到界面
     connect(dataCenter, &model::DataCenter::getVideoBarrageDone,
             this, &VideoBox::getVideoBarrageSuccess);
+
 }
 
 VideoBox::~VideoBox()
@@ -67,11 +68,19 @@ void VideoBox::onPlayBtnClicked()
 
     // 创建一个新的播放器实例
     playPage = new PlayerPage(videoInfo);
-    // 当窗口被销毁（例如用户关闭）时，将静态指针重置为nullptr
+    // 当窗口被销毁（例如关闭）时，将静态指针重置为nullptr
     connect(playPage, &PlayerPage::destroyed, this, [=](){
         playPage = nullptr;
     });
-
+    // 更新videoBox播放数
+    connect(playPage, &PlayerPage::increasePlayCount, this, [=](const QString& videoId){
+        if(videoId == this->videoInfo.videoId) {
+            LOG() << "更新videoBox播放数";
+            this->videoInfo.playCount++;
+            ui->playNum->setText(intToString(this->videoInfo.playCount));
+            return;
+        }
+    });
     playPage->show();
 
     auto dataCenter = model::DataCenter::getInstance();
@@ -114,6 +123,11 @@ void VideoBox::setUserIcon(const QString &userAvatarId)
 
 void VideoBox::paintEvent(QPaintEvent *event)
 {
+    // 防止图片还没下载好就对QPixmap进行绘制
+    if(videoCoverImage.isNull()) {
+        QWidget::paintEvent(event);
+        return;
+    }
     // 绘制图片
     ui->imageBox->setAutoFillBackground(true);
     videoCoverImage = videoCoverImage.scaled(ui->imageBox->size(),

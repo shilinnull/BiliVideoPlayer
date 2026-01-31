@@ -125,6 +125,11 @@ QHash<int64_t, QList<BarrageInfo>> &DataCenter::getBarragesData()
     return barrages;
 }
 
+void DataCenter::setPlayNumberAsync(const QString &videoId)
+{
+    netClient.setPlayNumber(videoId);
+}
+
 DataCenter::DataCenter(QObject *parent)
     : QObject{parent}
 {

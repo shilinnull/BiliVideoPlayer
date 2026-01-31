@@ -47,6 +47,10 @@ public:
     const QList<VideoInfo>& getVideoList() const ;
     // 清空视频列表
     void clearVideoList();
+    // 增加播放量
+    void incrementPlayNum(const QString& videoId);
+
+
     QList<VideoInfo> videoInfos;	// 从服务器上获取下来的视频数据
     int64_t pageIndex;				// 页面索引
     int64_t videoTotalCount;		// 当前模式下的视频个数

@@ -29,6 +29,7 @@ public:
     void getVideoBarrageAsync(const QString& videoId);          // 获取弹幕
     void setBarragesData(const QJsonArray& barrageArray);       // 设置弹幕
     QHash<int64_t, QList<BarrageInfo>>& getBarragesData();      // 获取弹幕内容
+    void setPlayNumberAsync(const QString& videoId);            // 更新播放数
 private:
     explicit DataCenter(QObject *parent = nullptr);
     static DataCenter* instance;

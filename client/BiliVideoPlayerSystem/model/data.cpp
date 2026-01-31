@@ -130,6 +130,16 @@ void VideoList::clearVideoList()
     pageIndex = 1;
 }
 
+void VideoList::incrementPlayNum(const QString& videoId)
+{
+    for(auto& videoInfo : videoInfos) {
+        if(videoInfo.videoId == videoId) {
+            videoInfo.playCount++;
+            return ;
+        }
+    }
+}
+
 void BarrageInfo::loadBarrageInfo(QJsonObject &barrageJson)
 {
     barrageId = barrageJson["barrageId"].toString();

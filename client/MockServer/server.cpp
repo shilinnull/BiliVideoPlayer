@@ -65,6 +65,11 @@ bool MockServer::init()
         return this->getBarrage(req);
     });
 
+    // 获取弹幕数据
+    httpServer.route("/HttpService/setPlay", [=](const QHttpServerRequest& req){
+        return this->setPlay(req);
+    });
+
     return 8000 == ret;
 }
 
@@ -81,7 +86,7 @@ QHttpServerResponse MockServer::tempLogin(const QHttpServerRequest &req)
 {
     QJsonDocument docReq = QJsonDocument::fromJson(req.body());
     const QJsonObject& jsonReq = docReq.object();
-    LOG() << "[tempLogin] 收到 tempLogin 请求, requestId=" << jsonReq["requestId"].toString();
+    LOG() << "[tempLogin] 收到 tempLogin 请求, requestId=" << jsonReq["requ estId"].toString();
 
     roleType = TempUser;		// 设置临时用户登录
 
@@ -135,7 +140,7 @@ QHttpServerResponse MockServer::allVideoList(const QHttpServerRequest &request)
         videoJsonObj["photoFileId"] = QString::number(resourceId++);
         videoJsonObj["videoFileId"] = QString::number(resourceId++);
         videoJsonObj["likeCount"] = 1234;
-        videoJsonObj["playCount"] = 24567;
+        videoJsonObj["playCount"] = 666;
         videoJsonObj["videoSize"] = 10240;
         videoJsonObj["videoDesc"] = "【北京旅游攻略】一条视频告诉你去了北京该怎么玩"
                                     "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
@@ -472,6 +477,27 @@ QHttpServerResponse MockServer::getBarrage(const QHttpServerRequest &req)
 
     QJsonDocument docResp;
     docResp.setObject(jsonBody);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::setPlay(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG()<<"[setPlay] 收到 setPlay 请求， requestId = "<<jsonReq["requestId"].toString();
+
+    QString videoId = jsonReq["videoId"].toString();
+    LOG() <<"视频"<<videoId<<"播放次数更新成功";
+
+    QJsonObject jsonResp;
+    jsonResp["requestId"] = jsonReq["requestId"].toString();
+    jsonResp["errorCode"] = 0;
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonResp);
 
     QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
     httpResp.setHeader("Content-Type", "application/json; charset=utf-8");

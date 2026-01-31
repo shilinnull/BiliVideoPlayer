@@ -56,7 +56,7 @@ void Toast::initUI(const QString &text)
     QWidget* qWidget = new QWidget(this);
     qWidget->setFixedSize(800, 60);
     qWidget->setStyleSheet("background-color: rgba(102, 102, 102, 0.5);"
-                           "border-raidus:4px;");
+                           "border-radius:4px;");
     QVBoxLayout* layout = new QVBoxLayout(qWidget);
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);

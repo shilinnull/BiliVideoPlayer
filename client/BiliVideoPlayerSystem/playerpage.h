@@ -50,7 +50,7 @@ private:
     QString secondToTime(int64_t second);           // 转换时间
     void initBarrageArea();							// 弹幕区域布局
     void updateVideoInfoUI();                       // 设置视频信息
-
+    void updataPlayCount();                         // 更新播放数
 private:
     Ui::PlayerPage *ui;
     QPoint dragPos;
@@ -59,6 +59,7 @@ private:
     MpvPlayer* mpvPlayer = nullptr; // 封装mpv库，控制播放视频
     bool isPlay = false;            // 默认情况下暂停
     model::VideoInfo videoInfo;     // 保存视频信息
+    bool isUpdatePlayNum = false;   // 是否更新播放次数
 
     // 弹幕相关信息
     QDialog* barrageArea;
@@ -67,6 +68,8 @@ private:
     QFrame* bottom;
     bool isStartBS = true;
     QHash<int64_t, QList<model::BarrageInfo>> bulletScreens;    // 获取当前播放下的所有数据
+signals:
+    void increasePlayCount(const QString& videoId);
 };
 
 #endif // PLAYERPAGE_H

@@ -21,7 +21,7 @@ private:
     QLabel* btnImage;
     QLabel* btnTittle;
 
-    int pageId;
+    int pageId = -1;
 
 signals:
     void switchPage(int pageId);

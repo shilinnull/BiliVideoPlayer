@@ -126,7 +126,9 @@ QPushButton{ border : none; }</string>
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">#minBtn{ border-image : url(&quot;:images/PlayPage/suoxiao.png&quot;); }</string>
+            <string notr="true">#minBtn{ border-image : url(&quot;:images/PlayPage/suoxiao.png&quot;); }
+#minBtn:hover
+{background-color:rgb(77, 77, 77);}</string>
            </property>
            <property name="text">
             <string/>
@@ -148,7 +150,9 @@ QPushButton{ border : none; }</string>
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">#quitBtn{ border-image : url(&quot;:/images/PlayPage/quxiao.png&quot;); }</string>
+            <string notr="true">#quitBtn{ border-image : url(&quot;:/images/PlayPage/quxiao.png&quot;); }
+#quitBtn:hover
+{background-color:rgb(77, 77, 77);}</string>
            </property>
            <property name="text">
             <string/>

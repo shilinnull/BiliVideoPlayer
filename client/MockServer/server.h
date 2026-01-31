@@ -47,6 +47,8 @@ private:
     QHttpServerResponse downloadVideo(const QHttpServerRequest& req);   // 下载视频
     QHttpServerResponse downloadVideoSegmentation(const QString& fileName);   // 下载视频分片
     QHttpServerResponse getBarrage(const QHttpServerRequest& req);      // 获取弹幕数据
+    QHttpServerResponse setPlay(const QHttpServerRequest& req);         // 更新播放次数
+
 
 private:
     MockServer();

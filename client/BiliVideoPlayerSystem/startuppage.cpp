@@ -1,5 +1,6 @@
 #include "startuppage.h"
 #include "./model/datacenter.h"
+#include "util.h"
 
 StartupPage::StartupPage(QDialog *parent)
     : QDialog{parent}
@@ -34,14 +35,13 @@ StartupPage::StartupPage(QDialog *parent)
 
 void StartupPage::startTimer()
 {
-    QTimer* timer = new QTimer();
-    timer->setSingleShot(true);		// 设置为周期定时
-    connect(timer, &QTimer::timeout, this, [this, timer]{
-        if(loginSuccess) {	// 用户登录成功才删除该启动页
-            timer->stop();
-            delete timer;
-            close();
+    QTimer* timer = new QTimer(this);
+	timer->setSingleShot(true);		// 设置为周期定时
+    connect(timer, &QTimer::timeout, this, [this]{
+        if(!loginSuccess) {
+            LOG() << "临时登录未完成，继续启动客户端";
         }
+        close();
     });
     timer->start(2000); // 两秒钟后触发
 

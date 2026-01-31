@@ -286,6 +286,30 @@ void NetClient::getVideoBarrage(const QString &videoId)
     });
 }
 
+void NetClient::setPlayNumber(const QString &videoId)
+{
+    // 1. 构造请求体
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["videoId"] = videoId;
+
+    // 2. 发送请求
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/setPlay", reqBody);
+
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject resultObject = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"setPlay 请求出错，reason = "<<reason;
+            return;
+        }
+        LOG()<<"setPlay 成功, 播放次数成功，resquestId = "<< resultObject["requestId"].toString();
+    });
+}
+
 QString NetClient::makeRequeId()
 {
     return "R" + QUuid::createUuid().toString().sliced(25, 12);

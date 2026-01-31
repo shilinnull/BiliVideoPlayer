@@ -48,7 +48,10 @@ void BiliVideoPlayer::initUI()
 void BiliVideoPlayer::connectSignalAndSlot()
 {
     connect(ui->minBtn, &QPushButton::clicked, this, &QWidget::showMinimized);
-    connect(ui->quitBtn, &QPushButton::clicked, this, &QWidget::close);
+    connect(ui->quitBtn, &QPushButton::clicked, this, [=]{
+
+        this->close();
+    });
 
     connect(ui->homePageBtn, &PageSwitchButton::switchPage, this, &BiliVideoPlayer::onSwitchStackedWidgetPage);
     connect(ui->myPageBtn, &PageSwitchButton::switchPage, this, &BiliVideoPlayer::onSwitchStackedWidgetPage);
@@ -67,15 +70,6 @@ void BiliVideoPlayer::connectSignalAndSlot()
 
 void BiliVideoPlayer::resetSwitchBtnInfo(int pageId)
 {
-    // 重新设置左侧栏未选中按钮颜⾊
-    QList<PageSwitchButton*> switchBtns = findChildren<PageSwitchButton*>();
-    for(auto &switchBtn : switchBtns) {
-        if(switchBtn->getPageId() != pageId)
-            switchBtn->setTextColor("#666666");
-        else
-            switchBtn->setTextColor("#FF6699"); // 设置选中按钮的文本颜色
-    }
-
     // 根据当前页面ID设置按钮图像
     if (pageId == HomePage) {
         ui->homePageBtn->setImageAndText(":/images/homePage/shouyexuan.png", "首页", HomePage);
@@ -93,10 +87,14 @@ void BiliVideoPlayer::resetSwitchBtnInfo(int pageId)
         ui->homePageBtn->setImageAndText(":/images/homePage/shouye.png", "首页", HomePage);
         ui->myPageBtn->setImageAndText(":/images/homePage/wode.png", "我的", MyselfPage);
         ui->sysPageBtn->setImageAndText(":/images/homePage/admin.png", "系统", AdminPage);
-        LOG() << "切换到上传视频界面";
     } else {
         LOG() << "暂时不支持页面";
     }
+
+    // 重新设置左侧栏未选中按钮颜色
+    ui->homePageBtn->setTextColor(pageId == HomePage ? "#FF6699" : "#666666");
+    ui->myPageBtn->setTextColor(pageId == MyselfPage ? "#FF6699" : "#666666");
+    ui->sysPageBtn->setTextColor(pageId == AdminPage ? "#FF6699" : "#666666");
 }
 
 void BiliVideoPlayer::onSwitchStackedWidgetPage(int pageId)
