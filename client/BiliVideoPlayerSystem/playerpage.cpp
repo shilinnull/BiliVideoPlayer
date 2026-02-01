@@ -36,7 +36,7 @@ PlayerPage::PlayerPage(const model::VideoInfo& videoInfo, QWidget *parent)
     });
 
     connect(ui->minBtn, &QPushButton::clicked, this, &QWidget::showMinimized);
-    connect(ui->quitBtn, &QPushButton::clicked, this, &QWidget::close);
+    connect(ui->quitBtn, &QPushButton::clicked, this, &PlayerPage::onQuitBtnClicked);
     connect(ui->volumeBtn, &QPushButton::clicked, this, &PlayerPage::onVolumeBtnClicked);
     connect(ui->speedBtn, &QPushButton::clicked, this, &PlayerPage::onSpeedBtnClicked);
     connect(ui->likeImageBtn, &QPushButton::clicked, this, &PlayerPage::onLikeImageBtnClicked);
@@ -48,6 +48,23 @@ PlayerPage::PlayerPage(const model::VideoInfo& videoInfo, QWidget *parent)
     connect(mpvPlayer, &MpvPlayer::endOfPlaylist, this, &PlayerPage::onEndOfPlayList);
     connect(ui->bulletScreenBtn, &QPushButton::clicked, this, &PlayerPage::onBulletScreenClicked);
     connect(ui->bulletScreenText, &BarrageEdit::onSendScreenBtn, this, &PlayerPage::onSendBulletScreenBtnClicked);
+
+    likeCount = videoInfo.likeCount;        // 更新播放数
+    auto dataCenter = model::DataCenter::getInstance();
+    connect(dataCenter, &model::DataCenter::getIsLikeVideoDone, this,
+            [=](const QString& videoId, bool isLike){
+        if(videoId != videoInfo.videoId) {
+            return ;
+        }
+        if(isLike) {
+            ui->likeImageBtn->setStyleSheet("#likeImageBtn{border-image: url(:/images/PlayPage/dianzan.png)}");
+        } else {
+            ui->likeImageBtn->setStyleSheet("#likeImageBtn{border-image: url(:/images/PlayPage/quxiaodianzan.png)}");
+        }
+        this->isLike = isLike;
+    });
+    dataCenter->getIsLikeVideoAsync(videoInfo.videoId);
+
 }
 
 PlayerPage::~PlayerPage()
@@ -172,9 +189,20 @@ void PlayerPage::onSpeedBtnClicked()
 void PlayerPage::onLikeImageBtnClicked()
 {
     // 检测用户是否登录，登录才能点赞
-    Login* login = new Login();
-    // login->show();
-    Toast::showMessage("先登录，登录后才能点赞", login);
+    if(false) {
+        Login* login = new Login();
+        Toast::showMessage("先登录，登录后才能点赞", login);
+    }
+
+    isLike = !isLike;
+    if(isLike) {
+        likeCount++;
+        ui->likeImageBtn->setStyleSheet("#likeImageBtn{border-image: url(:/images/PlayPage/dianzan.png)}");
+    } else {
+        likeCount--;
+        ui->likeImageBtn->setStyleSheet("#likeImageBtn{border-image: url(:/images/PlayPage/quxiaodianzan.png)}");
+    }
+    ui->likeNum->setText(intToString(likeCount));
 }
 
 void PlayerPage::onplayBtnClicked()
@@ -340,5 +368,24 @@ void PlayerPage::updataPlayCount()
     // 通知videobox更新界面上的播放数
     emit increasePlayCount(videoInfo.videoId);
     isUpdatePlayNum = true;
+}
+
+void PlayerPage::onQuitBtnClicked()
+{
+    if(likeCount != videoInfo.likeCount){
+        // 视频的点赞信息发生改变，给服务器同步
+        auto dataCenter = model::DataCenter::getInstance();
+        dataCenter->setLikeNumberAsync(videoInfo.videoId);
+
+        // 更新视频列表中的videoId视频的点赞信息：首页 和 我的页面
+        auto videoListPtr = dataCenter->getVideoListPtr();
+        videoListPtr->updateLikeNum(videoInfo.videoId, likeCount);
+        videoInfo.likeCount = likeCount;
+
+        // 通知videoBox更新点赞数据
+        emit updateLikeNum(likeCount);
+    }
+
+    this->deleteLater();
 }
 

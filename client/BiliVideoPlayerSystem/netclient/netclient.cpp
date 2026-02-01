@@ -252,6 +252,7 @@ void NetClient::downloadVideo(const QString &videoFileId)
         auto dataCenter = model::DataCenter::getInstance();
         emit dataCenter->downloadVideoDone(videoFilePath, videoFileId);
         LOG() << "downloadVideo 请求结束，视频下载成功";
+        httpReply->deleteLater();
     });
 
 }
@@ -307,6 +308,58 @@ void NetClient::setPlayNumber(const QString &videoId)
             return;
         }
         LOG()<<"setPlay 成功, 播放次数成功，resquestId = "<< resultObject["requestId"].toString();
+   });
+}
+
+void NetClient::getIsLikeVideo(const QString &videoId)
+{
+    // 1. 构造请求体
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["videoId"] = videoId;
+
+    // 2. 发送请求
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/judgeLike", reqBody);
+
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject resultObject = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"judgeLike 请求出错，reason = "<<reason;
+            return;
+        }
+        QJsonObject result = resultObject["result"].toObject();
+        emit dataCenter->getIsLikeVideoDone(videoId, result["isLike"].toBool());
+        LOG()<<"judgeLike 成功，resquestId = "<< resultObject["requestId"].toString();
+    });
+}
+
+void NetClient::setLikeNumber(const QString &videoId)
+{
+    // 1. 构造请求体
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["videoId"] = videoId;
+
+    // 2. 发送请求
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/setLike", reqBody);
+
+    // 3. 异步处理 setLike 请求的响应
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"setLike 请求出错，reason = "<<reason;
+            return;
+        }
+
+        LOG()<<"setLike 成功, resquestId = "<<replyObj["requestId"].toString();
     });
 }
 

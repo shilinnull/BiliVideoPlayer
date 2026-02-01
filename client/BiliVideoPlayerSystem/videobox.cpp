@@ -93,6 +93,11 @@ void VideoBox::onPlayBtnClicked()
         playPage->startPlaying();  // 开始播放
     });
 
+    connect(playPage, &PlayerPage::updateLikeNum, this, [=](int64_t likeCount){
+        LOG()<<"更新 videoBox 点赞数";
+        this->videoInfo.likeCount = likeCount;
+        ui->likeNum->setText(intToString(videoInfo.likeCount));
+    });
 }
 
 void VideoBox::setVideoDuration(int64_t duration)

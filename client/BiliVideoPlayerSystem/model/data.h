@@ -49,6 +49,8 @@ public:
     void clearVideoList();
     // 增加播放量
     void incrementPlayNum(const QString& videoId);
+    // 更新播放数
+    void updateLikeNum(const QString& videoId, int64_t likeCount);
 
 
     QList<VideoInfo> videoInfos;	// 从服务器上获取下来的视频数据

@@ -140,6 +140,16 @@ void VideoList::incrementPlayNum(const QString& videoId)
     }
 }
 
+void VideoList::updateLikeNum(const QString &videoId, int64_t likeCount)
+{
+    for(auto& videoInfo : videoInfos) {
+        if(videoInfo.videoId == videoId) {
+            videoInfo.likeCount = likeCount;
+            return ;
+        }
+    }
+}
+
 void BarrageInfo::loadBarrageInfo(QJsonObject &barrageJson)
 {
     barrageId = barrageJson["barrageId"].toString();

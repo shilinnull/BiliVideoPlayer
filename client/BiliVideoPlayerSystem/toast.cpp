@@ -32,6 +32,7 @@ Toast::Toast(const QString &text)
         this->close();
         this->deleteLater();
     });
+    timer->start(2000);
 }
 
 void Toast::showMessage(const QString &text)

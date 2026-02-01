@@ -43,14 +43,16 @@ private slots:
     void setVolume(int volumeRatio);                // 音量调整
     void onPlayPositionChanged(int64_t playTime);   // 播放位置改变
     void onEndOfPlayList();                         // 所有视频分片播放结束
-    void onSetPlayProgress(double playRatio);			// 设置播放进度
+    void onSetPlayProgress(double playRatio);		// 设置播放进度
     void onBulletScreenClicked();					// 弹幕开关控制
     void onSendBulletScreenBtnClicked(const QString& text);// 发送弹幕
+
 private:
     QString secondToTime(int64_t second);           // 转换时间
     void initBarrageArea();							// 弹幕区域布局
     void updateVideoInfoUI();                       // 设置视频信息
     void updataPlayCount();                         // 更新播放数
+    void onQuitBtnClicked();                        // 退出
 private:
     Ui::PlayerPage *ui;
     QPoint dragPos;
@@ -60,6 +62,8 @@ private:
     bool isPlay = false;            // 默认情况下暂停
     model::VideoInfo videoInfo;     // 保存视频信息
     bool isUpdatePlayNum = false;   // 是否更新播放次数
+    bool isLike = false;            // 检测是否被点赞过，默认没有
+    int64_t likeCount = 0;          // 标记点赞数
 
     // 弹幕相关信息
     QDialog* barrageArea;
@@ -70,6 +74,7 @@ private:
     QHash<int64_t, QList<model::BarrageInfo>> bulletScreens;    // 获取当前播放下的所有数据
 signals:
     void increasePlayCount(const QString& videoId);
+    void updateLikeNum(int64_t likeCount);
 };
 
 #endif // PLAYERPAGE_H

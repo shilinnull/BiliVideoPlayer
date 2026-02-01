@@ -48,7 +48,8 @@ private:
     QHttpServerResponse downloadVideoSegmentation(const QString& fileName);   // 下载视频分片
     QHttpServerResponse getBarrage(const QHttpServerRequest& req);      // 获取弹幕数据
     QHttpServerResponse setPlay(const QHttpServerRequest& req);         // 更新播放次数
-
+    QHttpServerResponse judgeLike(const QHttpServerRequest& req);       // 检测是否点赞
+    QHttpServerResponse setLike(const QHttpServerRequest& req);         // 更新点赞
 
 private:
     MockServer();

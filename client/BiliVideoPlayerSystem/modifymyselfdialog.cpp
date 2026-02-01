@@ -47,6 +47,7 @@ void ModifyMyselfDialog::showPasswordDlg()
     QString currentPassword = dialog->getNewPassword();
     if(currentPassword.isEmpty()) {
         LOG() << "取消修改密码";
+        delete dialog;
         return ;
     }
     LOG() << "新密码已经设置" << currentPassword;

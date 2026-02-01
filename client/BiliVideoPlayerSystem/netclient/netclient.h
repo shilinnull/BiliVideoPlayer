@@ -20,6 +20,8 @@ public:
     void downloadVideo(const QString& videoFileId);         // 下载视频
     void getVideoBarrage(const QString& videoId);           // 获取弹幕
     void setPlayNumber(const QString& videoId);             // 更新播放次数
+    void getIsLikeVideo(const QString& videoId);            // 检测是否点赞
+    void setLikeNumber(const QString& videoId);             // 更新点赞
 private:
     static QString makeRequeId();
     QNetworkReply* sendHttpRequest(const QString& resourcePath, QJsonObject& jsonBody);

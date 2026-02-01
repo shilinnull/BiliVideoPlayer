@@ -70,6 +70,16 @@ bool MockServer::init()
         return this->setPlay(req);
     });
 
+    // 检测是否点赞
+    httpServer.route("/HttpService/judgeLike", [=](const QHttpServerRequest& req){
+        return this->judgeLike(req);
+    });
+
+    // 设置点赞
+    httpServer.route("/HttpService/setLike", [=](const QHttpServerRequest& req){
+        return this->setLike(req);
+    });
+
     return 8000 == ret;
 }
 
@@ -495,6 +505,51 @@ QHttpServerResponse MockServer::setPlay(const QHttpServerRequest &req)
     QJsonObject jsonResp;
     jsonResp["requestId"] = jsonReq["requestId"].toString();
     jsonResp["errorCode"] = 0;
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonResp);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::judgeLike(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG()<<"[judgeLike] 收到 judgeLike 请求， requestId = "<<jsonReq["requestId"].toString();
+
+    QJsonObject jsonResp;
+    jsonResp["requestId"] = jsonReq["requestId"].toString();
+    jsonResp["errorCode"] = 0;
+    jsonResp["errorMsg"] = "";
+
+    QJsonObject resultJson;
+    resultJson["isLike"] = true;            // 设置成 true 给客户端测试响应
+    jsonResp["result"] = resultJson;
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonResp);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::setLike(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG()<<"[setLike] 收到 setLike 请求， requestId = "<<jsonReq["requestId"].toString();
+
+    QString videoId = jsonReq["videoId"].toString();
+    LOG() << "视频" << videoId << "点赞成功";
+
+    QJsonObject jsonResp;
+    jsonResp["requestId"] = jsonReq["requestId"].toString();
+    jsonResp["errorCode"] = 0;
+    jsonResp["errorMsg"] = "";
 
     QJsonDocument docResp;
     docResp.setObject(jsonResp);

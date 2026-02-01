@@ -30,6 +30,8 @@ public:
     void setBarragesData(const QJsonArray& barrageArray);       // 设置弹幕
     QHash<int64_t, QList<BarrageInfo>>& getBarragesData();      // 获取弹幕内容
     void setPlayNumberAsync(const QString& videoId);            // 更新播放数
+    void getIsLikeVideoAsync(const QString& videoId);           // 检测是否点赞
+    void setLikeNumberAsync(const QString &videoId);            // 更新点赞
 private:
     explicit DataCenter(QObject *parent = nullptr);
     static DataCenter* instance;
@@ -50,6 +52,7 @@ signals:
     void downloadVideoDone(const QString& videoFilePath,
                            const QString& videoFileId); // 下载视频处理完毕
     void getVideoBarrageDone(const QString& videoId);   // 过去弹幕信息完毕
+    void getIsLikeVideoDone(const QString& videoId, bool isLike);   // 检测是否点赞成功
 
 };
 

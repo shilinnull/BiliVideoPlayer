@@ -130,6 +130,16 @@ void DataCenter::setPlayNumberAsync(const QString &videoId)
     netClient.setPlayNumber(videoId);
 }
 
+void DataCenter::getIsLikeVideoAsync(const QString &videoId)
+{
+    netClient.getIsLikeVideo(videoId);
+}
+
+void DataCenter::setLikeNumberAsync(const QString &videoId)
+{
+    netClient.setLikeNumber(videoId);
+}
+
 DataCenter::DataCenter(QObject *parent)
     : QObject{parent}
 {
