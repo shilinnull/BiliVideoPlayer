@@ -287,6 +287,13 @@ void PlayerPage::onSendBulletScreenBtnClicked(const QString &text)
     int duration = 10000 * width() / (double)(30 * 18 + 1450);
     bs->setBulletScreenAnimal(top->width(), duration);
     bs->startAnimal();
+
+    model::BarrageInfo barrageInfo;
+    barrageInfo.playTime = mpvPlayer->getPlayTime();
+    barrageInfo.text = text;
+    barrageInfo.userId = videoInfo.userId;
+    auto dataCenter = model::DataCenter::getInstance();
+    dataCenter->loadupBarragesAsync(videoInfo.videoId, barrageInfo);
 }
 
 QString PlayerPage::secondToTime(int64_t second)

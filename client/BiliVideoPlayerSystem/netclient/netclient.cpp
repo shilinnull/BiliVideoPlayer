@@ -363,6 +363,37 @@ void NetClient::setLikeNumber(const QString &videoId)
     });
 }
 
+void NetClient::loadupBarrages(const QString &videoId, const model::BarrageInfo &barrageInfo)
+{
+    // 1. 构造请求体
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["videoId"] = videoId;
+
+    QJsonObject barrageObj;
+    barrageObj["barrageContent"] = barrageInfo.text;
+    barrageObj["barrageTime"] = barrageInfo.playTime;
+    reqBody["barrageInfo"] = barrageObj;
+
+    // 2. 发送请求
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/newBarrage", reqBody);
+
+    // 3. 异步处理 newBarrage 请求的响应
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"newBarrage 请求出错，reason = "<<reason;
+            return;
+        }
+
+        LOG()<<"newBarrage 成功, resquestId = "<<replyObj["requestId"].toString();
+    });
+}
+
 QString NetClient::makeRequeId()
 {
     return "R" + QUuid::createUuid().toString().sliced(25, 12);

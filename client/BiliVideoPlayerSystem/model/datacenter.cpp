@@ -140,6 +140,11 @@ void DataCenter::setLikeNumberAsync(const QString &videoId)
     netClient.setLikeNumber(videoId);
 }
 
+void DataCenter::loadupBarragesAsync(const QString &videoId, const BarrageInfo &barrageInfo)
+{
+    netClient.loadupBarrages(videoId, barrageInfo);
+}
+
 DataCenter::DataCenter(QObject *parent)
     : QObject{parent}
 {

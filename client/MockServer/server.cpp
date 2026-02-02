@@ -80,6 +80,11 @@ bool MockServer::init()
         return this->setLike(req);
     });
 
+    // 新增弹幕
+    httpServer.route("/HttpService/newBarrage", [=](const QHttpServerRequest& req){
+        return this->newBarrage(req);
+    });
+
     return 8000 == ret;
 }
 
@@ -550,6 +555,34 @@ QHttpServerResponse MockServer::setLike(const QHttpServerRequest &req)
     jsonResp["requestId"] = jsonReq["requestId"].toString();
     jsonResp["errorCode"] = 0;
     jsonResp["errorMsg"] = "";
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonResp);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::newBarrage(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG()<<"[newBarrage] 收到 newBarrage 请求， requestId = "<<jsonReq["requestId"].toString();
+
+    QString videoId = jsonReq["videoId"].toString();
+
+    // 解析弹幕信息
+    BarrageInfo barrageInfo;
+    QJsonObject barrageObj = jsonReq["barrageInfo"].toObject();
+    barrageInfo.playTime = barrageObj["barrageTime"].toInteger();
+    barrageInfo.text = barrageObj["barrageContent"].toString();
+    LOG()<<"视频 "<<videoId<<" 插入弹幕 "<< "播放时间：" << barrageInfo.playTime << "内容：" <<barrageInfo.text;
+    barrages[barrageInfo.playTime].append(barrageInfo);
+
+    QJsonObject jsonResp;
+    jsonResp["requestId"] = jsonReq["requestId"].toString();
+    jsonResp["errorCode"] = 0;
 
     QJsonDocument docResp;
     docResp.setObject(jsonResp);

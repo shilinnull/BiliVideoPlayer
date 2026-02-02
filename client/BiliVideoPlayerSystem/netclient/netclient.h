@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QNetworkAccessManager>
+#include "model/data.h"
 
 namespace network {
 class NetClient : public QObject
@@ -22,6 +23,8 @@ public:
     void setPlayNumber(const QString& videoId);             // 更新播放次数
     void getIsLikeVideo(const QString& videoId);            // 检测是否点赞
     void setLikeNumber(const QString& videoId);             // 更新点赞
+    void loadupBarrages(const QString& videoId,
+                const model::BarrageInfo& barrageInfo);     // 新增弹幕
 private:
     static QString makeRequeId();
     QNetworkReply* sendHttpRequest(const QString& resourcePath, QJsonObject& jsonBody);

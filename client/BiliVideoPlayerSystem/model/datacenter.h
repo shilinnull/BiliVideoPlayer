@@ -32,6 +32,8 @@ public:
     void setPlayNumberAsync(const QString& videoId);            // 更新播放数
     void getIsLikeVideoAsync(const QString& videoId);           // 检测是否点赞
     void setLikeNumberAsync(const QString &videoId);            // 更新点赞
+    void loadupBarragesAsync(const QString& videoId,
+                             const BarrageInfo& barrageInfo);   // 新增弹幕
 private:
     explicit DataCenter(QObject *parent = nullptr);
     static DataCenter* instance;
