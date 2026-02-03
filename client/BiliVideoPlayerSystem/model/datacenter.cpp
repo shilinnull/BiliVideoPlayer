@@ -145,6 +145,32 @@ void DataCenter::loadupBarragesAsync(const QString &videoId, const BarrageInfo &
     netClient.loadupBarrages(videoId, barrageInfo);
 }
 
+void DataCenter::setMySelfInfo(const QJsonObject &mySelfInfoObj)
+{
+    if(this->myselfInfo == nullptr) {
+        this->myselfInfo = new UserInfo;
+    }
+    this->myselfInfo->loadUserInfo(mySelfInfoObj);
+}
+
+const UserInfo *DataCenter::getMyselfInfo() const
+{
+    return myselfInfo;
+}
+
+void DataCenter::setOtherUserInfo(const QJsonObject &otherInfoObj)
+{
+    if(this->otherUserInfo == nullptr) {
+        this->otherUserInfo = new UserInfo;
+    }
+    this->otherUserInfo->loadUserInfo(otherInfoObj);
+}
+
+UserInfo *DataCenter::getOtherUserInfo()
+{
+    return otherUserInfo;
+}
+
 DataCenter::DataCenter(QObject *parent)
     : QObject{parent}
 {

@@ -86,6 +86,41 @@ public:
     void loadBarrageInfo(QJsonObject& barrageJson);
 };
 
+enum RoleTye{
+    SuperAdmin = 1,
+    Admid,
+    User,
+    TempUser
+};
+
+enum IdentityType{
+    CUser = 1,      // C端用户
+    BUser           // B端用户
+};
+
+
+class UserInfo{
+public:
+    QString userId;
+    QString phoneNum;
+    QString nickname;
+    QList<int> roleType;
+    QList<int> identityType;
+    int64_t likeCount;
+    int64_t playCount;
+    int64_t followedCount;
+    int64_t followerCount;
+    int userStatus;
+    int isFollowing;
+    QString userMemo;
+    QString userCTime;
+    QString avatarFileId;
+
+    void loadUserInfo(const QJsonObject& jsonObj);
+    bool isBUser() const ;
+    bool isTempUser() const;
+};
+
 
 };
 

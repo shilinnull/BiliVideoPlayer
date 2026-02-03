@@ -34,6 +34,10 @@ public:
     void setLikeNumberAsync(const QString &videoId);            // 更新点赞
     void loadupBarragesAsync(const QString& videoId,
                              const BarrageInfo& barrageInfo);   // 新增弹幕
+    void setMySelfInfo(const QJsonObject& mySelfInfoObj);       // 设置个人信息
+    const UserInfo* getMyselfInfo() const;                      // 获取个人信息
+    void setOtherUserInfo(const QJsonObject& otherInfoObj);     // 设置他人信息
+    UserInfo* getOtherUserInfo();                               // 获取他人信息
 private:
     explicit DataCenter(QObject *parent = nullptr);
     static DataCenter* instance;
@@ -43,6 +47,8 @@ private:
     QString loginSessionId = "";					// 当前客户端登录到服务器会话的id
     VideoList* videoListPtr = nullptr;				// 管理首页获取的视频信息
     QHash<int64_t, QList<BarrageInfo>> barrages;    // 弹幕信息
+    UserInfo* myselfInfo = nullptr;                 // 保存当前用户个人信息
+    UserInfo* otherUserInfo = nullptr;              // 保存其他用户个人信息
 signals:
     void loginTempUserDone();						// 临时用户登录
     void getAllVideoListDone();						// 获取所有视频信息处理完毕

@@ -78,7 +78,7 @@
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <property name="spacing">
-          <number>7</number>
+          <number>8</number>
          </property>
          <property name="leftMargin">
           <number>0</number>
@@ -126,18 +126,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="nicknameLabel">
-           <property name="minimumSize">
-            <size>
-             <width>125</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>125</width>
-             <height>16777215</height>
-            </size>
+          <widget class="QPushButton" name="nicknameBtn">
+           <property name="styleSheet">
+            <string notr="true">#nicknameBtn {
+	border : none;
+}</string>
            </property>
            <property name="text">
             <string>视频用户lin</string>

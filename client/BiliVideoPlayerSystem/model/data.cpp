@@ -1,4 +1,5 @@
 #include "data.h"
+#include <QJsonArray>
 
 namespace model{
 
@@ -156,6 +157,48 @@ void BarrageInfo::loadBarrageInfo(QJsonObject &barrageJson)
     userId = barrageJson["userId"].toString();
     playTime = barrageJson["barrageTime"].toInt();
     text = barrageJson["barrageContent"].toString();
+}
+
+void UserInfo::loadUserInfo(const QJsonObject &jsonObj)
+{
+    userId = jsonObj["userId"].toString();
+    phoneNum = jsonObj["phoneNum"].toString();
+    nickname = jsonObj["nickname"].toString();
+    // ⻆⾊类型：超级管理员-1、普通管理员-2、普通用户-3，临时用户-4
+    QJsonArray roleTypeArray = jsonObj["roleType"].toArray();
+    for(int i = 0; i < roleTypeArray.count(); i++) {
+        roleType.append(roleTypeArray[i].toInt());
+    }
+    // ⾝份类型：C端用户 B端用户
+    QJsonArray identityTypeArray = jsonObj["identityType"].toArray();
+    for(int i = 0; i < identityTypeArray.count(); i++) {
+        identityType.append(identityTypeArray[i].toInt());
+    }
+
+    likeCount = jsonObj["likeCount"].toInt();
+    playCount = jsonObj["playCount"].toInt();
+    followedCount = jsonObj["followedCount"].toInt();
+    followerCount = jsonObj["followerCount"].toInt();
+    userStatus = jsonObj["userStatus"].toInt();
+    isFollowing = jsonObj["isFollowing"].toInt();
+    userMemo = jsonObj["userMemo"].toString();
+    userCTime = jsonObj["userCTime"].toString();
+    avatarFileId = jsonObj["avatarFileId"].toString();
+}
+
+bool UserInfo::isBUser() const
+{
+    for (auto idType : identityType) {
+        if (BUser == idType) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool UserInfo::isTempUser() const
+{
+    return identityType.isEmpty();
 }
 
 }
