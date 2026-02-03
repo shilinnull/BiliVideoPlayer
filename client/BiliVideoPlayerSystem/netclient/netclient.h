@@ -25,6 +25,7 @@ public:
     void setLikeNumber(const QString& videoId);             // 更新点赞
     void loadupBarrages(const QString& videoId,
                 const model::BarrageInfo& barrageInfo);     // 新增弹幕
+    void getUserInfo(const QString& userId);               // 获取用户信息
 private:
     static QString makeRequeId();
     QNetworkReply* sendHttpRequest(const QString& resourcePath, QJsonObject& jsonBody);

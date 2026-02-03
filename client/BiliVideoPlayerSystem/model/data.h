@@ -98,7 +98,6 @@ enum IdentityType{
     BUser           // B端用户
 };
 
-
 class UserInfo{
 public:
     QString userId;

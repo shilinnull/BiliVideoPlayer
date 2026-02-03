@@ -38,6 +38,8 @@ public:
     const UserInfo* getMyselfInfo() const;                      // 获取个人信息
     void setOtherUserInfo(const QJsonObject& otherInfoObj);     // 设置他人信息
     UserInfo* getOtherUserInfo();                               // 获取他人信息
+    void getMyselfInfoAsync();                                  // 获取用户个人信息
+    void getOtherUserInfoAsync(const QString& userId);          // 获取其他用户信息
 private:
     explicit DataCenter(QObject *parent = nullptr);
     static DataCenter* instance;
@@ -61,6 +63,8 @@ signals:
                            const QString& videoFileId); // 下载视频处理完毕
     void getVideoBarrageDone(const QString& videoId);   // 过去弹幕信息完毕
     void getIsLikeVideoDone(const QString& videoId, bool isLike);   // 检测是否点赞成功
+    void getMyselfInfoDone();                                  // 获取用户个人信息完毕
+    void getOtherUserInfoDone();                               // 获取其他用户信息完毕
 
 };
 

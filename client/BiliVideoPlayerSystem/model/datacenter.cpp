@@ -171,6 +171,17 @@ UserInfo *DataCenter::getOtherUserInfo()
     return otherUserInfo;
 }
 
+void DataCenter::getMyselfInfoAsync()
+{
+    // 不传 userId, 就是获取自己信息，服务端可以通过session拿到当前登录用户的id
+    netClient.getUserInfo("");
+}
+
+void DataCenter::getOtherUserInfoAsync(const QString& userId)
+{
+    netClient.getUserInfo(userId);
+}
+
 DataCenter::DataCenter(QObject *parent)
     : QObject{parent}
 {

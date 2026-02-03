@@ -394,6 +394,45 @@ void NetClient::loadupBarrages(const QString &videoId, const model::BarrageInfo 
     });
 }
 
+void NetClient::getUserInfo(const QString &userId)
+{
+    // 1. 构造请求体
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    if(userId.isEmpty()) {  // 获取自己的信息
+        reqBody["userId"] = userId;
+    }
+
+    // 2. 发送请求
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/getUserInfo", reqBody);
+
+    // 3. 异步处理 getUserInfo 请求的响应
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"getUserInfo 请求出错，reason = "<<reason;
+            return;
+        }
+
+        // 将信息保存到dataCenter中
+        QJsonObject resultObj = replyObj["result"].toObject();
+        QJsonObject userInfoObj = resultObj["userInfo"].toObject();
+        if(userId.isEmpty()) {
+            dataCenter->setMySelfInfo(userInfoObj);
+            emit dataCenter->getMyselfInfoDone();
+        } else {
+            dataCenter->setOtherUserInfo(userInfoObj);
+            emit dataCenter->getOtherUserInfoDone();
+        }
+
+        LOG()<<"getUserInfo 成功, resquestId = "<<replyObj["requestId"].toString() << "userId: " << userId;
+    });
+}
+
 QString NetClient::makeRequeId()
 {
     return "R" + QUuid::createUuid().toString().sliced(25, 12);

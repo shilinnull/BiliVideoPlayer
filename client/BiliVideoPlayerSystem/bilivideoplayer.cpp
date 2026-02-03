@@ -11,6 +11,15 @@ BiliVideoPlayer *BiliVideoPlayer::getInstance()
     return instance;
 }
 
+void BiliVideoPlayer::showSystemPageBtn(bool isShow)
+{
+    if(isShow) {
+        ui->sysPageBtn->show();
+    } else {
+        ui->sysPageBtn->hide();
+    }
+}
+
 BiliVideoPlayer::BiliVideoPlayer(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::BiliVideoPlayer)
@@ -34,6 +43,9 @@ void BiliVideoPlayer::initUI()
     setAttribute(Qt::WA_TranslucentBackground);
     setWindowIcon(QIcon(":/images/homePage/logo.png"));
 
+    // 启动默认隐藏系统按钮，等待用户信息加载后再决定是否显示
+    showSystemPageBtn(false);
+
     QGraphicsDropShadowEffect* dropShadow = new QGraphicsDropShadowEffect(this);
     dropShadow->setColor(Qt::black);
     dropShadow->setBlurRadius(5);
@@ -49,7 +61,6 @@ void BiliVideoPlayer::connectSignalAndSlot()
 {
     connect(ui->minBtn, &QPushButton::clicked, this, &QWidget::showMinimized);
     connect(ui->quitBtn, &QPushButton::clicked, this, [=]{
-
         this->close();
     });
 
@@ -101,6 +112,9 @@ void BiliVideoPlayer::onSwitchStackedWidgetPage(int pageId)
 {
     ui->stackedWidget->setCurrentIndex(pageId);     // 切换页面
     resetSwitchBtnInfo(pageId);                     // 重新设置按钮上的背景和字体
+    if(pageId == MyselfPage) {
+        ui->myPage->loadMySelf();                   // 加载用户个人信息
+    }
     repaint();                                      // 保证页面可以立即刷新出来
 }
 

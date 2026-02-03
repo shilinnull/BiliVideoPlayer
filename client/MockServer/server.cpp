@@ -85,6 +85,10 @@ bool MockServer::init()
         return this->newBarrage(req);
     });
 
+    // 获取个人信息
+    httpServer.route("/HttpService/getUserInfo", [=](const QHttpServerRequest& req){
+        return this->getUserInfo(req);
+    });
     return 8000 == ret;
 }
 
@@ -395,7 +399,7 @@ QHttpServerResponse MockServer::downloadPhoto(const QHttpServerRequest &req)
     dir.cdUp(); dir.cdUp();
     QString imagePath = dir.absolutePath();
     imagePath += idPathTable[fileId];
-    LOG()<<"图片ID："<<fileId<<"--"<<imagePath;
+    // LOG()<<"图片ID："<<fileId<<"--"<<imagePath;
     QByteArray imageData = loadFileToByteArray(imagePath);
     QHttpServerResponse httpResp(imageData, QHttpServerResponse::StatusCode::Ok);
     httpResp.setHeader("Content-Type", "application/octet-stream");
@@ -413,7 +417,7 @@ QHttpServerResponse MockServer::downloadVideo(const QHttpServerRequest &req)
     dir.cdUp();
     QString imagePath = dir.absolutePath();
     imagePath += idPathTable[fileId];
-    LOG()<<"视频id："<<fileId<<"--"<<imagePath;
+    // LOG()<<"视频id："<<fileId<<"--"<<imagePath;
 
     if (!QFileInfo::exists(imagePath)) {
         LOG() << "视频文件不存在:" << imagePath;
@@ -583,6 +587,89 @@ QHttpServerResponse MockServer::newBarrage(const QHttpServerRequest &req)
     QJsonObject jsonResp;
     jsonResp["requestId"] = jsonReq["requestId"].toString();
     jsonResp["errorCode"] = 0;
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonResp);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::getUserInfo(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    const QString userId = jsonReq["userId"].toString();
+    LOG()<<"[getUserInfo] 收到 getUserInfo 请求， requestId = "
+          <<jsonReq["requestId"].toString() << "userId: " << userId;
+
+    QJsonObject jsonResp;
+    jsonResp["requestId"] = jsonReq["requestId"].toString();
+    jsonResp["errorCode"] = 0;
+    jsonResp["errorMsg"] = "";
+
+    // 构造用户信息
+    QJsonObject userInfoObj;
+    if(userId.isEmpty()) {
+        // 获取个人信息
+        userInfoObj["userId"] = "1000001";    // 用户id
+        userInfoObj["phoneNum"] = "15012345678";   // 手机号码
+        userInfoObj["nickname"] = "张三";    // 用户昵称
+
+        // 角色类型：0-未知，1-超级管理员，2-普通管理员，3-普通用户，4-临时用户
+        QJsonArray roleTypeArray;
+        roleTypeArray.append(3);
+        userInfoObj["roleType"] = roleTypeArray;
+
+        // 身份类型：0-未知，1-C端用户，2-B端用户
+        // 临时用户的身份类型为空
+        QJsonArray identityArray;
+        identityArray.append(2);
+        userInfoObj["identityType"] = identityArray;
+
+        userInfoObj["likeCount"] = 12345;    // 点赞数
+        userInfoObj["playCount"] = 12346;    // 播放数
+        userInfoObj["followedCount"] = 123;    // 关注数
+        userInfoObj["followerCount"] = 123;    // 粉丝数
+        userInfoObj["userStatus"] = 0;      // 用户状态
+        userInfoObj["isFollowing"] = 0;      // 是否关注
+        userInfoObj["userMemo"] = "";       // 用户备注信息
+        userInfoObj["userTime"] = "2038-12-18 12:28:58"; // 用户创建时间
+        userInfoObj["avatarFileID"] = "10001";    // 用户图像id
+    } else {
+        // 获取其他用户信息
+        userInfoObj["userId"] = "1000002";
+        userInfoObj["phoneNum"] = "15022345678";
+        userInfoObj["nickname"] = "李四";
+
+        // 角色类型：0-未知，1-超级管理员，2-普通管理员，3-普通用户，4-临时用户
+        QJsonArray roleTypeArray;
+        roleTypeArray.append(1);
+        userInfoObj["roleType"] = roleTypeArray;
+
+        // 身份类型：0-未知，1-C端用户，2-B端用户
+        // 临时用户的身份类型为空
+        QJsonArray identityArray;
+        identityArray.append(1);
+        userInfoObj["identityType"] = identityArray;
+
+        userInfoObj["likeCount"] = 12345;
+        userInfoObj["playCount"] = 12346;
+        userInfoObj["followedCount"] = 123;
+        userInfoObj["followerCount"] = 123;
+        userInfoObj["userStatus"] = 0;
+        userInfoObj["isFollowing"] = 0;
+        userInfoObj["userMemo"] = "";
+        userInfoObj["userCTime"] = "2038-12-18 12:28:58";
+        userInfoObj["avatarFileIdx"] = "10001";
+    }
+
+    QJsonObject resultObj;
+    resultObj["userInfo"] = userInfoObj;
+    jsonResp["result"] = resultObj;
+
+    LOG() << resultObj;
 
     QJsonDocument docResp;
     docResp.setObject(jsonResp);

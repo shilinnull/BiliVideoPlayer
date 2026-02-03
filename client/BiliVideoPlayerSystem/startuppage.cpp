@@ -30,6 +30,8 @@ StartupPage::StartupPage(QDialog *parent)
     auto dataCenter = model::DataCenter::getInstance();
     connect(dataCenter, &model::DataCenter::loginTempUserDone, this, [=]{
         loginSuccess = true;
+        // 临时登录后立刻获取用户信息，用于判断C/B用户
+        dataCenter->getMyselfInfoAsync();
     });
 }
 

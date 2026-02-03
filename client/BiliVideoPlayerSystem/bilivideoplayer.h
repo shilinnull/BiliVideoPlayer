@@ -27,8 +27,9 @@ class BiliVideoPlayer : public QWidget
     Q_OBJECT
 
 public:
-    static BiliVideoPlayer* getInstance();
     ~BiliVideoPlayer();
+    static BiliVideoPlayer* getInstance();
+    void showSystemPageBtn(bool isShow = true);
 private:
     // 初始化UI
     void initUI();

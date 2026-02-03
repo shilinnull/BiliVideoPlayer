@@ -84,4 +84,12 @@ static QString intToString(int value) {
     }
 }
 
+static QString intToString2(int value) {
+    if(value < 10000) {
+        return QString::number(value);
+    }else {
+        return QString::asprintf("%.2lfw", value / 10000.0);
+    }
+}
+
 #endif // UTIL_H

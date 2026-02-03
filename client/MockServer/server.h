@@ -51,6 +51,7 @@ private:
     QHttpServerResponse judgeLike(const QHttpServerRequest& req);       // 检测是否点赞
     QHttpServerResponse setLike(const QHttpServerRequest& req);         // 更新点赞
     QHttpServerResponse newBarrage(const QHttpServerRequest& req);      // 新增弹幕
+    QHttpServerResponse getUserInfo(const QHttpServerRequest& req);     // 获取个人信息
 
 private:
     MockServer();

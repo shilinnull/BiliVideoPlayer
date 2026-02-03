@@ -388,7 +388,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QLabel" name="myVideolabel">
+       <widget class="QLabel" name="myVideoLabel">
         <property name="styleSheet">
          <string notr="true">#myVideoLabel { font-family : 微软雅⿊; font-size: 18px; line-height: 24px; }</string>
         </property>

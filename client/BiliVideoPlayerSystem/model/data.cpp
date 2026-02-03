@@ -188,17 +188,23 @@ void UserInfo::loadUserInfo(const QJsonObject &jsonObj)
 
 bool UserInfo::isBUser() const
 {
-    for (auto idType : identityType) {
-        if (BUser == idType) {
+    for(auto idType : identityType){
+        if(idType == BUser){
             return true;
         }
     }
+
     return false;
 }
 
 bool UserInfo::isTempUser() const
 {
-    return identityType.isEmpty();
+    for(auto role : roleType){
+        if(role == TempUser){
+            return true;
+        }
+    }
+    return false;
 }
 
 }
