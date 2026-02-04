@@ -44,6 +44,7 @@ private:
     QHttpServerResponse keyVideoList(const QHttpServerRequest& req);    // 根据搜索文本获取视频内容
     void buildResponseData();
     QHttpServerResponse downloadPhoto(const QHttpServerRequest& req);   // 下载图片
+    QHttpServerResponse uploadPhoto(const QHttpServerRequest& req);     // 上传图片
     QHttpServerResponse downloadVideo(const QHttpServerRequest& req);   // 下载视频
     QHttpServerResponse downloadVideoSegmentation(const QString& fileName);   // 下载视频分片
     QHttpServerResponse getBarrage(const QHttpServerRequest& req);      // 获取弹幕数据
@@ -52,6 +53,7 @@ private:
     QHttpServerResponse setLike(const QHttpServerRequest& req);         // 更新点赞
     QHttpServerResponse newBarrage(const QHttpServerRequest& req);      // 新增弹幕
     QHttpServerResponse getUserInfo(const QHttpServerRequest& req);     // 获取个人信息
+    QHttpServerResponse setAvatar(const QHttpServerRequest& req);       // 设置用户头像
 
 private:
     MockServer();

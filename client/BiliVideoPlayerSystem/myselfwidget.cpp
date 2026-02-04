@@ -4,6 +4,7 @@
 #include "modifymyselfdialog.h"
 #include "bilivideoplayer.h"
 #include "model/datacenter.h"
+#include "toast.h"
 
 #include <QFileDialog>
 
@@ -49,35 +50,36 @@ void MyselfWidget::getMyselfInfo()
 
 void MyselfWidget::loadMySelf()
 {
+    // 切换到个人模式，即允许点击用户头像按钮修改个⼈头像
+    ui->avatarBtn->changeMod(false);
+    ui->avatarBtn->setEnabled(false); // 等待用户信息返回后再决定是否可编辑
+
     // 加载个人信息
     getMyselfInfo();
     // 加载个人视频列表
-
-    // 切换到个⼈模式，即允许点击用户头像按钮修改个⼈头像
-    ui->avatarBtn->changeMod(false);
-    ui->avatarBtn->setEnabled(true);
 }
 
 void MyselfWidget::initUI()
 {
     ui->attentionBtn->hide();
 
-
 #ifdef TEST_UI
+    // 往视频显示区域添加VideoBox-测试
     int resourceId = 10000;
-    for(int i = 0; i < 16; i++) {
+    for(int i = 0; i < 20; ++i){
         model::VideoInfo videoInfo;
+        resourceId++;
         videoInfo.userAvatarId = "";
         videoInfo.photoFileId = QString::number(resourceId++);
         videoInfo.videoFileId = QString::number(resourceId++);
-        videoInfo.nickName="用户昵称";
+        videoInfo.nickName = "用户昵称";
         videoInfo.likeCount = 1234;
         videoInfo.playCount = 23456;
-        videoInfo.videoTitle="【北京旅游攻略】一条视频告诉你去了北京该怎么玩";
+        videoInfo.videoTitle = "【北京旅游攻略】一条视频告诉你去了北京该怎么玩";
         videoInfo.videoDuration = 10;
         videoInfo.videoUpTime = "9-16 12:28:58";
-        VideoBox* videoBox = new VideoBox(videoInfo);
-        ui->layout->addWidget(videoBox, i / 4, i % 4);
+        VideoBox* videoBox =  new VideoBox(videoInfo);
+        ui->layout->addWidget(videoBox, i/4, i%4);
     }
 #endif
 }
@@ -89,10 +91,20 @@ void MyselfWidget::connectSignalAndSlots()
     connect(ui->uploadVideoBtn, &QPushButton::clicked, this, &MyselfWidget::uploadViewBtnClicked);
     auto dataCenter = model::DataCenter::getInstance();
     connect(dataCenter, &model::DataCenter::getMyselfInfoDone, this, &MyselfWidget::getMyselfInfoDone);
+    connect(dataCenter, &model::DataCenter::downloadPhotoDone, this, &MyselfWidget::getAvatarDone);
+    connect(dataCenter, &model::DataCenter::uploadPhotoDone, this, &MyselfWidget::uploadAvatarDone1);
+    connect(dataCenter, &model::DataCenter::setAvatarDone, this, &MyselfWidget::uploadAvatarDone2);
+
 }
 
 void MyselfWidget::uploadAvatarBtnClicked()
 {
+    auto dataCenter = model::DataCenter::getInstance();
+    const auto* myself = dataCenter->getMyselfInfo();
+    if(myself != nullptr && myself->isTempUser()) {
+        Toast::showMessage("请先登录，再修改头像");
+        return;
+    }
     QString filename = QFileDialog::getOpenFileName(nullptr, "选择头像", "", "Image File(*jpg *.png)");
     if(filename.isNull()) {
         LOG() << "取消选择头像";
@@ -104,6 +116,7 @@ void MyselfWidget::uploadAvatarBtnClicked()
         return ;
     }
     ui->avatarBtn->setIcon(std::move(makeCircleIcon(fileDate, ui->avatarBtn->width() / 2)));
+    dataCenter->uploadPhotoAsync(fileDate); // 上传图片到服务器
 }
 
 void MyselfWidget::settingBtnClicked()
@@ -126,6 +139,7 @@ void MyselfWidget::getMyselfInfoDone()
         biliPlayer->showSystemPageBtn(false);
         ui->avatarBtn->setIcon(QIcon(":/image/myself/defaultAvatar.png"));
         ui->avatarBtn->setEnabled(false); // 临时用户不允许修改头像
+        ui->avatarBtn->changeMod(false);
         ui->nicknameBtn->setText("点击登录");
 
         ui->nicknameBtn->adjustSize();
@@ -146,7 +160,6 @@ void MyselfWidget::getMyselfInfoDone()
     ui->nicknameBtn->adjustSize();
     ui->nicknameBtn->setEnabled(false);
     // 根据昵称按钮文本长度移动设置按钮，即让设置按钮紧跟在昵称按钮之后
-    // 7是：nicknameBtn和settingBtn间的间隔
     QRect rect = ui->nicknameBtn->geometry();
     ui->settingBtn->move(rect.x() + rect.width() + 8, ui->settingBtn->geometry().y());
 
@@ -157,12 +170,40 @@ void MyselfWidget::getMyselfInfoDone()
     ui->playCountLabel->setText(intToString2(myself->playCount));
 
     // 3. 设置头像
-    // todo
+    if(myself->avatarFileId.isEmpty()) {
+        ui->avatarBtn->setIcon(QIcon(":/images/myself/defaultAvatar.png"));
+    } else {
+        dataCenter->downloadPhotoAsync(myself->avatarFileId);
+    }
 
     // 4. 其他：隐藏关注按钮、不能点击登录、允许修改头像
     ui->attentionBtn->hide();
     ui->avatarBtn->setEnabled(true);
+    ui->avatarBtn->changeMod(true);
     ui->myVideoLabel->setText("我的视频");
+}
+
+void MyselfWidget::getAvatarDone(const QString &fileId, const QByteArray &data)
+{
+    auto* myself = model::DataCenter::getInstance()->getMyselfInfo();
+    if(myself != nullptr && myself->avatarFileId == fileId) {
+        ui->avatarBtn->setIcon(QIcon(makeCircleIcon(data, ui->avatarBtn->width() / 2)));
+    }
+}
+
+void MyselfWidget::uploadAvatarDone1(const QString &fileId)
+{
+    //图片上传成功之后，将图片工d去修改服务器上用户头像id
+    auto dataCenter = model::DataCenter::getInstance();
+    dataCenter->setAvatarAsync(fileId);
+}
+
+void MyselfWidget::uploadAvatarDone2()
+{
+    //重新通过用户头像fildId 获取头像，头像获取成功会自动设置到界面
+    auto dataCenter = model::DataCenter::getInstance();
+    const auto* myself = dataCenter->getMyselfInfo();
+    dataCenter->downloadPhotoAsync(myself->avatarFileId);
 }
 
 void MyselfWidget::hideWidget(bool isHide)

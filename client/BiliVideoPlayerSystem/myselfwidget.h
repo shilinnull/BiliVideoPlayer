@@ -27,8 +27,10 @@ private:
 private slots:
     void uploadAvatarBtnClicked();  // 点击上传头像
     void settingBtnClicked();       // 点击设置按钮
-    void getMyselfInfoDone();
-
+    void getMyselfInfoDone();       // 用户信息获取成功
+    void getAvatarDone(const QString& fileId, const QByteArray& data);  // 获取用户头像
+    void uploadAvatarDone1(const QString& fileId);  // 上传图片
+    void uploadAvatarDone2();                       // 修改图片
 signals:
     void switchUploadVideoPage(int pageIndex);
 private:

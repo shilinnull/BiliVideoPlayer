@@ -25,6 +25,7 @@ public:
     void getAllVideoInTagAsync(int tagId);                      // 获取标签视频列表
     void getVideosBySearchTextAsync(const QString& searchText); // 获取搜索视频列表
     void downloadPhotoAsync(const QString& photoFileId);        // 下载图片
+    void uploadPhotoAsync(const QByteArray& photoData);         // 上传图片
     void downloadVideoAsync(const QString& videoFileId);        // 下载视频
     void getVideoBarrageAsync(const QString& videoId);          // 获取弹幕
     void setBarragesData(const QJsonArray& barrageArray);       // 设置弹幕
@@ -40,6 +41,8 @@ public:
     UserInfo* getOtherUserInfo();                               // 获取他人信息
     void getMyselfInfoAsync();                                  // 获取用户个人信息
     void getOtherUserInfoAsync(const QString& userId);          // 获取其他用户信息
+    void setAvatar(const QString& fileId);                      // 修改用户头像ID
+    void setAvatarAsync(const QString& fileId);                 // 设置用户头像
 private:
     explicit DataCenter(QObject *parent = nullptr);
     static DataCenter* instance;
@@ -65,6 +68,8 @@ signals:
     void getIsLikeVideoDone(const QString& videoId, bool isLike);   // 检测是否点赞成功
     void getMyselfInfoDone();                                  // 获取用户个人信息完毕
     void getOtherUserInfoDone();                               // 获取其他用户信息完毕
+    void uploadPhotoDone(const QString& fileId);                // 上传图片完毕
+    void setAvatarDone();                                      // 修改用户头像完毕
 
 };
 

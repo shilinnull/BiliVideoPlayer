@@ -17,7 +17,6 @@ public:
     explicit VideoBox(model::VideoInfo videoInfo, QWidget *parent = nullptr);
     ~VideoBox();
 
-    bool eventFilter(QObject* watched, QEvent* event) override;
     void updateVideoInfoUI();
 private:
     void onPlayBtnClicked();
@@ -27,6 +26,7 @@ private:
 protected:
     // 避免图片重叠
     void paintEvent(QPaintEvent *event) override;
+    bool eventFilter(QObject* watched, QEvent* event) override;
 private slots:
     void getVideoImageDone(const QString& imageId, QByteArray imageData);
     void getUserImageDone(const QString& imageId, QByteArray imageData);

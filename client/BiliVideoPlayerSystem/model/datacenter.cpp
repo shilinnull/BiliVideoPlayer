@@ -91,6 +91,11 @@ void DataCenter::downloadPhotoAsync(const QString &photoFileId)
     netClient.downloadPhoto(photoFileId);
 }
 
+void DataCenter::uploadPhotoAsync(const QByteArray &photoData)
+{
+    netClient.uploadPhoto(photoData);
+}
+
 void DataCenter::downloadVideoAsync(const QString &videoFileId)
 {
     netClient.downloadVideo(videoFileId);
@@ -180,6 +185,16 @@ void DataCenter::getMyselfInfoAsync()
 void DataCenter::getOtherUserInfoAsync(const QString& userId)
 {
     netClient.getUserInfo(userId);
+}
+
+void DataCenter::setAvatar(const QString &fileId)
+{
+    myselfInfo->avatarFileId = fileId;
+}
+
+void DataCenter::setAvatarAsync(const QString &fileId)
+{
+    netClient.setAvatar(fileId);
 }
 
 DataCenter::DataCenter(QObject *parent)

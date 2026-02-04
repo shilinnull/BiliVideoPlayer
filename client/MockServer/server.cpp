@@ -50,6 +50,11 @@ bool MockServer::init()
         return this->downloadPhoto(req);
     });
 
+    // 获取图片
+    httpServer.route("/HttpService/uploadPhoto", [=](const QHttpServerRequest& req){
+        return this->uploadPhoto(req);
+    });
+
     // 下载视频
     httpServer.route("/HttpService/downloadVideo", [=](const QHttpServerRequest& req){
         return this->downloadVideo(req);
@@ -88,6 +93,11 @@ bool MockServer::init()
     // 获取个人信息
     httpServer.route("/HttpService/getUserInfo", [=](const QHttpServerRequest& req){
         return this->getUserInfo(req);
+    });
+
+    // 获修改头像
+    httpServer.route("/HttpService/setAvatar", [=](const QHttpServerRequest& req){
+        return this->setAvatar(req);
     });
     return 8000 == ret;
 }
@@ -406,6 +416,40 @@ QHttpServerResponse MockServer::downloadPhoto(const QHttpServerRequest &req)
     return httpResp;
 }
 
+QHttpServerResponse MockServer::uploadPhoto(const QHttpServerRequest &req)
+{
+    QUrlQuery query(QUrl(req.url()));
+    QString requestId = query.queryItemValue("requestId");
+    QString sessionId = query.queryItemValue("sessionId");
+    LOG() << "[uploadPhoto] 收到 uploadPhoto 请求, requestId=" << requestId << "sessionId: " << sessionId;
+    // 解析图片数据
+    const QByteArray imageData = req.body();
+    // 临时保存
+    QDir dir(QDir::currentPath());
+    dir.cdUp(); dir.cdUp();
+    QString imagePath = dir.absolutePath();
+    imagePath += "/images/temp.png";
+    LOG() << imagePath;
+    writeByteArrayToFile(imagePath, imageData); // 写文件
+    idPathTable["1000"] = "/images/temp.png";
+
+    QJsonObject resultObj;
+    resultObj["fileId"] = "1000";
+
+    QJsonObject jsonBody;
+    jsonBody["requestId"] = requestId;
+    jsonBody["errorCode"] = 0;
+    jsonBody["errorMsg"] = "";
+    jsonBody["result"] = resultObj;
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonBody);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json");
+    return httpResp;
+}
+
 QHttpServerResponse MockServer::downloadVideo(const QHttpServerRequest &req)
 {
     QUrlQuery query(req.url());
@@ -645,13 +689,13 @@ QHttpServerResponse MockServer::getUserInfo(const QHttpServerRequest &req)
 
         // 角色类型：0-未知，1-超级管理员，2-普通管理员，3-普通用户，4-临时用户
         QJsonArray roleTypeArray;
-        roleTypeArray.append(1);
+        roleTypeArray.append(3);
         userInfoObj["roleType"] = roleTypeArray;
 
         // 身份类型：0-未知，1-C端用户，2-B端用户
         // 临时用户的身份类型为空
         QJsonArray identityArray;
-        identityArray.append(1);
+        identityArray.append(2);
         userInfoObj["identityType"] = identityArray;
 
         userInfoObj["likeCount"] = 12345;
@@ -670,6 +714,25 @@ QHttpServerResponse MockServer::getUserInfo(const QHttpServerRequest &req)
     jsonResp["result"] = resultObj;
 
     LOG() << resultObj;
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonResp);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::setAvatar(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG()<<"[setAvatar] 收到 setAvatar 请求， requestId = "
+          <<jsonReq["requestId"].toString() << ", file: " << jsonReq["fileId"].toString();
+
+    QJsonObject jsonResp;
+    jsonResp["requestId"] = jsonReq["requestId"].toString();
+    jsonResp["errorCode"] = 0;
 
     QJsonDocument docResp;
     docResp.setObject(jsonResp);

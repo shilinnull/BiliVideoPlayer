@@ -18,6 +18,7 @@ public:
     void getAllVideosInTag(int tagId);      // 获取标签下的所有视频
     void getVideosBySearchText(const QString& searchText);  // 根据文本获取视频
     void downloadPhoto(const QString& photoFileId);         // 下载图片
+    void uploadPhoto(const QByteArray& photoData);          // 上传图片
     void downloadVideo(const QString& videoFileId);         // 下载视频
     void getVideoBarrage(const QString& videoId);           // 获取弹幕
     void setPlayNumber(const QString& videoId);             // 更新播放次数
@@ -25,7 +26,8 @@ public:
     void setLikeNumber(const QString& videoId);             // 更新点赞
     void loadupBarrages(const QString& videoId,
                 const model::BarrageInfo& barrageInfo);     // 新增弹幕
-    void getUserInfo(const QString& userId);               // 获取用户信息
+    void getUserInfo(const QString& userId);                // 获取用户信息
+    void setAvatar(const QString& fileId);                  // 设置用户头像
 private:
     static QString makeRequeId();
     QNetworkReply* sendHttpRequest(const QString& resourcePath, QJsonObject& jsonBody);

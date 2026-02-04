@@ -164,6 +164,8 @@ void UserInfo::loadUserInfo(const QJsonObject &jsonObj)
     userId = jsonObj["userId"].toString();
     phoneNum = jsonObj["phoneNum"].toString();
     nickname = jsonObj["nickname"].toString();
+    roleType.clear();
+    identityType.clear();
     // ⻆⾊类型：超级管理员-1、普通管理员-2、普通用户-3，临时用户-4
     QJsonArray roleTypeArray = jsonObj["roleType"].toArray();
     for(int i = 0; i < roleTypeArray.count(); i++) {

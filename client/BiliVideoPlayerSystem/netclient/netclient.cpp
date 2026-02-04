@@ -223,6 +223,44 @@ void NetClient::downloadPhoto(const QString &photoFileId)
     });
 }
 
+void NetClient::uploadPhoto(const QByteArray &photoData)
+{
+    // 1. 构造请求
+    auto dataCenter = model::DataCenter::getInstance();
+    QString queryStr;
+    queryStr += "requestId=";
+    queryStr += makeRequeId();
+    queryStr += "&";
+    queryStr += "sessionId=";
+    queryStr += dataCenter->getLoginSessionId();
+
+    // 2. 发送请求
+    QNetworkRequest httpReq;
+    httpReq.setUrl(QUrl(HTTP_URL + "/HttpService/uploadPhoto?" + queryStr));
+    httpReq.setHeader(QNetworkRequest::ContentTypeHeader, "application/octet-stream");
+    QNetworkReply* httpReply = httpClient.post(httpReq, photoData);
+
+    // 3. 异步响应处理
+    connect(httpReply, &QNetworkReply::finished, this, [=]{
+        bool ok = false;
+        QString reason;
+        QJsonObject resultObject = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"uploadPhoto 请求出错，reason = "<<reason;
+            return;
+        }
+        const QJsonObject resultObj = resultObject["result"].toObject();
+        const QString fileId = resultObj["fileId"].toString();
+        emit dataCenter->uploadPhotoDone(fileId);
+
+        const QString requestId = resultObject["requestId"].toString();
+        LOG() << "uploadPhoto 请求结束, 图⽚上传成功, requestId= " << requestId;
+
+        httpReply->deleteLater();
+    });
+}
+
 void NetClient::downloadVideo(const QString &videoFileId)
 {
     // 1. 构造请求
@@ -430,6 +468,33 @@ void NetClient::getUserInfo(const QString &userId)
         }
 
         LOG()<<"getUserInfo 成功, resquestId = "<<replyObj["requestId"].toString() << "userId: " << userId;
+    });
+}
+
+void NetClient::setAvatar(const QString &fileId)
+{
+    // 修改头像，图片已经上传过了，只设置fileId
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["fileId"] = fileId;
+
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/setAvatar", reqBody);
+
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG() << "setAvatar 请求出错! reason=" << reason << ", requestId=" << reqBody["requestId"].toString();
+            return;
+        }
+
+        dataCenter->setAvatar(fileId);
+        emit dataCenter->setAvatarDone();
+
+        LOG()<<"setAvatar 成功, resquestId = "<<replyObj["requestId"].toString();
     });
 }
 
