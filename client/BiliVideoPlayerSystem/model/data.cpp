@@ -81,6 +81,11 @@ void VideoInfo::loadVideoInfo(const QJsonObject &jsonObj)
     videoTitle = jsonObj.value("videoTitle").toString();
     videoDuration = jsonObj.value("videoDuration").toInt();
     videoUpTime = jsonObj.value("videoUpTime").toString();
+
+    videoStatus = static_cast<VideoStatus>(jsonObj.value("videoStatus").toInt());
+    checkerId = jsonObj.value("checkerId").toString();
+    checkerName = jsonObj.value("checkerName").toString();
+    checkerAvatar = jsonObj.value("checkerAvatar").toString();
 }
 
 VideoList::VideoList()

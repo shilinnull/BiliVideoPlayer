@@ -498,6 +498,38 @@ void NetClient::setAvatar(const QString &fileId)
     });
 }
 
+void NetClient::getUserVideoList(const QString &userId, int pageIndex)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    if(userId.isEmpty()) {  // 获取自己的信息
+        reqBody["userId"] = userId;
+    }
+    reqBody["pageIndex"] = pageIndex;
+    reqBody["pageCount"] = model::VideoList::PAGE_COUNT;
+
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/userVideoList", reqBody);
+
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"userVideoList 请求出错，reason = "<<reason;
+            return;
+        }
+
+        // 将信息保存到dataCenter中
+        QJsonObject resultObj = replyObj["result"].toObject();
+        dataCenter->setUserVideoList(resultObj);
+        emit dataCenter->getUserVideoListDone(userId);
+
+        LOG()<<"userVideoList 成功, resquestId = "<<replyObj["requestId"].toString() << "userId: " << userId;
+    });
+}
+
 QString NetClient::makeRequeId()
 {
     return "R" + QUuid::createUuid().toString().sliced(25, 12);

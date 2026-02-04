@@ -57,5 +57,4 @@ void Volume::calcVolume()
 
     // 计算音量大小
     volumeRatio = ui->outLine->height() / (double)145 * 100;
-    LOG() << "音量大小" << volumeRatio;
 }

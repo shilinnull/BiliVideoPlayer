@@ -8,6 +8,15 @@
 
 namespace model{
 
+// 视频状态
+enum VideoStatus {
+    noStatus = 0,   // 无状态
+    waitForChecking,// 待审核
+    putaway,        // 审核通过 or 上架
+    reject,         // 审核驳回
+    discard         // 已下架
+};
+
 // 视频信息结构
 class VideoInfo{
 public:
@@ -25,10 +34,16 @@ public:
     int64_t videoDuration;    	// 持续时长
     QString videoUpTime;    	// 视频上传时间
 
+    int videoStatus;            // 视频状态
+    QString checkerId;          // 审核者ID
+    QString checkerName;        // 审核者昵称
+    QString checkerAvatar;      // 审核者用户头像ID
+
     // 通过 JSON 对象加载视频信息
     void loadVideoInfo(const QJsonObject& jsonObj);
 };
 
+// 视频列表
 class VideoList{
 public:
     VideoList();
@@ -76,6 +91,9 @@ private:
     static int id;
 };
 
+
+
+// 弹幕信息
 class BarrageInfo {
 public:
     QString barrageId;      // 弹幕id

@@ -99,6 +99,11 @@ bool MockServer::init()
     httpServer.route("/HttpService/setAvatar", [=](const QHttpServerRequest& req){
         return this->setAvatar(req);
     });
+
+    // 获取指定用户视频列表
+    httpServer.route("/HttpService/userVideoList", [=](const QHttpServerRequest& req){
+        return this->userVideoList(req);
+    });
     return 8000 == ret;
 }
 
@@ -397,6 +402,12 @@ void MockServer::buildResponseData()
         idPathTable.insert(QString::number(resourceId++), "/images/videoImage3.png");
         idPathTable.insert(QString::number(resourceId++), "/videos/111.m3u8");
     }
+    resourceId = 50000;
+    for(int i = 0; i < 100; i++) {
+        idPathTable.insert(QString::number(resourceId++), "/images/touxiang3.png");
+        idPathTable.insert(QString::number(resourceId++), "/images/videoImage3.png");
+        idPathTable.insert(QString::number(resourceId++), "/videos/111.m3u8");
+    }
 }
 
 QHttpServerResponse MockServer::downloadPhoto(const QHttpServerRequest &req)
@@ -404,7 +415,6 @@ QHttpServerResponse MockServer::downloadPhoto(const QHttpServerRequest &req)
     QUrlQuery query(QUrl(req.url()));
     QString requestId = query.queryItemValue("requestId");
     QString fileId = query.queryItemValue("fileId");
-    LOG() << "[downloadPhoto] 收到 downloadPhoto 请求, requestId=" << requestId;
     QDir dir(QDir::currentPath());
     dir.cdUp(); dir.cdUp();
     QString imagePath = dir.absolutePath();
@@ -713,8 +723,6 @@ QHttpServerResponse MockServer::getUserInfo(const QHttpServerRequest &req)
     resultObj["userInfo"] = userInfoObj;
     jsonResp["result"] = resultObj;
 
-    LOG() << resultObj;
-
     QJsonDocument docResp;
     docResp.setObject(jsonResp);
 
@@ -728,12 +736,72 @@ QHttpServerResponse MockServer::setAvatar(const QHttpServerRequest &req)
     QJsonDocument docReq = QJsonDocument::fromJson(req.body());
     const QJsonObject& jsonReq = docReq.object();
     LOG()<<"[setAvatar] 收到 setAvatar 请求， requestId = "
-          <<jsonReq["requestId"].toString() << ", file: " << jsonReq["fileId"].toString();
+          <<jsonReq["requestId"].toString() << ", fileId: " << jsonReq["fileId"].toString();
 
     QJsonObject jsonResp;
     jsonResp["requestId"] = jsonReq["requestId"].toString();
     jsonResp["errorCode"] = 0;
 
+    QJsonDocument docResp;
+    docResp.setObject(jsonResp);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::userVideoList(const QHttpServerRequest &req)
+{
+    // 1. 获取到请求中数据
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG()<<"[userVideoList] 收到 userVideoList 请求， requestId = "<<jsonReq["requestId"].toString();
+
+
+
+    QJsonArray videoListObject;
+    int videoId = 10000;
+    int userId = 50000;
+    int resourceId = 50000;
+    QJsonArray videoLists;
+    for(int i = 0; i < jsonReq["pageCount"].toInt(); ++i){
+        QJsonObject videoJsonObj;
+        videoJsonObj["videoId"] = QString::number(videoId++);
+        videoJsonObj["userId"] = QString::number(userId++);
+        videoJsonObj["userAvatarId"] = QString::number(resourceId++);
+        videoJsonObj["nickname"] = "用户昵称";
+        videoJsonObj["photoFileId"] = QString::number(resourceId++);
+        videoJsonObj["videoFileId"] = QString::number(resourceId++);
+        videoJsonObj["likeCount"] = 1234;
+        videoJsonObj["playCount"] = 23456;
+        videoJsonObj["videoSize"] = 10240;
+        videoJsonObj["videoDesc"] = "【北京旅游攻略】一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩~";
+        videoJsonObj["videoTitle"] = "【北京旅游攻略】一条视频告诉你去了北京该怎么玩";
+        videoJsonObj["videoDuration"] = 10;
+        videoJsonObj["videoUpTime"] = "9-16 12:28:58";
+        videoJsonObj["videoStatus"] = 2;
+        videoJsonObj["checkerId"] = "1234";
+        videoJsonObj["checkerName"] = "张三";
+        videoJsonObj["checkerAvatar"] = "";
+
+        videoListObject.append(videoJsonObj);
+    }
+    QJsonObject resultObject;
+    resultObject["videoList"] = videoListObject;
+    resultObject["totalCount"] = 50;
+
+    QJsonObject jsonResp;
+    jsonResp["requestId"] = jsonReq["requestId"].toString();
+    jsonResp["errorCode"] = 0;
+    jsonResp["result"] = resultObject;
+
+    // 3. 返回响应
     QJsonDocument docResp;
     docResp.setObject(jsonResp);
 

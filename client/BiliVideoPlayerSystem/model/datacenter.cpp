@@ -1,6 +1,7 @@
 #include "datacenter.h"
 
 #include <QJsonArray>
+#include "util.h"
 
 namespace model {
 
@@ -195,6 +196,42 @@ void DataCenter::setAvatar(const QString &fileId)
 void DataCenter::setAvatarAsync(const QString &fileId)
 {
     netClient.setAvatar(fileId);
+}
+
+void DataCenter::setUserVideoList(const QJsonObject &videoListObj)
+{
+    getUserVideoList();
+    QJsonArray videoListArray = videoListObj["videoList"].toArray();
+    for(int i = 0; i < videoListArray.size(); i++) {
+        // 解析单个视频
+        QJsonObject videoInfoObj = videoListArray[i].toObject();
+        VideoInfo videoInfo;
+        videoInfo.loadVideoInfo(videoInfoObj);
+
+        // 视频信息放到用户视频列表中
+        userVideoList->videoInfos.append(videoInfo);
+    }
+    int videoTotalCount = videoListObj["totalCount"].toInt();
+    LOG() << "视频总个数: " << videoTotalCount;
+    userVideoList->setVideoTotalCount(videoTotalCount);
+
+    // 如果本次未获取到视频，说明后续已经没有视频了，页面索引不需要+1
+    if(0 == videoListArray.size()) {
+        userVideoList->setPageIndex(userVideoList->getPageIndex() - 1);
+    }
+}
+
+VideoList *DataCenter::getUserVideoList()
+{
+    if(nullptr == userVideoList) {
+        userVideoList = new VideoList();
+    }
+    return userVideoList;
+}
+
+void DataCenter::getUserVideoListAsync(const QString &userId, int pageIndex)
+{
+    netClient.getUserVideoList(userId, pageIndex);
 }
 
 DataCenter::DataCenter(QObject *parent)

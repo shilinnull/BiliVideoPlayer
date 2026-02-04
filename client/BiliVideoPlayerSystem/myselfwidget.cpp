@@ -7,6 +7,7 @@
 #include "toast.h"
 
 #include <QFileDialog>
+#include <QScrollBar>
 
 MyselfWidget::MyselfWidget(QWidget *parent)
     : QWidget(parent)
@@ -57,13 +58,14 @@ void MyselfWidget::loadMySelf()
     // 加载个人信息
     getMyselfInfo();
     // 加载个人视频列表
+    getUserVideoList("", 1);
 }
 
 void MyselfWidget::initUI()
 {
     ui->attentionBtn->hide();
 
-#ifdef TEST_UI
+#ifndef TEST_UI
     // 往视频显示区域添加VideoBox-测试
     int resourceId = 10000;
     for(int i = 0; i < 20; ++i){
@@ -94,6 +96,8 @@ void MyselfWidget::connectSignalAndSlots()
     connect(dataCenter, &model::DataCenter::downloadPhotoDone, this, &MyselfWidget::getAvatarDone);
     connect(dataCenter, &model::DataCenter::uploadPhotoDone, this, &MyselfWidget::uploadAvatarDone1);
     connect(dataCenter, &model::DataCenter::setAvatarDone, this, &MyselfWidget::uploadAvatarDone2);
+    connect(dataCenter, &model::DataCenter::getUserVideoListDone, this, &MyselfWidget::getUserVideoListDone);
+    connect(ui->scrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this, &MyselfWidget::onSCrollAreaValueChanged);
 
 }
 
@@ -115,7 +119,6 @@ void MyselfWidget::uploadAvatarBtnClicked()
         LOG() << "头像文件读取失败";
         return ;
     }
-    ui->avatarBtn->setIcon(std::move(makeCircleIcon(fileDate, ui->avatarBtn->width() / 2)));
     dataCenter->uploadPhotoAsync(fileDate); // 上传图片到服务器
 }
 
@@ -193,17 +196,44 @@ void MyselfWidget::getAvatarDone(const QString &fileId, const QByteArray &data)
 
 void MyselfWidget::uploadAvatarDone1(const QString &fileId)
 {
-    //图片上传成功之后，将图片工d去修改服务器上用户头像id
+    // 图片上传成功之后，通过fileId修改服务器上用户头像id
     auto dataCenter = model::DataCenter::getInstance();
     dataCenter->setAvatarAsync(fileId);
 }
 
 void MyselfWidget::uploadAvatarDone2()
 {
-    //重新通过用户头像fildId 获取头像，头像获取成功会自动设置到界面
+    // 重新通过用户头像 fildId 获取头像，头像获取成功会自动设置到界面
     auto dataCenter = model::DataCenter::getInstance();
     const auto* myself = dataCenter->getMyselfInfo();
     dataCenter->downloadPhotoAsync(myself->avatarFileId);
+}
+
+void MyselfWidget::getUserVideoListDone(const QString &userId)
+{
+    auto* dataCenter = model::DataCenter::getInstance();
+    auto* userVideoList = dataCenter->getUserVideoList();
+
+    const int rowCount = 4;     // 一行多少个视频
+    for(int i = ui->layout->count(); i < userVideoList->getVideoCount(); ++i) {
+        int row = i / rowCount;
+        int col = i % rowCount;
+        VideoBox* videoBox = new VideoBox(userVideoList->videoInfos[i]);
+        ui->layout->addWidget(videoBox, row, col);
+    }
+}
+
+void MyselfWidget::onSCrollAreaValueChanged(int value)
+{
+    if(0 == value) {
+        return;
+    }
+    if(value == ui->scrollArea->verticalScrollBar()->maximum()) {
+        auto dataCenter = model::DataCenter::getInstance();
+        auto userVideoListPtr = dataCenter->getUserVideoList();
+        dataCenter->getUserVideoListAsync("", userVideoListPtr->getPageIndex());
+        userVideoListPtr->setPageIndex(userVideoListPtr->getPageIndex() + 1);
+    }
 }
 
 void MyselfWidget::hideWidget(bool isHide)
@@ -249,5 +279,30 @@ void MyselfWidget::hideWidget(bool isHide)
         ui->uploadVideoBtn->show();
         ui->scrollArea->show();
         ui->titleBar->show();
+    }
+}
+
+void MyselfWidget::getUserVideoList(const QString &userId, int pageIndex)
+{
+    //如果获取的是第一页的视频时，需要将之前界面上的视频元素清空
+    auto* dataCenter = model::DataCenter::getInstance();
+    auto userVideoList = dataCenter->getUserVideoList();
+    if(pageIndex == 1) {
+        userVideoList->clearVideoList();    // 清空视频列表
+        clearVideoList();                   // 删除界面元素
+    }
+    dataCenter->getUserVideoListAsync(userId, pageIndex);
+    // page+1，滚动条向下动时就可以获取下一页视频
+    userVideoList->setPageIndex(pageIndex + 1);
+}
+
+void MyselfWidget::clearVideoList()
+{
+    QLayoutItem* videoBoxWidget = nullptr;
+    while(nullptr != (videoBoxWidget = ui->layout->takeAt(0))) {
+        if (videoBoxWidget->widget() != nullptr) {
+            delete videoBoxWidget->widget();
+        }
+        delete videoBoxWidget;
     }
 }

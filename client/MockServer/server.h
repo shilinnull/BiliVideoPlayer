@@ -54,6 +54,7 @@ private:
     QHttpServerResponse newBarrage(const QHttpServerRequest& req);      // 新增弹幕
     QHttpServerResponse getUserInfo(const QHttpServerRequest& req);     // 获取个人信息
     QHttpServerResponse setAvatar(const QHttpServerRequest& req);       // 设置用户头像
+    QHttpServerResponse userVideoList(const QHttpServerRequest& req);   // 获取视频列表
 
 private:
     MockServer();

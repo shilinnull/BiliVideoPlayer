@@ -67,7 +67,6 @@ void PlaySlider::mouseMoveEvent(QMouseEvent *event)
 void PlaySlider::setPlayStep(double stepRatio)
 {
     playProgress = stepRatio * ui->inLine->width();
-    LOG() << "播放进度：" << playProgress;
     moveSlider();
 }
 

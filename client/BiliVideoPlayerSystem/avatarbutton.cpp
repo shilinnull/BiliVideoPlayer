@@ -13,6 +13,7 @@ AvatarButton::AvatarButton(QWidget *parent)
                         "background-color: rgba(0, 0, 0, 0.5);"
                         "border-radius: 30px;}");
     mask->setText("修改头像");
+    mask->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     mask->hide();
 
     // 点击 mask 也会落到 mask 背后的按钮上

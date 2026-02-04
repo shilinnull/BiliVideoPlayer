@@ -28,6 +28,8 @@ public:
                 const model::BarrageInfo& barrageInfo);     // 新增弹幕
     void getUserInfo(const QString& userId);                // 获取用户信息
     void setAvatar(const QString& fileId);                  // 设置用户头像
+    void getUserVideoList(const QString& userId,
+                          int pageIndex);                   // 获取指定用户视频列表
 private:
     static QString makeRequeId();
     QNetworkReply* sendHttpRequest(const QString& resourcePath, QJsonObject& jsonBody);

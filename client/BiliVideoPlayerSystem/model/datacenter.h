@@ -43,6 +43,10 @@ public:
     void getOtherUserInfoAsync(const QString& userId);          // 获取其他用户信息
     void setAvatar(const QString& fileId);                      // 修改用户头像ID
     void setAvatarAsync(const QString& fileId);                 // 设置用户头像
+    void setUserVideoList(const QJsonObject& videoListObj);     // 设置用户视频列表
+    VideoList* getUserVideoList();                              // 获取用户视频列表
+    void getUserVideoListAsync(const QString& userId,
+                               int pageIndex);                  // 获取我的视频列表
 private:
     explicit DataCenter(QObject *parent = nullptr);
     static DataCenter* instance;
@@ -54,6 +58,7 @@ private:
     QHash<int64_t, QList<BarrageInfo>> barrages;    // 弹幕信息
     UserInfo* myselfInfo = nullptr;                 // 保存当前用户个人信息
     UserInfo* otherUserInfo = nullptr;              // 保存其他用户个人信息
+    VideoList* userVideoList = nullptr;             // 保存指定用户视频列表：我的视频列表 或 其他用户视频列表
 signals:
     void loginTempUserDone();						// 临时用户登录
     void getAllVideoListDone();						// 获取所有视频信息处理完毕
@@ -61,15 +66,16 @@ signals:
     void getAllVideoInTagDone();					// 获取标签下所有视频信息处理完毕
     void getAllVideoListSearchTextDone();			// 根据搜索内容获取视频处理完毕
     void downloadPhotoDone(const QString& imageId,
-                           QByteArray imageData);   // 下载图片处理完毕
+                           QByteArray imageData);       // 下载图片处理完毕
     void downloadVideoDone(const QString& videoFilePath,
                            const QString& videoFileId); // 下载视频处理完毕
     void getVideoBarrageDone(const QString& videoId);   // 过去弹幕信息完毕
     void getIsLikeVideoDone(const QString& videoId, bool isLike);   // 检测是否点赞成功
-    void getMyselfInfoDone();                                  // 获取用户个人信息完毕
-    void getOtherUserInfoDone();                               // 获取其他用户信息完毕
-    void uploadPhotoDone(const QString& fileId);                // 上传图片完毕
-    void setAvatarDone();                                      // 修改用户头像完毕
+    void getMyselfInfoDone();                                       // 获取用户个人信息完毕
+    void getOtherUserInfoDone();                                    // 获取其他用户信息完毕
+    void uploadPhotoDone(const QString& fileId);                    // 上传图片完毕
+    void setAvatarDone();                                           // 修改用户头像完毕
+    void getUserVideoListDone(const QString& userId);               // 获取我的视频列表完毕
 
 };
 
