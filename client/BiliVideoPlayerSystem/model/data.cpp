@@ -214,4 +214,22 @@ bool UserInfo::isTempUser() const
     return false;
 }
 
+void UserInfo::buildTempUser()
+{
+    userId = "";
+    phoneNum = "";
+    nickname = "";
+    roleType.append(TempUser);
+    identityType.append(CUser);
+    likeCount = 0;
+    playCount = 0;
+    followedCount = 0;
+    followerCount = 0;
+    userStatus = 0;
+    isFollowing = 0;
+    userMemo = "";
+    userCTime = "";
+    avatarFileId = "";
+}
+
 }

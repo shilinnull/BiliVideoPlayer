@@ -8,6 +8,7 @@
 #include "bulletscreenitem.h"
 #include <QShortcut>
 #include <QKeySequence>
+#include "bilivideoplayer.h"
 
 PlayerPage::PlayerPage(const model::VideoInfo& videoInfo, QWidget *parent)
     : QWidget(parent)
@@ -48,6 +49,7 @@ PlayerPage::PlayerPage(const model::VideoInfo& videoInfo, QWidget *parent)
     connect(mpvPlayer, &MpvPlayer::endOfPlaylist, this, &PlayerPage::onEndOfPlayList);
     connect(ui->bulletScreenBtn, &QPushButton::clicked, this, &PlayerPage::onBulletScreenClicked);
     connect(ui->bulletScreenText, &BarrageEdit::onSendScreenBtn, this, &PlayerPage::onSendBulletScreenBtnClicked);
+    connect(ui->userAvatar, &QPushButton::clicked, this, &PlayerPage::onUserAvatarClicked);
 
     likeCount = videoInfo.likeCount;        // 更新播放数
     auto dataCenter = model::DataCenter::getInstance();
@@ -396,3 +398,10 @@ void PlayerPage::onQuitBtnClicked()
     this->deleteLater();
 }
 
+void PlayerPage::onUserAvatarClicked()
+{
+    // 先关闭当前界面
+    onQuitBtnClicked();
+
+    BiliVideoPlayer::getInstance()->switchToUserInfoPage(this->videoInfo.userId);
+}

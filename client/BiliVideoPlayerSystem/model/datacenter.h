@@ -27,6 +27,9 @@ public:
     void downloadPhotoAsync(const QString& photoFileId);        // 下载图片
     void uploadPhotoAsync(const QByteArray& photoData);         // 上传图片
     void downloadVideoAsync(const QString& videoFileId);        // 下载视频
+    void deleteVideoAsync(const QString& videoId);              // 删除视频
+    void newAttentionAsync(const QString& userId);              // 新增关注
+    void delAttentionAsync(const QString& userId);              // 取消关注
     void getVideoBarrageAsync(const QString& videoId);          // 获取弹幕
     void setBarragesData(const QJsonArray& barrageArray);       // 设置弹幕
     QHash<int64_t, QList<BarrageInfo>>& getBarragesData();      // 获取弹幕内容
@@ -37,6 +40,7 @@ public:
                              const BarrageInfo& barrageInfo);   // 新增弹幕
     void setMySelfInfo(const QJsonObject& mySelfInfoObj);       // 设置个人信息
     const UserInfo* getMyselfInfo() const;                      // 获取个人信息
+    void buildTempUserInfo();                                   // 构建临时用户
     void setOtherUserInfo(const QJsonObject& otherInfoObj);     // 设置他人信息
     UserInfo* getOtherUserInfo();                               // 获取他人信息
     void getMyselfInfoAsync();                                  // 获取用户个人信息
@@ -69,6 +73,9 @@ signals:
                            QByteArray imageData);       // 下载图片处理完毕
     void downloadVideoDone(const QString& videoFilePath,
                            const QString& videoFileId); // 下载视频处理完毕
+    void deleteVideoDone(const QString& videoId);       // 删除视频完毕
+    void newAttentionDone(const QString& userId);       // 新增关注完毕
+    void delAttentionDone(const QString& userId);       // 取消关注完毕
     void getVideoBarrageDone(const QString& videoId);   // 过去弹幕信息完毕
     void getIsLikeVideoDone(const QString& videoId, bool isLike);   // 检测是否点赞成功
     void getMyselfInfoDone();                                       // 获取用户个人信息完毕

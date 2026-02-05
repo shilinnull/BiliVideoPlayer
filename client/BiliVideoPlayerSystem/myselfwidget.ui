@@ -323,7 +323,7 @@
           <height>0</height>
          </size>
         </property>
-        <widget class="QPushButton" name="attentionBtn">
+        <widget class="AttentionButton" name="attentionBtn">
          <property name="geometry">
           <rect>
            <x>0</x>
@@ -555,6 +555,11 @@ QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical { border:none; wi
    <class>AvatarButton</class>
    <extends>QPushButton</extends>
    <header location="global">avatarbutton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>AttentionButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">myselfwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

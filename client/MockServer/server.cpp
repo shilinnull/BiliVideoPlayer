@@ -61,8 +61,13 @@ bool MockServer::init()
     });
 
     // 模拟videos⽬录下视频文件下载
-    httpServer.route("/videos/<arg>", [=](const QString& request){
-        return this->downloadVideoSegmentation(request);
+    httpServer.route("/videos/<arg>", [=](const QString& req){
+        return this->downloadVideoSeg(req);
+    });
+
+    // 删除视频
+    httpServer.route("/HttpService/removeVideo", [=](const QHttpServerRequest& req){
+        return this->removeVideo(req);
     });
 
     // 获取弹幕数据
@@ -103,6 +108,16 @@ bool MockServer::init()
     // 获取指定用户视频列表
     httpServer.route("/HttpService/userVideoList", [=](const QHttpServerRequest& req){
         return this->userVideoList(req);
+    });
+
+    // 新增关注
+    httpServer.route("/HttpService/newAttention", [=](const QHttpServerRequest& req){
+        return this->newAttention(req);
+    });
+
+    // 取消关注
+    httpServer.route("/HttpService/delAttention", [=](const QHttpServerRequest& req){
+        return this->delAttention(req);
     });
     return 8000 == ret;
 }
@@ -484,7 +499,65 @@ QHttpServerResponse MockServer::downloadVideo(const QHttpServerRequest &req)
     return httpResp;
 }
 
-QHttpServerResponse MockServer::downloadVideoSegmentation(const QString &fileName)
+QHttpServerResponse MockServer::removeVideo(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG() << "[removeVideo] 收到 removeVideo 请求, requestId=" << jsonReq["requestId"].toString()
+          << "videoId: " << jsonReq["videoId"].toString();
+
+    QJsonObject jsonBody;
+    jsonBody["requestId"] = jsonReq["requestId"].toString();
+    jsonBody["errorCode"] = 0;
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonBody);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::newAttention(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG() << "[newAttention] 收到 newAttention 请求, requestId=" << jsonReq["requestId"].toString()
+          << "videoId: " << jsonReq["videoId"].toString();
+
+    QJsonObject jsonBody;
+    jsonBody["requestId"] = jsonReq["requestId"].toString();
+    jsonBody["errorCode"] = 0;
+    jsonBody["errorMsg"] = "";
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonBody);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::delAttention(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG() << "[delAttention] 收到 delAttention 请求, requestId=" << jsonReq["requestId"].toString()
+          << "videoId: " << jsonReq["videoId"].toString();
+
+    QJsonObject jsonBody;
+    jsonBody["requestId"] = jsonReq["requestId"].toString();
+    jsonBody["errorCode"] = 0;
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonBody);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::downloadVideoSeg(const QString &fileName)
 {
     QString normalizedName = fileName;
     if (normalizedName.startsWith('/')) {

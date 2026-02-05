@@ -46,7 +46,10 @@ private:
     QHttpServerResponse downloadPhoto(const QHttpServerRequest& req);   // 下载图片
     QHttpServerResponse uploadPhoto(const QHttpServerRequest& req);     // 上传图片
     QHttpServerResponse downloadVideo(const QHttpServerRequest& req);   // 下载视频
-    QHttpServerResponse downloadVideoSegmentation(const QString& fileName);   // 下载视频分片
+    QHttpServerResponse downloadVideoSeg(const QString& fileName);      // 下载视频分片
+    QHttpServerResponse removeVideo(const QHttpServerRequest& req);     // 删除视频
+    QHttpServerResponse newAttention(const QHttpServerRequest& req);    // 新增关注
+    QHttpServerResponse delAttention(const QHttpServerRequest& req);    // 取消关注
     QHttpServerResponse getBarrage(const QHttpServerRequest& req);      // 获取弹幕数据
     QHttpServerResponse setPlay(const QHttpServerRequest& req);         // 更新播放次数
     QHttpServerResponse judgeLike(const QHttpServerRequest& req);       // 检测是否点赞

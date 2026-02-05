@@ -30,6 +30,8 @@ public:
     ~BiliVideoPlayer();
     static BiliVideoPlayer* getInstance();
     void showSystemPageBtn(bool isShow = true);
+    void switchToUserInfoPage(const QString& userId);   // 切换到其他用户主页
+
 private:
     // 初始化UI
     void initUI();
@@ -46,6 +48,7 @@ protected:
     void mouseMoveEvent(QMouseEvent* event) override;
 private:
     BiliVideoPlayer(QWidget *parent = nullptr);
+    void onSwitchPageUI(int pageId);
 private:
     QPoint dragPos;
     static BiliVideoPlayer *instance;

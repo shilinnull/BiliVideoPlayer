@@ -53,6 +53,7 @@ private:
     void updateVideoInfoUI();                       // 设置视频信息
     void updataPlayCount();                         // 更新播放数
     void onQuitBtnClicked();                        // 退出
+    void onUserAvatarClicked();                     // 用户头像点击
 private:
     Ui::PlayerPage *ui;
     QPoint dragPos;

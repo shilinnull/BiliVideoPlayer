@@ -18,6 +18,7 @@ public:
     ~VideoBox();
 
     void updateVideoInfoUI();
+    void showMoreBtn(bool isShow);      // 是否显示...按钮
 private:
     void onPlayBtnClicked();
     void setVideoDuration(int64_t duration);            // 设置视频时长
@@ -31,6 +32,9 @@ private slots:
     void getVideoImageDone(const QString& imageId, QByteArray imageData);
     void getUserImageDone(const QString& imageId, QByteArray imageData);
     void getVideoBarrageSuccess(const QString& videoId);
+    void onMoreBtnClicked();                        // 点击删除视频按钮
+signals:
+    void deleteVideo(const QString& videoId);       // 删除视频信号
 private:
     Ui::VideoBox *ui;
     static PlayerPage* playPage;

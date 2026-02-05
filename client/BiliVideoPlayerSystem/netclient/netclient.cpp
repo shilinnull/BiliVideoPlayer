@@ -295,6 +295,83 @@ void NetClient::downloadVideo(const QString &videoFileId)
 
 }
 
+void NetClient::deleteVideo(const QString &videoId)
+{
+    // 1. 构造请求体
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["videoId"] = videoId;
+
+    // 2. 发送请求
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/removeVideo", reqBody);
+
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject resultObject = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"deleteVideo 请求出错，reason = "<<reason;
+            return;
+        }
+
+        emit dataCenter->deleteVideoDone(videoId);
+        LOG()<<"deleteVideo 成功, resquestId = "<<resultObject["requestId"].toString();
+    });
+}
+
+void NetClient::newAttention(const QString &userId)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["userId"] = userId;
+
+    // 2. 发送请求
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/newAttention", reqBody);
+
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject resultObject = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"newAttention 请求出错，reason = "<<reason;
+            return;
+        }
+
+        emit dataCenter->newAttentionDone(userId);
+        LOG()<<"newAttention 成功, resquestId = "<<resultObject["requestId"].toString();
+    });
+}
+
+void NetClient::delAttention(const QString &userId)
+{
+    // 1. 构造请求体
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["userId"] = userId;
+
+    // 2. 发送请求
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/delAttention", reqBody);
+
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject resultObject = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"delAttention 请求出错，reason = "<<reason;
+            return;
+        }
+
+        emit dataCenter->delAttentionDone(userId);
+        LOG()<<"delAttention 成功, resquestId = "<<resultObject["requestId"].toString();
+    });
+}
+
 void NetClient::getVideoBarrage(const QString &videoId)
 {
     // 1. 构造请求体
@@ -319,7 +396,6 @@ void NetClient::getVideoBarrage(const QString &videoId)
         QJsonObject resultObj = resultObject["result"].toObject();
         dataCenter->setBarragesData(resultObj["barrageList"].toArray());
 
-        // d. 统计界面显示视频信息
         emit dataCenter->getVideoBarrageDone(videoId);
         LOG()<<"getBarrage 成功, resquestId = "<<resultObj["requestId"].toString();
     });
@@ -434,18 +510,15 @@ void NetClient::loadupBarrages(const QString &videoId, const model::BarrageInfo 
 
 void NetClient::getUserInfo(const QString &userId)
 {
-    // 1. 构造请求体
     auto dataCenter = model::DataCenter::getInstance();
     QJsonObject reqBody;
     reqBody["sessionId"] = dataCenter->getLoginSessionId();
-    if(userId.isEmpty()) {  // 获取自己的信息
+    if(!userId.isEmpty()) {  // 获取其他用户信息
         reqBody["userId"] = userId;
     }
 
-    // 2. 发送请求
     QNetworkReply* httpReply = sendHttpRequest("/HttpService/getUserInfo", reqBody);
 
-    // 3. 异步处理 getUserInfo 请求的响应
     connect(httpReply, &QNetworkReply::finished, this, [=](){
         bool ok = false;
         QString reason;
@@ -503,7 +576,7 @@ void NetClient::getUserVideoList(const QString &userId, int pageIndex)
     auto dataCenter = model::DataCenter::getInstance();
     QJsonObject reqBody;
     reqBody["sessionId"] = dataCenter->getLoginSessionId();
-    if(userId.isEmpty()) {  // 获取自己的信息
+    if(!userId.isEmpty()) {  // 获取其他用户视频列表
         reqBody["userId"] = userId;
     }
     reqBody["pageIndex"] = pageIndex;

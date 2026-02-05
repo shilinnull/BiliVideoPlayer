@@ -20,6 +20,13 @@ void BiliVideoPlayer::showSystemPageBtn(bool isShow)
     }
 }
 
+void BiliVideoPlayer::switchToUserInfoPage(const QString &userId)
+{
+    onSwitchPageUI(MyselfPage);
+    // 加载其他用户个人信息
+    ui->myPage->loadOtherUser(userId);
+}
+
 BiliVideoPlayer::BiliVideoPlayer(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::BiliVideoPlayer)
@@ -30,6 +37,12 @@ BiliVideoPlayer::BiliVideoPlayer(QWidget *parent)
     initUI();
     // 初始化信号和槽
     connectSignalAndSlot();
+}
+
+void BiliVideoPlayer::onSwitchPageUI(int pageId)
+{
+    ui->stackedWidget->setCurrentIndex(pageId);
+    resetSwitchBtnInfo(pageId);
 }
 
 BiliVideoPlayer::~BiliVideoPlayer()

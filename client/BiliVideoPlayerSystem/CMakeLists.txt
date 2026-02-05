@@ -46,6 +46,7 @@ qt_add_executable(BiliVideoPlayerSystem
     test/TestJson.h
     netclient/netclient.h netclient/netclient.cpp
     test/TestHttp.h
+    confirmdialog.h confirmdialog.cpp
 )
 
 include_directories(

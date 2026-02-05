@@ -102,6 +102,21 @@ void DataCenter::downloadVideoAsync(const QString &videoFileId)
     netClient.downloadVideo(videoFileId);
 }
 
+void DataCenter::deleteVideoAsync(const QString &videoId)
+{
+    netClient.deleteVideo(videoId);
+}
+
+void DataCenter::newAttentionAsync(const QString &userId)
+{
+    netClient.newAttention(userId);
+}
+
+void DataCenter::delAttentionAsync(const QString &userId)
+{
+    netClient.delAttention(userId);
+}
+
 void DataCenter::getVideoBarrageAsync(const QString &videoId)
 {
     netClient.getVideoBarrage(videoId);
@@ -162,6 +177,14 @@ void DataCenter::setMySelfInfo(const QJsonObject &mySelfInfoObj)
 const UserInfo *DataCenter::getMyselfInfo() const
 {
     return myselfInfo;
+}
+
+void DataCenter::buildTempUserInfo()
+{
+    if(this->myselfInfo == nullptr) {
+        this->myselfInfo = new UserInfo;
+    }
+    myselfInfo->buildTempUser();
 }
 
 void DataCenter::setOtherUserInfo(const QJsonObject &otherInfoObj)

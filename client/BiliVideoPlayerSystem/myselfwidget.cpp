@@ -5,13 +5,55 @@
 #include "bilivideoplayer.h"
 #include "model/datacenter.h"
 #include "toast.h"
+#include "confirmdialog.h"
 
 #include <QFileDialog>
 #include <QScrollBar>
 
+
+AttentionButton::AttentionButton(QWidget *parent)
+    : QPushButton(parent)
+{
+    changeStatus(false);
+}
+
+void AttentionButton::changeStatus(bool isAttention)
+{
+    isAttentionStatus = isAttention;
+    if(isAttentionStatus) {
+        setText("已关注");
+        setStyleSheet("QPushButton{"
+                      "background-color: transparent;"
+                      "color: #FF6699;"
+                      "border-radius: 4px;"
+                      "border: 1px solid #FF6699;"
+                      "padding-left: 13px;"
+                      "padding-right: 13px;}");
+        setIconSize(QSize(24, 24));
+        setIcon(QIcon(":/images/myself/guanzhu.png"));
+    } else {
+        setText("关注");
+        setStyleSheet("QPushButton{"
+                      "background-color: #FF6699;"
+                      "color: #FFFFFF;"
+                      "border-radius: 4px;"
+                      "border: none;}");
+        setIcon(QIcon());
+    }
+}
+
+bool AttentionButton::isAttentioned() const
+{
+    return isAttentionStatus;
+}
+
+//////////////////////////////////////////////////
+
+
 MyselfWidget::MyselfWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::MyselfWidget)
+    , login(new Login())
 {
     ui->setupUi(this);
     initUI();
@@ -49,6 +91,13 @@ void MyselfWidget::getMyselfInfo()
     }
 }
 
+void MyselfWidget::getOtherUserInfo(const QString &userId)
+{
+    // 从网络中获取，每次加载其他用户是不同的
+    auto dataCenter = model::DataCenter::getInstance();
+    dataCenter->getOtherUserInfoAsync(userId);
+}
+
 void MyselfWidget::loadMySelf()
 {
     // 切换到个人模式，即允许点击用户头像按钮修改个⼈头像
@@ -58,7 +107,21 @@ void MyselfWidget::loadMySelf()
     // 加载个人信息
     getMyselfInfo();
     // 加载个人视频列表
+    userId = "";
     getUserVideoList("", 1);
+}
+
+void MyselfWidget::loadOtherUser(const QString &userId)
+{
+    // 加载用户信息
+    getOtherUserInfo(userId);
+    this->userId = userId;
+    // 加载用户视频列表
+    getUserVideoList(userId, 1);
+
+    // 切换到其他用户模式
+    ui->avatarBtn->changeMod(false);
+    ui->avatarBtn->setEnabled(false);
 }
 
 void MyselfWidget::initUI()
@@ -88,20 +151,26 @@ void MyselfWidget::initUI()
 
 void MyselfWidget::connectSignalAndSlots()
 {
-    connect(ui->avatarBtn, &AvatarButton::clicked, this, &MyselfWidget::uploadAvatarBtnClicked);
+    connect(ui->avatarBtn, &AvatarButton::clicked, this, &MyselfWidget::onUploadAvatarBtnClicked);
+    connect(ui->nicknameBtn, &AvatarButton::clicked, this, &MyselfWidget::onNicknameBtnClicked);
+    connect(ui->quitBtn, &AvatarButton::clicked, this, &MyselfWidget::onQuitBtnClicked);
     connect(ui->settingBtn, &QPushButton::clicked, this, &MyselfWidget::settingBtnClicked);
     connect(ui->uploadVideoBtn, &QPushButton::clicked, this, &MyselfWidget::uploadViewBtnClicked);
     auto dataCenter = model::DataCenter::getInstance();
-    connect(dataCenter, &model::DataCenter::getMyselfInfoDone, this, &MyselfWidget::getMyselfInfoDone);
+    connect(dataCenter, &model::DataCenter::getMyselfInfoDone, this, &MyselfWidget::getMyselfInfoDone, Qt::UniqueConnection);
+    connect(dataCenter, &model::DataCenter::getOtherUserInfoDone, this, &MyselfWidget::getOtherUserInfoDone, Qt::UniqueConnection);
     connect(dataCenter, &model::DataCenter::downloadPhotoDone, this, &MyselfWidget::getAvatarDone);
     connect(dataCenter, &model::DataCenter::uploadPhotoDone, this, &MyselfWidget::uploadAvatarDone1);
     connect(dataCenter, &model::DataCenter::setAvatarDone, this, &MyselfWidget::uploadAvatarDone2);
     connect(dataCenter, &model::DataCenter::getUserVideoListDone, this, &MyselfWidget::getUserVideoListDone);
     connect(ui->scrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this, &MyselfWidget::onSCrollAreaValueChanged);
-
+    connect(dataCenter, &model::DataCenter::deleteVideoDone, this, &MyselfWidget::deleteVideoDone);
+    connect(ui->attentionBtn, &AttentionButton::clicked, this, &MyselfWidget::onAttentionBtnClicked);
+    connect(dataCenter, &model::DataCenter::newAttentionDone, this, &MyselfWidget::newAttentionDone);
+    connect(dataCenter, &model::DataCenter::delAttentionDone, this, &MyselfWidget::delAttentionDone);
 }
 
-void MyselfWidget::uploadAvatarBtnClicked()
+void MyselfWidget::onUploadAvatarBtnClicked()
 {
     auto dataCenter = model::DataCenter::getInstance();
     const auto* myself = dataCenter->getMyselfInfo();
@@ -120,6 +189,25 @@ void MyselfWidget::uploadAvatarBtnClicked()
         return ;
     }
     dataCenter->uploadPhotoAsync(fileDate); // 上传图片到服务器
+}
+
+void MyselfWidget::onNicknameBtnClicked()
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    auto mySelf = dataCenter->getMyselfInfo();
+    if(mySelf->isTempUser()) {
+        login->show();
+    }
+}
+
+void MyselfWidget::onQuitBtnClicked()
+{
+    ConfirmDialog confirmDlg;
+    confirmDlg.setOperatorText("确定退出登录吗？");
+    confirmDlg.exec();
+    if(confirmDlg.isConfirmPass()) {
+        LOG() << "用户选择退出登录";
+    }
 }
 
 void MyselfWidget::settingBtnClicked()
@@ -186,10 +274,51 @@ void MyselfWidget::getMyselfInfoDone()
     ui->myVideoLabel->setText("我的视频");
 }
 
+void MyselfWidget::getOtherUserInfoDone()
+{
+    // 1. 界面控件显示隐藏处理
+    hideWidget(false);
+    // 隐藏 设置用户信息按钮、退出登录按钮、上传视频按钮
+    ui->settingBtn->hide();
+    ui->quitBtn->hide();
+    ui->uploadVideoBtn->hide();
+    ui->avatarBtn->setEnabled(false);
+    ui->nicknameBtn->setEnabled(false);
+
+    // 2. 获取其他用户的个人信息
+    auto dataCenter = model::DataCenter::getInstance();
+    auto otherUserInfo = dataCenter->getOtherUserInfo();
+
+    // 3. 更新界面数据
+    // 设置昵称、关注数、粉丝数、点赞数、播放数
+    ui->nicknameBtn->setText(otherUserInfo->nickname);
+    ui->attentionCountLabel->setText(intToString2(otherUserInfo->followedCount));
+    ui->fansCountLabel->setText(intToString2(otherUserInfo->followerCount));
+    ui->likeCountLabel->setText(intToString2(otherUserInfo->likeCount));
+    ui->playCountLabel->setText(intToString2(otherUserInfo->playCount));
+    ui->attentionBtn->changeStatus(otherUserInfo->isFollowing == 1);
+    ui->myVideoLabel->setText("TA的视频");
+
+    // 4. 更新用户头像
+    if(otherUserInfo->avatarFileId.isEmpty()){
+        ui->avatarBtn->setIcon(QIcon(":/images/myself/defaultAvatar.png"));
+    }else{
+        dataCenter->downloadPhotoAsync(otherUserInfo->avatarFileId);
+    }
+}
+
 void MyselfWidget::getAvatarDone(const QString &fileId, const QByteArray &data)
 {
+    // 下面两个只会走一个
+
+    // 获取自己的头像
     auto* myself = model::DataCenter::getInstance()->getMyselfInfo();
     if(myself != nullptr && myself->avatarFileId == fileId) {
+        ui->avatarBtn->setIcon(QIcon(makeCircleIcon(data, ui->avatarBtn->width() / 2)));
+    }
+    // 获取其他用户的头像
+    auto* otherUser = model::DataCenter::getInstance()->getOtherUserInfo();
+    if(otherUser != nullptr && otherUser->avatarFileId == fileId) {
         ui->avatarBtn->setIcon(QIcon(makeCircleIcon(data, ui->avatarBtn->width() / 2)));
     }
 }
@@ -220,6 +349,10 @@ void MyselfWidget::getUserVideoListDone(const QString &userId)
         int col = i % rowCount;
         VideoBox* videoBox = new VideoBox(userVideoList->videoInfos[i]);
         ui->layout->addWidget(videoBox, row, col);
+        if("" == userId){   // 如果是当前用户的获取的视频列表，每个VideoBox都支持删除
+            videoBox->showMoreBtn(true);
+            connect(videoBox, &VideoBox::deleteVideo, this, &MyselfWidget::deleteVideo);
+        }
     }
 }
 
@@ -231,9 +364,68 @@ void MyselfWidget::onSCrollAreaValueChanged(int value)
     if(value == ui->scrollArea->verticalScrollBar()->maximum()) {
         auto dataCenter = model::DataCenter::getInstance();
         auto userVideoListPtr = dataCenter->getUserVideoList();
-        dataCenter->getUserVideoListAsync("", userVideoListPtr->getPageIndex());
+        dataCenter->getUserVideoListAsync(userId, userVideoListPtr->getPageIndex());
         userVideoListPtr->setPageIndex(userVideoListPtr->getPageIndex() + 1);
     }
+}
+
+void MyselfWidget::deleteVideo(const QString &videoId)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    dataCenter->deleteVideoAsync(videoId);
+}
+
+void MyselfWidget::deleteVideoDone(const QString &videoId)
+{
+    LOG() << "删除视频";
+    getUserVideoList("", 1);    // 刷新视频列表
+}
+
+void MyselfWidget::onAttentionBtnClicked()
+{
+    // 临时用户不能关注
+    auto dataCenter = model::DataCenter::getInstance();
+    auto myselfInfo = dataCenter->getMyselfInfo();
+    if(myselfInfo->isTempUser()) {
+        Toast::showMessage("请先登录或注册再进行关注！", this);
+        return ;
+    }
+    // 修改界面
+    bool isAttentioned =  ui->attentionBtn->isAttentioned();
+    isAttentioned = !isAttentioned;
+    ui->attentionBtn->changeStatus(isAttentioned);
+
+    // 关注页面有效的时候才能关注
+    auto otherUserInfo = dataCenter->getOtherUserInfo();
+    if(nullptr ==  otherUserInfo) {
+        Toast::showMessage("指定用户不存在！");
+        return ;
+    }
+    if(isAttentioned) {
+        dataCenter->newAttentionAsync(userId);
+    } else {
+        dataCenter->delAttentionAsync(userId);
+    }
+}
+
+void MyselfWidget::newAttentionDone(const QString &userId)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    auto otherUserInfo = dataCenter->getOtherUserInfo();
+    int64_t followCount = otherUserInfo->followerCount + 1;
+    ui->fansCountLabel->setText(intToString2(followCount));
+
+    otherUserInfo->followerCount = followCount;
+}
+
+void MyselfWidget::delAttentionDone(const QString &userId)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    auto otherUserInfo = dataCenter->getOtherUserInfo();
+    int64_t followCount = otherUserInfo->followerCount - 1;
+    ui->fansCountLabel->setText(intToString2(followCount));
+
+    otherUserInfo->followerCount = followCount;
 }
 
 void MyselfWidget::hideWidget(bool isHide)
@@ -306,3 +498,4 @@ void MyselfWidget::clearVideoList()
         delete videoBoxWidget;
     }
 }
+

@@ -4,6 +4,7 @@
 #include "model/datacenter.h"
 #include <QDir>
 #include <QPixmap>
+#include <QMenu>
 
 PlayerPage* VideoBox::playPage = nullptr;
 
@@ -28,6 +29,8 @@ VideoBox::VideoBox(model::VideoInfo videoInfo, QWidget *parent)
     updateVideoInfoUI();		// 设置视频信息到界面
     connect(dataCenter, &model::DataCenter::getVideoBarrageDone,
             this, &VideoBox::getVideoBarrageSuccess);
+    // ...按钮点击
+    connect(ui->delVideoBtn, &QPushButton::clicked, this, &VideoBox::onMoreBtnClicked);
 
 }
 
@@ -41,7 +44,6 @@ bool VideoBox::eventFilter(QObject *watched, QEvent *event)
     if(ui->imageBox == watched || ui->videoTitle == watched) {
         if(QEvent::MouseButtonPress == event->type()) {
             onPlayBtnClicked();
-            LOG() << "按下播放按钮";
             return true;
         }
     }
@@ -60,29 +62,17 @@ void VideoBox::updateVideoInfoUI()
     setUserIcon(videoInfo.userAvatarId);
 }
 
+void VideoBox::showMoreBtn(bool isShow)
+{
+    if(isShow) {
+        ui->delVideoBtn->show();
+    } else {
+        ui->delVideoBtn->hide();
+    }
+}
+
 void VideoBox::onPlayBtnClicked()
 {
-    // 如果已经有一个播放器窗口存在，则先销毁它
-    if(playPage)
-        delete playPage;
-
-    // 创建一个新的播放器实例
-    playPage = new PlayerPage(videoInfo);
-    // 当窗口被销毁（例如关闭）时，将静态指针重置为nullptr
-    connect(playPage, &PlayerPage::destroyed, this, [=](){
-        playPage = nullptr;
-    });
-    // 更新videoBox播放数
-    connect(playPage, &PlayerPage::increasePlayCount, this, [=](const QString& videoId){
-        if(videoId == this->videoInfo.videoId) {
-            LOG() << "更新videoBox播放数";
-            this->videoInfo.playCount++;
-            ui->playNum->setText(intToString(this->videoInfo.playCount));
-            return;
-        }
-    });
-    playPage->show();
-
     auto dataCenter = model::DataCenter::getInstance();
     dataCenter->downloadVideoAsync(videoInfo.videoFileId);  // 获取视频
     dataCenter->getVideoBarrageAsync(videoInfo.videoId);    // 获取弹幕
@@ -90,13 +80,9 @@ void VideoBox::onPlayBtnClicked()
             [=](const QString& videoFilePath, const QString& videoFileId){
         if(videoInfo.videoFileId != videoFileId)
             return;
-        playPage->startPlaying();  // 开始播放
-    });
-
-    connect(playPage, &PlayerPage::updateLikeNum, this, [=](int64_t likeCount){
-        LOG()<<"更新 videoBox 点赞数";
-        this->videoInfo.likeCount = likeCount;
-        ui->likeNum->setText(intToString(videoInfo.likeCount));
+        if(playPage != nullptr) {
+            playPage->startPlaying();  // 开始播放
+        }
     });
 }
 
@@ -166,9 +152,79 @@ void VideoBox::getVideoBarrageSuccess(const QString &videoId)
 {
     if(videoId != videoInfo.videoId)
         return;
+    if(playPage) {
+        playPage->deleteLater();
+        playPage = nullptr;
+    }
+    playPage = new PlayerPage(videoInfo);
+
+    connect(playPage, &QObject::destroyed, this, [=](){
+        VideoBox::playPage = nullptr;  // 关闭后清空指针，避免悬空引用
+    });
+
+    // 更新videoBox播放数
+    connect(playPage, &PlayerPage::increasePlayCount, this, [=](const QString& videoId){
+        if(videoId == this->videoInfo.videoId) {
+            LOG() << "更新videoBox播放数";
+            this->videoInfo.playCount++;
+            ui->playNum->setText(intToString(this->videoInfo.playCount));
+            return;
+        }
+    });
+
+    connect(playPage, &PlayerPage::updateLikeNum, this, [=](int64_t likeCount){
+        LOG()<<"更新 videoBox 点赞数";
+        this->videoInfo.likeCount = likeCount;
+        ui->likeNum->setText(intToString(videoInfo.likeCount));
+    });
+
     playPage->setUserIcon(userPixmap);  // 设置用户头像
     playPage->show();
     playPage->startPlaying();
 }
+
+void VideoBox::onMoreBtnClicked()
+{
+    // 定义菜单的样式
+    QString style = "QMenu {"
+                    "background-color:#FFFFFF;"
+                    "border:none;"
+                    "border-radius: 6px;"
+                    "padding: 0; }";
+
+    style += "QMenu::item {"
+             "background-color:#FFFFFF;"
+             "border: none;"
+             "border-radius: 6px;"
+             "min-width: 50px;"
+             "min-height: 32px;"
+
+             "font-size: 12px;"
+             "color: #222222;"
+             "padding-left: 24px;}";
+
+    style += "QMenu::item:selected { "
+             "background-color: rgb(236, 93, 133); "
+             "color: #FFFFFF; }";
+    QMenu menu(this);
+    menu.setStyleSheet(style);
+    // 让圆角生效: 去掉窗口框架和阴影、设置透明度
+    menu.setWindowFlags(menu.windowFlags() | Qt::FramelessWindowHint
+                        | Qt::NoDropShadowWindowHint);
+    menu.setAttribute(Qt::WA_TranslucentBackground, true);
+
+    menu.addAction("删除");
+
+    QPoint point = QCursor::pos();
+    QAction* action = menu.exec(point);
+    if(nullptr == action) { // 用户取消菜单则返回
+        return ;
+    }
+    if(action->text() == "删除") {
+        LOG() << "删除视频: " << videoInfo.videoId;
+        emit deleteVideo(videoInfo.videoId);    // 发送信号让MyselfWidget真正删除视频操作
+    }
+}
+
 
 

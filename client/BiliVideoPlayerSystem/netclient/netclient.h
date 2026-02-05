@@ -20,6 +20,9 @@ public:
     void downloadPhoto(const QString& photoFileId);         // 下载图片
     void uploadPhoto(const QByteArray& photoData);          // 上传图片
     void downloadVideo(const QString& videoFileId);         // 下载视频
+    void deleteVideo(const QString& videoId);               // 删除视频
+    void newAttention(const QString& userId);               // 新增关注
+    void delAttention(const QString& userId);               // 取消关注
     void getVideoBarrage(const QString& videoId);           // 获取弹幕
     void setPlayNumber(const QString& videoId);             // 更新播放次数
     void getIsLikeVideo(const QString& videoId);            // 检测是否点赞

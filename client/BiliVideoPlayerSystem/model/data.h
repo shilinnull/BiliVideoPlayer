@@ -136,6 +136,7 @@ public:
     void loadUserInfo(const QJsonObject& jsonObj);
     bool isBUser() const ;
     bool isTempUser() const;
+    void buildTempUser();
 };
 
 

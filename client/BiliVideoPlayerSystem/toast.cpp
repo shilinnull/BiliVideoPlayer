@@ -6,6 +6,12 @@
 #include <QScreen>
 #include <QApplication>
 
+namespace {
+Toast* activeToast = nullptr;
+QString pendingText;
+QWidget* pendingWidget = nullptr;
+}
+
 Toast::Toast(const QString& text, QWidget *pWdidget)
 {
     initUI(text);
@@ -37,14 +43,29 @@ Toast::Toast(const QString &text)
 
 void Toast::showMessage(const QString &text)
 {
-    Toast* toast = new Toast(text);
-    toast->show();
+    Toast::showMessage(text, nullptr);
 }
 
 void Toast::showMessage(const QString &text, QWidget *pWidget)
 {
-    Toast* toast = new Toast(text, pWidget);
-    toast->show();
+    if(activeToast != nullptr) {
+        pendingText = text;
+        pendingWidget = pWidget;
+        return;
+    }
+
+    activeToast = new Toast(text, pWidget);
+    connect(activeToast, &QObject::destroyed, activeToast, [=](){
+        activeToast = nullptr;
+        if(!pendingText.isEmpty()) {
+            const QString nextText = pendingText;
+            QWidget* nextWidget = pendingWidget;
+            pendingText.clear();
+            pendingWidget = nullptr;
+            Toast::showMessage(nextText, nextWidget);
+        }
+    });
+    activeToast->show();
 }
 
 void Toast::initUI(const QString &text)
