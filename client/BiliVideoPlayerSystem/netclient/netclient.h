@@ -33,6 +33,12 @@ public:
     void setAvatar(const QString& fileId);                  // 设置用户头像
     void getUserVideoList(const QString& userId,
                           int pageIndex);                   // 获取指定用户视频列表
+    void getAuthcode(const QString& phoneNum);              // 获取验证码
+    void loginWithMessage(const QString& phoneNum,
+                          const QString& authcode,
+                          const QString& authcodeId);       // 验证码登录
+    void loginWithPassword(const QString& phoneNum,
+                           const QString& password);        // 账号密码登录
 private:
     static QString makeRequeId();
     QNetworkReply* sendHttpRequest(const QString& resourcePath, QJsonObject& jsonBody);

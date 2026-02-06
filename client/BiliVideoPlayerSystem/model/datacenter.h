@@ -40,6 +40,7 @@ public:
                              const BarrageInfo& barrageInfo);   // 新增弹幕
     void setMySelfInfo(const QJsonObject& mySelfInfoObj);       // 设置个人信息
     const UserInfo* getMyselfInfo() const;                      // 获取个人信息
+    void clearUserInfo();                                       // 清除用户信息
     void buildTempUserInfo();                                   // 构建临时用户
     void setOtherUserInfo(const QJsonObject& otherInfoObj);     // 设置他人信息
     UserInfo* getOtherUserInfo();                               // 获取他人信息
@@ -51,6 +52,14 @@ public:
     VideoList* getUserVideoList();                              // 获取用户视频列表
     void getUserVideoListAsync(const QString& userId,
                                int pageIndex);                  // 获取我的视频列表
+    void getAuthcodeAsync(const QString& phoneNum);             // 获取验证码
+    void loginWithMessageAsync(const QString& phoneNum,
+                                const QString& authcode,
+                                const QString& authcodeId);     // 验证码登录
+    void loginWithPasswordAsync(const QString& phoneNum,
+                                const QString& password);       // 账号密码登录
+
+
 private:
     explicit DataCenter(QObject *parent = nullptr);
     static DataCenter* instance;
@@ -83,6 +92,11 @@ signals:
     void uploadPhotoDone(const QString& fileId);                    // 上传图片完毕
     void setAvatarDone();                                           // 修改用户头像完毕
     void getUserVideoListDone(const QString& userId);               // 获取我的视频列表完毕
+    void getAuthcodeDone(const QString& authcodeId);                // 获取验证码完毕
+    void loginWithMessageDone();                                    // 验证码登录完毕
+    void loginWithMessageFailed(const QString& errorInfo);          // 验证码登录失败
+    void loginWithPasswordDone();                                   // 账号密码登录成功
+    void loginWithPasswordFailed(const QString& errorInfo);         // 账号密码登录失败
 
 };
 

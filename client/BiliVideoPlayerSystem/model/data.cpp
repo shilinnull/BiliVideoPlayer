@@ -218,7 +218,8 @@ void UserInfo::buildTempUser()
 {
     userId = "";
     phoneNum = "";
-    nickname = "";
+    nickname = "临时用户";
+    // roleType.append(User);
     roleType.append(TempUser);
     identityType.append(CUser);
     likeCount = 0;

@@ -100,10 +100,6 @@ void MyselfWidget::getOtherUserInfo(const QString &userId)
 
 void MyselfWidget::loadMySelf()
 {
-    // 切换到个人模式，即允许点击用户头像按钮修改个⼈头像
-    ui->avatarBtn->changeMod(false);
-    ui->avatarBtn->setEnabled(false); // 等待用户信息返回后再决定是否可编辑
-
     // 加载个人信息
     getMyselfInfo();
     // 加载个人视频列表
@@ -168,6 +164,10 @@ void MyselfWidget::connectSignalAndSlots()
     connect(ui->attentionBtn, &AttentionButton::clicked, this, &MyselfWidget::onAttentionBtnClicked);
     connect(dataCenter, &model::DataCenter::newAttentionDone, this, &MyselfWidget::newAttentionDone);
     connect(dataCenter, &model::DataCenter::delAttentionDone, this, &MyselfWidget::delAttentionDone);
+    connect(login, &Login::loginSuccess, this, [=]{
+        dataCenter->clearUserInfo();    // 清除旧信息
+        loadMySelf();                   // 从服务器上重新获取信息
+    });
 }
 
 void MyselfWidget::onUploadAvatarBtnClicked()
@@ -175,7 +175,7 @@ void MyselfWidget::onUploadAvatarBtnClicked()
     auto dataCenter = model::DataCenter::getInstance();
     const auto* myself = dataCenter->getMyselfInfo();
     if(myself != nullptr && myself->isTempUser()) {
-        Toast::showMessage("请先登录，再修改头像");
+        Toast::showMessage("请先登录，再修改头像！");
         return;
     }
     QString filename = QFileDialog::getOpenFileName(nullptr, "选择头像", "", "Image File(*jpg *.png)");
@@ -229,8 +229,8 @@ void MyselfWidget::getMyselfInfoDone()
         BiliVideoPlayer* biliPlayer = BiliVideoPlayer::getInstance();
         biliPlayer->showSystemPageBtn(false);
         ui->avatarBtn->setIcon(QIcon(":/image/myself/defaultAvatar.png"));
-        ui->avatarBtn->setEnabled(false); // 临时用户不允许修改头像
-        ui->avatarBtn->changeMod(false);
+        ui->avatarBtn->setEnabled(true);
+        ui->avatarBtn->changeMod(true);
         ui->nicknameBtn->setText("点击登录");
 
         ui->nicknameBtn->adjustSize();

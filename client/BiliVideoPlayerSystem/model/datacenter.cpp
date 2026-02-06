@@ -179,6 +179,14 @@ const UserInfo *DataCenter::getMyselfInfo() const
     return myselfInfo;
 }
 
+void DataCenter::clearUserInfo()
+{
+    if(myselfInfo) {
+        delete myselfInfo;
+        myselfInfo = nullptr;
+    }
+}
+
 void DataCenter::buildTempUserInfo()
 {
     if(this->myselfInfo == nullptr) {
@@ -255,6 +263,21 @@ VideoList *DataCenter::getUserVideoList()
 void DataCenter::getUserVideoListAsync(const QString &userId, int pageIndex)
 {
     netClient.getUserVideoList(userId, pageIndex);
+}
+
+void DataCenter::getAuthcodeAsync(const QString &phoneNum)
+{
+    netClient.getAuthcode(phoneNum);
+}
+
+void DataCenter::loginWithMessageAsync(const QString &phoneNum, const QString &authcode, const QString &authcodeId)
+{
+    netClient.loginWithMessage(phoneNum, authcode, authcodeId);
+}
+
+void DataCenter::loginWithPasswordAsync(const QString &phoneNum, const QString &password)
+{
+    netClient.loginWithPassword(phoneNum, password);
 }
 
 DataCenter::DataCenter(QObject *parent)

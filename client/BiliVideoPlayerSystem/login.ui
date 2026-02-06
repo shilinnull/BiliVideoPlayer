@@ -365,7 +365,7 @@ QLineEdit{
               </rect>
              </property>
              <property name="styleSheet">
-              <string notr="true">#registerNow{ color : #222222; border-radius: 36px; border: 1px solid #C2C9D9; }</string>
+              <string notr="true">#registerNow{ color : #222222; border-radius: 36px; border: 1px solid #FF6699; }</string>
              </property>
              <property name="text">
               <string>立即注册</string>

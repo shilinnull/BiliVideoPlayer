@@ -58,6 +58,9 @@ private:
     QHttpServerResponse getUserInfo(const QHttpServerRequest& req);     // 获取个人信息
     QHttpServerResponse setAvatar(const QHttpServerRequest& req);       // 设置用户头像
     QHttpServerResponse userVideoList(const QHttpServerRequest& req);   // 获取视频列表
+    QHttpServerResponse getCode(const QHttpServerRequest& req);         // 获取验证码
+    QHttpServerResponse vcodeLogin(const QHttpServerRequest& req);      // 验证码登录
+    QHttpServerResponse passwdLogin(const QHttpServerRequest& req);     // 账号密码登录
 
 private:
     MockServer();

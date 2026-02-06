@@ -119,6 +119,21 @@ bool MockServer::init()
     httpServer.route("/HttpService/delAttention", [=](const QHttpServerRequest& req){
         return this->delAttention(req);
     });
+
+    // 获取验证码
+    httpServer.route("/HttpService/getCode", [=](const QHttpServerRequest& req){
+        return this->getCode(req);
+    });
+
+    // 验证码登录
+    httpServer.route("/HttpService/vcodeLogin", [=](const QHttpServerRequest& req){
+        return this->vcodeLogin(req);
+    });
+
+    // 账号密码登录
+    httpServer.route("/HttpService/passwdLogin", [=](const QHttpServerRequest& req){
+        return this->passwdLogin(req);
+    });
     return 8000 == ret;
 }
 
@@ -875,6 +890,109 @@ QHttpServerResponse MockServer::userVideoList(const QHttpServerRequest &req)
     jsonResp["result"] = resultObject;
 
     // 3. 返回响应
+    QJsonDocument docResp;
+    docResp.setObject(jsonResp);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::getCode(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG()<<"[getCode] 收到 getCode 请求， requestId = "
+          <<jsonReq["requestId"].toString();
+
+    QString phoneNum = jsonReq["phoneNumber"].toString();
+    LOG() << "给手机号: " << phoneNum << "发送验证码: 123456";
+
+
+    QJsonObject jsonResp;
+    jsonResp["requestId"] = jsonReq["requestId"].toString();
+    jsonResp["errorCode"] = 0;
+    jsonResp["errorMsg"] = "";
+
+    QJsonObject authcodeJson;
+    authcodeJson["codeId"] = "111111";
+    jsonResp["result"] = authcodeJson;
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonResp);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::vcodeLogin(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG()<<"[vcodeLogin] 收到 vcodeLogin 请求， requestId = "
+          <<jsonReq["requestId"].toString();
+
+    QString phoneNum = jsonReq["phoneNumber"].toString();
+    QString authcode = jsonReq["verifyCode"].toString();
+    QString codeId = jsonReq["codeId"].toString();
+    LOG() << "给手机号: " << phoneNum << "发送验证码: " << authcode << "验证码id: " << codeId;
+
+    int errorCode = 0;
+    QString errorMsg;
+    if(phoneNum != "10000000000") {
+        errorCode = 600;
+        errorMsg = "手机号输入有误！";
+    }
+    if(authcode != "123456") {
+        errorCode  = 601;
+        errorMsg = "验证码输入有误！";
+    }
+    if(codeId != "111111") {
+        errorCode = 602;
+        errorMsg = "验证码id输入有误！";
+    }
+
+    QJsonObject jsonResp;
+    jsonResp["requestId"] = jsonReq["requestId"].toString();
+    jsonResp["errorCode"] = errorCode;
+    jsonResp["errorMsg"] = errorMsg;
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonResp);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::passwdLogin(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG()<<"[passwdLogin] 收到 passwdLogin 请求， requestId = "
+          <<jsonReq["requestId"].toString();
+
+    QString phoneNum = jsonReq["phoneNumber"].toString();
+    QString password = jsonReq["password"].toString();
+    LOG() << "passwdLogin 收到账户: " << phoneNum << "登录密码: " << password;
+
+    int errorCode = 0;
+    QString errorMsg;
+    if(phoneNum != "10000000000") {
+        errorCode = 603;
+        errorMsg = "手机号输入有误！";
+    }
+    if(password != "hello123"){
+        errorCode = 604;
+        errorMsg = "密码输入有误！";
+    }
+
+    QJsonObject jsonResp;
+    jsonResp["requestId"] = jsonReq["requestId"].toString();
+    jsonResp["errorCode"] = errorCode;
+    jsonResp["errorMsg"] = errorMsg;
+
     QJsonDocument docResp;
     docResp.setObject(jsonResp);
 

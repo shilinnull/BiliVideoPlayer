@@ -31,8 +31,7 @@ StartupPage::StartupPage(QDialog *parent)
     connect(dataCenter, &model::DataCenter::loginTempUserDone, this, [=]{
         loginSuccess = true;
         // 临时用户在服务器上没有信息，自己本地构建一个
-        // dataCenter->buildTempUserInfo();
-        dataCenter->getMyselfInfo();
+        dataCenter->buildTempUserInfo();
     });
 }
 

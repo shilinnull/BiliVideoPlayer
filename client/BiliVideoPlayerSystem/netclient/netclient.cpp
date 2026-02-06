@@ -603,6 +603,89 @@ void NetClient::getUserVideoList(const QString &userId, int pageIndex)
     });
 }
 
+void NetClient::getAuthcode(const QString &phoneNum)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["phoneNumber"] = phoneNum;
+
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/getCode", reqBody);
+
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"getCode 请求出错，reason = "<<reason;
+            return;
+        }
+
+        // 解析验证码id
+        QJsonObject authcodeJson = replyObj["result"].toObject();
+        QString authcodeId = authcodeJson["codeId"].toString();
+        emit dataCenter->getAuthcodeDone(authcodeId);
+
+        LOG()<<"getCode 成功, resquestId = "<<replyObj["requestId"].toString() << "codeId: " << authcodeId;
+    });
+}
+
+void NetClient::loginWithMessage(const QString &phoneNum, const QString &authcode, const QString &authcodeId)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["phoneNumber"] = phoneNum;
+    reqBody["verifyCode"] = authcode;
+    reqBody["codeId"] = authcodeId;
+
+
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/vcodeLogin", reqBody);
+
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"vcodeLogin 请求出错，reason = "<<reason;
+            emit dataCenter->loginWithMessageFailed(reason);
+            return;
+        }
+
+        emit dataCenter->loginWithMessageDone();
+        LOG()<<"vcodeLogin 成功, resquestId = "<<replyObj["requestId"].toString();
+    });
+}
+
+void NetClient::loginWithPassword(const QString &phoneNum, const QString &password)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["phoneNumber"] = phoneNum;
+    reqBody["password"] = password;
+
+
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/passwdLogin", reqBody);
+
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"passwdLogin 请求出错，reason = "<<reason;
+            emit dataCenter->loginWithPasswordFailed(reason);
+            return;
+        }
+
+        emit dataCenter->loginWithPasswordDone();
+        LOG()<<"passwdLogin 成功, resquestId = "<<replyObj["requestId"].toString();
+    });
+}
+
 QString NetClient::makeRequeId()
 {
     return "R" + QUuid::createUuid().toString().sliced(25, 12);
