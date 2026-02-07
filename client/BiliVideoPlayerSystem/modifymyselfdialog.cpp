@@ -4,7 +4,7 @@
 #include <QGraphicsDropShadowEffect>
 #include "util.h"
 #include "newpassworddialog.h"
-
+#include "model/datacenter.h"
 
 ModifyMyselfDialog::ModifyMyselfDialog(QWidget *parent)
     : QDialog(parent)
@@ -13,6 +13,11 @@ ModifyMyselfDialog::ModifyMyselfDialog(QWidget *parent)
     ui->setupUi(this);
     setWindowFlag(Qt::FramelessWindowHint);
     ui->passwordWidget->hide();
+    // 加载个人数据到界面上
+    auto dataCenter = model::DataCenter::getInstance();
+    auto myself = dataCenter->getMyselfInfo();
+    ui->phoneNumberLabel->setText(hidePhoneNum(myself->phoneNum));
+    ui->nicknameEdit->setText(myself->nickname);
 
     setWindowIcon(QIcon(":/images/homePage/logo.png"));
 
@@ -20,7 +25,9 @@ ModifyMyselfDialog::ModifyMyselfDialog(QWidget *parent)
     connect(ui->cancelBtn, &QPushButton::clicked, this, &ModifyMyselfDialog::onCancelBtnClicked);
     connect(ui->passwordBtn, &QPushButton::clicked, this, &ModifyMyselfDialog::showPasswordDlg);
     connect(ui->changePasswordBtn, &QPushButton::clicked, this, &ModifyMyselfDialog::showPasswordDlg);
-
+    connect(dataCenter, &model::DataCenter::setPasswordDone, this, [=] {
+        LOG() << "修改密码成功";
+    });
 }
 
 ModifyMyselfDialog::~ModifyMyselfDialog()
@@ -30,7 +37,18 @@ ModifyMyselfDialog::~ModifyMyselfDialog()
 
 void ModifyMyselfDialog::onSubmitBtnClicked()
 {
-    LOG() << "提交";
+    auto dataCenter = model::DataCenter::getInstance();
+    if(!newPassword.isEmpty()){
+        dataCenter->setPasswordAsync(newPassword);
+    }
+    // 获取新昵称
+    auto myself = dataCenter->getMyselfInfo();
+    const QString newNickName = ui->nicknameEdit->text().trimmed();
+    if(newNickName != myself->nickname) {
+        // 发送设置昵称的请求
+        dataCenter->setNickNameAsync(newNickName);
+    }
+    close();
 }
 
 void ModifyMyselfDialog::onCancelBtnClicked()
@@ -50,7 +68,8 @@ void ModifyMyselfDialog::showPasswordDlg()
         delete dialog;
         return ;
     }
-    LOG() << "新密码已经设置" << currentPassword;
+    newPassword = currentPassword;      // 新密码
+    LOG() << "新密码已经设置" << newPassword;
 
     ui->passwordBtn->hide();
     ui->passwordWidget->show();

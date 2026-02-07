@@ -15,6 +15,9 @@ public:
     explicit UploadVideoPage(QWidget *parent = nullptr);
     ~UploadVideoPage();
 
+    // 设置待上传文件名到界面
+    void setVideoTitle(const QString& videoFilePath);
+
 private:
     void addTagsByKind(const QString& kind);	// 将kind下的标签以按钮的形式展示到界面上
 
@@ -25,12 +28,16 @@ private slots:
     void onLineEditTextChanged(const QString& text);
     void onPlainEditTextChanged();
     void onChangeBtnClicked();                  // 更改视频封面图
-    void onUpDateTags(const QString& kind);		// QComoBox中分类选择改变槽函数
+    void onUpdateTags(const QString& kind);		// QComoBox中分类选择改变槽函数
+    void onUploadVideoDone(const QString& videoId); // 上传视频完成
 
 signals:
     void switchMySelfPage(int pageIndex);       // 切换到我的页面
 private:
     Ui::UploadVideoPage *ui;
+    QString videoFilePath;          // 上传视频路径
+    bool isUploadVideoOk = false;   // 上传视频是否成功
+    QString videoId;                // 视频ID
 };
 
 #endif // UPLOADVIDEOPAGE_H

@@ -65,7 +65,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>176****7602</string>
+    <string/>
    </property>
   </widget>
   <widget class="QLabel" name="passwordLabel">
@@ -153,7 +153,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="build/Desktop_Qt_6_7_3_MSVC2019_64bit-Debug/.qt/rcc/PREFIX.qrc">
+     <iconset resource="build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/.qt/rcc/PREFIX.qrc">
       <normaloff>:/images/myself/xiugaimima.png</normaloff>:/images/myself/xiugaimima.png</iconset>
     </property>
     <property name="iconSize">
@@ -252,7 +252,7 @@
   </widget>
  </widget>
  <resources>
-  <include location="build/Desktop_Qt_6_7_3_MSVC2019_64bit-Debug/.qt/rcc/PREFIX.qrc"/>
+  <include location="build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/.qt/rcc/PREFIX.qrc"/>
  </resources>
  <connections/>
 </ui>

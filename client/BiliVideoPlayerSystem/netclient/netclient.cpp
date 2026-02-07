@@ -8,6 +8,7 @@
 #include <QStandardPaths>
 #include "../util.h"
 #include "model/datacenter.h"
+#include <QUrlQuery>
 
 namespace network {
 
@@ -293,6 +294,46 @@ void NetClient::downloadVideo(const QString &videoFileId)
         httpReply->deleteLater();
     });
 
+}
+
+void NetClient::uploadVideo(const QString &videoPath)
+{
+    QUrl url(HTTP_URL + "/HttpService/uploadVideo");
+
+    // 将请求参数添加到请求url中
+    auto dataCenter = model::DataCenter::getInstance();
+    QUrlQuery query;
+    query.addQueryItem("requestId", makeRequeId());
+    query.addQueryItem("sessionId", dataCenter->getLoginSessionId());
+    url.setQuery(query);
+
+    // 设置请求对象的url
+    QNetworkRequest httpReq(url);
+    QFileInfo fileInfo(videoPath);
+    httpReq.setHeader(QNetworkRequest::ContentTypeHeader, "multipart/form-data");
+
+    // 读取视频数据
+    QByteArray videoData = loadFileToByteArray(videoPath);
+
+    // 发送请求
+    QNetworkReply* httpReply = httpClient.post(httpReq, videoData);
+    connect(httpReply, &QNetworkReply::finished, this, [=]{
+        bool ok = false;
+        QString reason;
+        QJsonObject resultObject = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"uploadVideo 请求出错，reason = "<<reason;
+            httpReply->deleteLater();
+            return;
+        }
+
+        const QString& requestId = resultObject["requestId"].toString();
+        const QJsonObject resultObj = resultObject["result"].toObject();
+        const QString& fileId = resultObject["fileId"].toString();
+        emit  dataCenter->uploadVideoDone(fileId);
+        LOG() << "uploadVideo请求结束, 视频上传成功, requestId= " << requestId << ", fileId=" << fileId;
+    });
 }
 
 void NetClient::deleteVideo(const QString &videoId)
@@ -708,6 +749,74 @@ void NetClient::loginSession()
         bool isGuest = jsonObj["isGuest"].toBool();
         emit dataCenter->loginSessionDone(isGuest);
         LOG()<<"loginSession 成功, resquestId = "<<replyObj["requestId"].toString();
+    });
+}
+
+void NetClient::logout()
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/logout", reqBody);
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"loginSession 请求出错，reason = "<<reason;
+            return;
+        }
+
+        QJsonObject sessionObj = replyObj["result"].toObject();
+        dataCenter->setSessionId(replyObj["sessionId"].toString());
+        emit dataCenter->logoutDone();
+        LOG()<<"logout 成功, resquestId = "<<replyObj["requestId"].toString();
+    });
+}
+
+void NetClient::setPassword(const QString& newPassword)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["password"] = newPassword;
+
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/setPassword", reqBody);
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"setPassword 请求出错，reason = "<<reason;
+            return;
+        }
+        emit dataCenter->setPasswordDone();
+        LOG()<<"setPassword 成功, resquestId = "<<replyObj["requestId"].toString();
+    });
+}
+
+void NetClient::setNickName(const QString &nickName)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["nickname"] = nickName;
+
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/setNickname", reqBody);
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"setNickName 请求出错，reason = "<<reason;
+            return;
+        }
+
+        emit dataCenter->setNickNameDone(nickName);
+        LOG()<<"setNickName 成功, resquestId = "<<replyObj["requestId"].toString();
     });
 }
 

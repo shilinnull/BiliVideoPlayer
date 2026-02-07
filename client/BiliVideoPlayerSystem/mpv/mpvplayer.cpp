@@ -184,8 +184,8 @@ QString MpvPlayer::getVideoFirstFrame(const QString &videoPath)
     QString firstFrame = QDir::currentPath() + "/firstFrame.png";
 
     // 构造截图命令
-    // 注意：不要将参数的参数对应的值放到一个字符串中
-    // 猜测：ffmpeg工具在解析命令时，可能是将参数的和值分开来解析的，即需要先解析出参数，然后在解析出参数的值
+    // 不要将参数的参数对应的值放到一个字符串中
+    // ffmpeg工具在解析命令时，可能是将参数的和值分开来解析的，即需要先解析出参数，然后在解析出参数的值
     // 放到一个字符串中，可能就会被当成某个参数 或者 某个参数的值来进行处理
     QStringList cmd;
     cmd<<"-ss"<<"00:00:00"

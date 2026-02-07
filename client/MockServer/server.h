@@ -47,6 +47,7 @@ private:
     QHttpServerResponse uploadPhoto(const QHttpServerRequest& req);     // 上传图片
     QHttpServerResponse downloadVideo(const QHttpServerRequest& req);   // 下载视频
     QHttpServerResponse downloadVideoSeg(const QString& fileName);      // 下载视频分片
+    QHttpServerResponse uploadVideo(const QHttpServerRequest& req);     // 上传视频
     QHttpServerResponse removeVideo(const QHttpServerRequest& req);     // 删除视频
     QHttpServerResponse newAttention(const QHttpServerRequest& req);    // 新增关注
     QHttpServerResponse delAttention(const QHttpServerRequest& req);    // 取消关注
@@ -62,6 +63,9 @@ private:
     QHttpServerResponse vcodeLogin(const QHttpServerRequest& req);      // 验证码登录
     QHttpServerResponse passwdLogin(const QHttpServerRequest& req);     // 账号密码登录
     QHttpServerResponse sessionLogin(const QHttpServerRequest& req);    // 会话登录
+    QHttpServerResponse logout(const QHttpServerRequest& req);          // 退出登录
+    QHttpServerResponse setPassword(const QHttpServerRequest& req);     // 设置用户密码
+    QHttpServerResponse setNickname(const QHttpServerRequest& req);     // 设置用户昵称
 
 private:
     MockServer();

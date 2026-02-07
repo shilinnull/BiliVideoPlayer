@@ -14,6 +14,7 @@ class Login : public QWidget
 public:
     explicit Login(QWidget *parent = nullptr);
     ~Login();
+    void reset();
 
 private slots:
     void onPasswordBtnClicked();    // 选择密码登录

@@ -41,9 +41,10 @@ private:
     void getUserVideoList(const QString& userId, int pageIndex);    // 获取自己视频列表
     void clearVideoList();                      // 清空视频列表
 private slots:
-    void onUploadAvatarBtnClicked();  // 点击上传头像
-    void onNicknameBtnClicked();      // 点击用户昵称按钮
-    void onQuitBtnClicked();            // 退出按钮点击
+    void onUploadAvatarBtnClicked();// 点击上传头像
+    void onNicknameBtnClicked();    // 点击用户昵称按钮
+    void onSetNickNameDone(const QString& nickName);       // 昵称修改成功
+    void onQuitBtnClicked();        // 退出按钮点击
     void settingBtnClicked();       // 点击设置按钮
     void getMyselfInfoDone();       // 用户信息获取成功
     void getOtherUserInfoDone();    // 获取其他用户信息成功
@@ -57,8 +58,9 @@ private slots:
     void onAttentionBtnClicked();                       // 关注按钮点击
     void newAttentionDone(const QString& userId);       // 请求关注响应槽函数
     void delAttentionDone(const QString& userId);       // 取消关注响应槽函数
+    void logoutDone();                                  // 退出登录成功
 signals:
-    void switchUploadVideoPage(int pageIndex);
+    void switchUploadVideoPage(int pageIndex, const QString& fileName);
 private:
     Ui::MyselfWidget *ui;
     Login* login;

@@ -22,7 +22,7 @@ void DataCenter::initDataFile()
 {
     QString basePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QString filePath = basePath + "/BiliPlayer.json";
-    LOG() << filePath;
+    LOG() << "initDataFile:" << filePath;
     QDir dir;
     // 路径不存在就创建
     if(!dir.exists(basePath)) {
@@ -44,7 +44,7 @@ void DataCenter::saveDataFile()
 {
     QString basePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QString filePath = basePath + "/BiliPlayer.json";
-
+    LOG() << "saveDataFile: " << filePath;
     // 写方式打开
     QFile file(filePath);
     if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -80,7 +80,7 @@ void DataCenter::loadDataFile()
 {
     QString basePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QString filePath = basePath + "/BiliPlayer.json";
-
+    LOG() << "loadDataFile: " << filePath;
     // 查看文件是否存在
     QFile fileInfo(filePath);
     if(!fileInfo.exists()) {
@@ -210,6 +210,12 @@ void DataCenter::downloadVideoAsync(const QString &videoFileId)
     netClient.downloadVideo(videoFileId);
 }
 
+void DataCenter::uploadVideoAsync(const QString &videoPath)
+{
+    netClient.uploadVideo(videoPath);
+
+}
+
 void DataCenter::deleteVideoAsync(const QString &videoId)
 {
     netClient.deleteVideo(videoId);
@@ -282,7 +288,7 @@ void DataCenter::setMySelfInfo(const QJsonObject &mySelfInfoObj)
     this->myselfInfo->loadUserInfo(mySelfInfoObj);
 }
 
-const UserInfo *DataCenter::getMyselfInfo() const
+UserInfo *DataCenter::getMyselfInfo()
 {
     return myselfInfo;
 }
@@ -391,6 +397,21 @@ void DataCenter::loginWithPasswordAsync(const QString &phoneNum, const QString &
 void DataCenter::loginSessionAsync()
 {
     netClient.loginSession();
+}
+
+void DataCenter::logoutAsync()
+{
+    netClient.logout();
+}
+
+void DataCenter::setPasswordAsync(const QString &password)
+{
+    netClient.setPassword(password);
+}
+
+void DataCenter::setNickNameAsync(const QString &nickName)
+{
+    netClient.setNickName(nickName);
 }
 
 DataCenter::DataCenter(QObject *parent)

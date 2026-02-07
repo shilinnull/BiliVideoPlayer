@@ -77,7 +77,10 @@ void MyselfWidget::uploadViewBtnClicked()
             LOG() << "视频文件必须小于4G";
             return ;
         }
-        emit switchUploadVideoPage(UploadPage);
+        // 上传视频文件
+        auto dataCenter = model::DataCenter::getInstance();
+        dataCenter->uploadVideoAsync(videoFilePath);
+        emit switchUploadVideoPage(UploadPage, videoFilePath);
     }
 }
 
@@ -168,6 +171,13 @@ void MyselfWidget::connectSignalAndSlots()
         dataCenter->clearUserInfo();    // 清除旧信息
         loadMySelf();                   // 从服务器上重新获取信息
     });
+    connect(dataCenter, &model::DataCenter::logoutDone, this, &MyselfWidget::logoutDone);   //退出登录
+    connect(dataCenter, &model::DataCenter::setPasswordDone, this, [=]{
+        LOG() << "修改密码成功";
+    });
+    // 修改昵称成功
+    connect(dataCenter, &model::DataCenter::setNickNameDone, this, &MyselfWidget::onSetNickNameDone);
+
 }
 
 void MyselfWidget::onUploadAvatarBtnClicked()
@@ -196,8 +206,24 @@ void MyselfWidget::onNicknameBtnClicked()
     auto dataCenter = model::DataCenter::getInstance();
     auto mySelf = dataCenter->getMyselfInfo();
     if(mySelf->isTempUser()) {
+        login->reset();     // 先清除旧文本
         login->show();
     }
+}
+
+void MyselfWidget::onSetNickNameDone(const QString& nickName)
+{
+    ui->nicknameBtn->setText(nickName);
+    ui->nicknameBtn->adjustSize();
+
+    // 让设置按钮到nickname之后
+    QRect rect = ui->nicknameBtn->geometry();
+    ui->settingBtn->move(rect.x() + rect.width() + 8, rect.y());
+
+    auto dataCenter = model::DataCenter::getInstance();
+    auto myself = dataCenter->getMyselfInfo();
+    myself->nickname = nickName;
+    LOG() << "修改用户昵称成功! nickName=" << nickName;
 }
 
 void MyselfWidget::onQuitBtnClicked()
@@ -206,7 +232,8 @@ void MyselfWidget::onQuitBtnClicked()
     confirmDlg.setOperatorText("确定退出登录吗？");
     confirmDlg.exec();
     if(confirmDlg.isConfirmPass()) {
-        LOG() << "用户选择退出登录";
+        auto dataCenter = model::DataCenter::getInstance();
+        dataCenter->logoutAsync();      // 发送退出请求
     }
 }
 
@@ -378,6 +405,7 @@ void MyselfWidget::deleteVideo(const QString &videoId)
 void MyselfWidget::deleteVideoDone(const QString &videoId)
 {
     LOG() << "删除视频";
+
     getUserVideoList("", 1);    // 刷新视频列表
 }
 
@@ -390,6 +418,7 @@ void MyselfWidget::onAttentionBtnClicked()
         Toast::showMessage("请先登录或注册再进行关注！", this);
         return ;
     }
+
     // 修改界面
     bool isAttentioned =  ui->attentionBtn->isAttentioned();
     isAttentioned = !isAttentioned;
@@ -426,6 +455,17 @@ void MyselfWidget::delAttentionDone(const QString &userId)
     ui->fansCountLabel->setText(intToString2(followCount));
 
     otherUserInfo->followerCount = followCount;
+}
+
+void MyselfWidget::logoutDone()
+{
+    clearVideoList();
+    auto dataCenter = model::DataCenter::getInstance();
+    dataCenter->getVideoListPtr()->clearVideoList();    // 清空视频列表
+    dataCenter->buildTempUserInfo();                    // 构建临时用户
+    loadMySelf();
+    // 隐藏主页系统按钮
+    BiliVideoPlayer::getInstance()->showSystemPageBtn(false);
 }
 
 void MyselfWidget::hideWidget(bool isHide)

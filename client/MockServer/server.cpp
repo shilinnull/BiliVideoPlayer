@@ -65,6 +65,12 @@ bool MockServer::init()
         return this->downloadVideoSeg(req);
     });
 
+    // 上传视频
+    httpServer.route("/HttpService/uploadVideo", [=](const QHttpServerRequest& req){
+        return this->uploadVideo(req);
+    });
+
+
     // 删除视频
     httpServer.route("/HttpService/removeVideo", [=](const QHttpServerRequest& req){
         return this->removeVideo(req);
@@ -139,6 +145,22 @@ bool MockServer::init()
     httpServer.route("/HttpService/sessionLogin", [=](const QHttpServerRequest& req){
         return this->sessionLogin(req);
     });
+
+    // 退出登录
+    httpServer.route("/HttpService/logout", [=](const QHttpServerRequest& req){
+        return this->logout(req);
+    });
+
+    // 设置用户密码
+    httpServer.route("/HttpService/setPassword", [=](const QHttpServerRequest& req){
+        return this->setPassword(req);
+    });
+
+    // 设置用户昵称
+    httpServer.route("/HttpService/setNickname", [=](const QHttpServerRequest& req){
+        return this->setNickname(req);
+    });
+
     return 8000 == ret;
 }
 
@@ -443,6 +465,7 @@ void MockServer::buildResponseData()
         idPathTable.insert(QString::number(resourceId++), "/images/videoImage3.png");
         idPathTable.insert(QString::number(resourceId++), "/videos/111.m3u8");
     }
+    idPathTable.insert(QString::number(60000), "/videos/");
 }
 
 QHttpServerResponse MockServer::downloadPhoto(const QHttpServerRequest &req)
@@ -599,6 +622,44 @@ QHttpServerResponse MockServer::downloadVideoSeg(const QString &fileName)
     QHttpServerResponse response(fileData, QHttpServerResponse::StatusCode::Ok);
     response.setHeader("Content-type", "application/octet-stream");
     return response;
+}
+
+QHttpServerResponse MockServer::uploadVideo(const QHttpServerRequest &req)
+{
+    QUrlQuery query(req.url());
+    QString requestId = query.queryItemValue("requestId");
+    LOG()<<"[downloadVideo] 收到 downloadVideo 请求， requestId="<<requestId;
+
+
+    // 构造视频路径
+    QDir dir(QDir::currentPath());
+    dir.cdUp();
+    dir.cdUp();
+    QString videoPath = dir.absolutePath();
+    videoPath += idPathTable["60000"];
+    videoPath += "222.mp4";
+    LOG() << videoPath;
+
+    // 写入文件
+    QByteArray videoData = req.body();
+    writeByteArrayToFile(videoPath, videoData);
+
+    // 构造http响应
+    QJsonObject jsonBody;
+    jsonBody["requestId"] = requestId;
+    jsonBody["errorCode"] = 0;
+    jsonBody["errorMsg"] = "";
+    QJsonObject resultJson;
+    resultJson["fileId"] = "60000";
+    jsonBody["result"] = resultJson;
+
+    // 序列化
+    QJsonDocument docResp;
+    docResp.setObject(jsonBody);
+
+    QHttpServerResponse  httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-type", "application/json; charset=utf-8");
+    return httpResp;
 }
 
 QHttpServerResponse MockServer::getBarrage(const QHttpServerRequest &req)
@@ -1029,3 +1090,70 @@ QHttpServerResponse MockServer::sessionLogin(const QHttpServerRequest &req)
     httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
     return httpResp;
 }
+
+QHttpServerResponse MockServer::logout(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG()<<"[logout] 收到 logout 请求， requestId = "
+          <<jsonReq["requestId"].toString() << "sessionId" << jsonReq["sessionId"].toString();
+
+    roleType = TempUser;    // 切换到临时用户身份
+
+    QJsonObject jsonResp;
+    jsonResp["requestId"] = jsonReq["requestId"].toString();
+    jsonResp["errorCode"] = 0;
+    jsonResp["errorMsg"] ="";
+
+    QJsonObject sessionObj;
+    sessionObj["sessionObj"] = jsonReq["sessionId"].toString();
+    jsonResp["result"] = sessionObj;
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonResp);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::setPassword(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG()<<"[setPassword] 收到 setPassword 请求， requestId = "
+          <<jsonReq["requestId"].toString() << "password: " << jsonReq["password"].toString();
+
+    QJsonObject jsonResp;
+    jsonResp["requestId"] = jsonReq["requestId"].toString();
+    jsonResp["errorCode"] = 0;
+    jsonResp["errorMsg"] ="";
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonResp);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::setNickname(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG()<<"[setNickname] 收到 setNickname 请求， requestId = "
+          <<jsonReq["requestId"].toString() << "nNickname: " << jsonReq["nickname"].toString();
+
+    QJsonObject jsonResp;
+    jsonResp["requestId"] = jsonReq["requestId"].toString();
+    jsonResp["errorCode"] = 0;
+    jsonResp["errorMsg"] ="";
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonResp);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+

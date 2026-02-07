@@ -8,6 +8,7 @@
 #include "bulletscreenitem.h"
 #include <QShortcut>
 #include <QKeySequence>
+#include <QTimer>
 #include "bilivideoplayer.h"
 
 PlayerPage::PlayerPage(const model::VideoInfo& videoInfo, QWidget *parent)
@@ -24,6 +25,7 @@ PlayerPage::PlayerPage(const model::VideoInfo& videoInfo, QWidget *parent)
     volume = new Volume(this);						// 音量
     playSpeed = new PlaySpeed(this);				// 倍速
     mpvPlayer = new MpvPlayer(ui->screen, this);	// 视频
+    login = new Login();                            // 登录窗口
 
     initBarrageArea();								// 初始化弹幕布局
     updateVideoInfoUI();
@@ -73,6 +75,7 @@ PlayerPage::~PlayerPage()
 {
     delete ui;
     delete mpvPlayer;
+    delete login;
 }
 
 void PlayerPage::moveWindows(const QPoint &point)
@@ -108,6 +111,7 @@ void PlayerPage::buildBulletScreenData()
 
 void PlayerPage::showBulletScreen()
 {
+    // 弹幕关闭
     if(!isStartBS) return ;
 
     // 通过时间获取弹幕数据
@@ -191,9 +195,10 @@ void PlayerPage::onSpeedBtnClicked()
 void PlayerPage::onLikeImageBtnClicked()
 {
     // 检测用户是否登录，登录才能点赞
-    if(false) {
-        Login* login = new Login();
-        Toast::showMessage("先登录，登录后才能点赞", login);
+    auto dataCenter = model::DataCenter::getInstance();
+    auto myself = dataCenter->getMyselfInfo();
+    if(myself->isTempUser()) {
+        Toast::showMessage("先登录/注册后才能点赞！", login);
     }
 
     isLike = !isLike;
@@ -266,6 +271,7 @@ void PlayerPage::onSetPlayProgress(double playRatio)
 
 void PlayerPage::onBulletScreenClicked()
 {
+    // 是否显示弹幕
     isStartBS = !isStartBS;
     if(isStartBS) {
         ui->bulletScreenBtn->setStyleSheet("border-image: url(:/images/PlayPage/danmu.png);");
@@ -278,9 +284,23 @@ void PlayerPage::onBulletScreenClicked()
 
 void PlayerPage::onSendBulletScreenBtnClicked(const QString &text)
 {
-    // 如果用户没有登录需要先登录才能发评论
-    // Toast::showMessage("请先登录才能发评论");
-    if(!isStartBS) return ;
+    // 弹幕关闭就不继续执行
+    if(!isStartBS) {
+        Toast::showMessage("请打开弹幕开关...");
+        return ;
+    }
+
+    auto dataCenter = model::DataCenter::getInstance();
+    auto myself = dataCenter->getMyselfInfo();
+    if(myself->isTempUser()) {
+        Toast::showMessage("请先登录/注册才能发评论！", login);
+        return;
+    }
+
+    if(text.isEmpty()) {
+        Toast::showMessage("弹幕信息为空，请先输入弹幕再发送信息！");
+        return;
+    }
 
     BulletScreenItem* bs = new BulletScreenItem(top);	// 显示到top栏上
     QPixmap pixmap(":/images/homePage/touxiang.png");
@@ -294,7 +314,6 @@ void PlayerPage::onSendBulletScreenBtnClicked(const QString &text)
     barrageInfo.playTime = mpvPlayer->getPlayTime();
     barrageInfo.text = text;
     barrageInfo.userId = videoInfo.userId;
-    auto dataCenter = model::DataCenter::getInstance();
     dataCenter->loadupBarragesAsync(videoInfo.videoId, barrageInfo);
 }
 

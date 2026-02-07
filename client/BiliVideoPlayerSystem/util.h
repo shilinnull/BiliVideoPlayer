@@ -92,4 +92,12 @@ static QString intToString2(int value) {
     }
 }
 
+// 隐藏手机号后四位
+static inline QString hidePhoneNum(const QString& phoneNum) {
+    if(phoneNum.size() < 11) {
+        return phoneNum;
+    }
+    return phoneNum.left(3) +"****" + phoneNum.right(4);
+}
+
 #endif // UTIL_H

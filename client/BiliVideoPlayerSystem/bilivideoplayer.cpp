@@ -55,10 +55,6 @@ void BiliVideoPlayer::initUI()
     setWindowFlag(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
     setWindowIcon(QIcon(":/images/homePage/logo.png"));
-
-    // 启动默认隐藏系统按钮，等待用户信息加载后再决定是否显示
-    showSystemPageBtn(false);
-
     QGraphicsDropShadowEffect* dropShadow = new QGraphicsDropShadowEffect(this);
     dropShadow->setColor(Qt::black);
     dropShadow->setBlurRadius(5);
@@ -68,6 +64,16 @@ void BiliVideoPlayer::initUI()
 
     // 初始化按钮状态 && 首页按钮为选中状态
     onSwitchStackedWidgetPage(HomePage);
+
+    // 是否显示系统按钮
+    auto dataCenter = model::DataCenter::getInstance();
+    auto myself = dataCenter->getMyselfInfo();
+    if(myself->isBUser()) {
+        ui->sysPageBtn->show();
+    } else {
+        ui->sysPageBtn->hide();
+    }
+
 }
 
 void BiliVideoPlayer::connectSignalAndSlot()
@@ -91,6 +97,14 @@ void BiliVideoPlayer::connectSignalAndSlot()
     // 视频上传页面切换到我的页面
     connect(ui->uploadVideo, &UploadVideoPage::switchMySelfPage, this, [=](int pageId){
         BiliVideoPlayer::onSwitchStackedWidgetPage(pageId);
+    });
+
+    // 切换到上传视频页面
+    connect(ui->myPage, &MyselfWidget::switchUploadVideoPage, this,
+            [=](int pageId, const QString& videoFilePath){
+        LOG() << "由我的页面切换到上传页面";
+        onSwitchPageUI(pageId);
+        ui->uploadVideo->setVideoTitle(videoFilePath);
     });
 }
 

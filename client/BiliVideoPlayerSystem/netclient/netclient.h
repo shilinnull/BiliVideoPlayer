@@ -20,6 +20,7 @@ public:
     void downloadPhoto(const QString& photoFileId);         // 下载图片
     void uploadPhoto(const QByteArray& photoData);          // 上传图片
     void downloadVideo(const QString& videoFileId);         // 下载视频
+    void uploadVideo(const QString& videoPath);             // 上传视频
     void deleteVideo(const QString& videoId);               // 删除视频
     void newAttention(const QString& userId);               // 新增关注
     void delAttention(const QString& userId);               // 取消关注
@@ -40,6 +41,9 @@ public:
     void loginWithPassword(const QString& phoneNum,
                            const QString& password);        // 账号密码登录
     void loginSession();                                    // 会话登录
+    void logout();                                          // 退出登录
+    void setPassword(const QString& newPassword);           // 设置密码
+    void setNickName(const QString& nickName);              // 修改昵称
 private:
     static QString makeRequeId();
     QNetworkReply* sendHttpRequest(const QString& resourcePath, QJsonObject& jsonBody);

@@ -30,6 +30,7 @@ public:
     void downloadPhotoAsync(const QString& photoFileId);        // 下载图片
     void uploadPhotoAsync(const QByteArray& photoData);         // 上传图片
     void downloadVideoAsync(const QString& videoFileId);        // 下载视频
+    void uploadVideoAsync(const QString& videoPath);            // 上传视频
     void deleteVideoAsync(const QString& videoId);              // 删除视频
     void newAttentionAsync(const QString& userId);              // 新增关注
     void delAttentionAsync(const QString& userId);              // 取消关注
@@ -42,7 +43,7 @@ public:
     void loadupBarragesAsync(const QString& videoId,
                              const BarrageInfo& barrageInfo);   // 新增弹幕
     void setMySelfInfo(const QJsonObject& mySelfInfoObj);       // 设置个人信息
-    const UserInfo* getMyselfInfo() const;                      // 获取个人信息
+    UserInfo* getMyselfInfo();                                  // 获取个人信息
     void clearUserInfo();                                       // 清除用户信息
     void buildTempUserInfo();                                   // 构建临时用户
     void setOtherUserInfo(const QJsonObject& otherInfoObj);     // 设置他人信息
@@ -62,7 +63,9 @@ public:
     void loginWithPasswordAsync(const QString& phoneNum,
                                 const QString& password);       // 账号密码登录
     void loginSessionAsync();                                   // 会话登录
-
+    void logoutAsync();                                         // 退出登录
+    void setPasswordAsync(const QString& password);             // 设置密码
+    void setNickNameAsync(const QString& nickName);             // 修改昵称
 private:
     explicit DataCenter(QObject *parent = nullptr);
     ~DataCenter();
@@ -86,6 +89,7 @@ signals:
                            QByteArray imageData);       // 下载图片处理完毕
     void downloadVideoDone(const QString& videoFilePath,
                            const QString& videoFileId); // 下载视频处理完毕
+    void uploadVideoDone(const QString& videoId);       // 上传视频处理完毕
     void deleteVideoDone(const QString& videoId);       // 删除视频完毕
     void newAttentionDone(const QString& userId);       // 新增关注完毕
     void delAttentionDone(const QString& userId);       // 取消关注完毕
@@ -102,7 +106,11 @@ signals:
     void loginWithPasswordDone();                                   // 账号密码登录成功
     void loginWithPasswordFailed(const QString& errorInfo);         // 账号密码登录失败
     void loginSessionDone(bool isTemper);                           // 会话登录成功
-    void loginSessionFailed(const QString& errorInfo);         // 会话登录失败
+    void loginSessionFailed(const QString& errorInfo);              // 会话登录失败
+    void logoutDone();                                              // 退出登录成功
+    void setPasswordDone();                                         // 设置密码成功
+    void setNickNameDone(const QString& nickName);                  // 修改昵称成功
+
 };
 
 }	// namespace model

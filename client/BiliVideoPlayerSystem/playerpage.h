@@ -11,6 +11,7 @@
 #include "mpv/mpvplayer.h"
 #include "model/datacenter.h"
 #include "model/data.h"
+#include "login.h"
 
 namespace Ui {
 class PlayerPage;
@@ -59,6 +60,7 @@ private:
     QPoint dragPos;
     Volume* volume;                 // 音量调节
     PlaySpeed* playSpeed;           // 播放速度
+    Login* login;                   // 登录窗口
     MpvPlayer* mpvPlayer = nullptr; // 封装mpv库，控制播放视频
     bool isPlay = false;            // 默认情况下暂停
     model::VideoInfo videoInfo;     // 保存视频信息

@@ -17,17 +17,31 @@ UploadVideoPage::UploadVideoPage(QWidget *parent)
     auto kindAndTag = dataCenter->getKindAndTagsClassPtr();
     ui->kinds->addItems(kindAndTag->getAllKinds());
     ui->kinds->setCurrentIndex(-1);		// 默认设置不选中
+    // 默认情况下，上传视频成功图片隐藏，视频上传成功后显⽰
+    ui->downIcon->hide();
 
     connect(ui->commitBtn, &QPushButton::clicked, this, &UploadVideoPage::onCommitBtnClicked);
     connect(ui->videoTittle, &QLineEdit::textChanged, this, &UploadVideoPage::onLineEditTextChanged);
     connect(ui->plainTextEdit, &QPlainTextEdit::textChanged, this, &UploadVideoPage::onPlainEditTextChanged);
     connect(ui->changeButton, &QPushButton::clicked, this, &UploadVideoPage::onChangeBtnClicked);
-    connect(ui->kinds, &QComboBox::currentTextChanged, this, &UploadVideoPage::onUpDateTags);
+    connect(ui->kinds, &QComboBox::currentTextChanged, this, &UploadVideoPage::onUpdateTags);
+    connect(dataCenter, &model::DataCenter::uploadVideoDone, this, &UploadVideoPage::onUploadVideoDone);
 }
 
 UploadVideoPage::~UploadVideoPage()
 {
     delete ui;
+}
+
+void UploadVideoPage::setVideoTitle(const QString &videoFilePath)
+{
+    this->videoFilePath = videoFilePath;
+
+    // 截图文件名设置到界面
+    int start = videoFilePath.lastIndexOf("/") + 1;
+    QString videoTitle = videoFilePath.mid(start);
+    ui->videoTittle->setText(videoTitle);
+    ui->fileName->setText(videoTitle);
 }
 
 void UploadVideoPage::addTagsByKind(const QString &kind)
@@ -144,7 +158,16 @@ void UploadVideoPage::onChangeBtnClicked()
     repaint();
 }
 
-void UploadVideoPage::onUpDateTags(const QString &kind)
+void UploadVideoPage::onUpdateTags(const QString &kind)
 {
     addTagsByKind(kind);
+}
+
+void UploadVideoPage::onUploadVideoDone(const QString &videoId)
+{
+    ui->uploadProgress->setText("上传完成");
+    ui->downIcon->show();
+    this->videoId = videoId;
+    isUploadVideoOk = true;
+
 }
