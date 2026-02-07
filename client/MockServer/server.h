@@ -61,6 +61,7 @@ private:
     QHttpServerResponse getCode(const QHttpServerRequest& req);         // 获取验证码
     QHttpServerResponse vcodeLogin(const QHttpServerRequest& req);      // 验证码登录
     QHttpServerResponse passwdLogin(const QHttpServerRequest& req);     // 账号密码登录
+    QHttpServerResponse sessionLogin(const QHttpServerRequest& req);    // 会话登录
 
 private:
     MockServer();

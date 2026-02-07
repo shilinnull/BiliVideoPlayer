@@ -13,6 +13,9 @@ class DataCenter : public QObject
     Q_OBJECT
 public:
     static DataCenter* getInstance();
+    void initDataFile();                // 初始化数据文件
+    void saveDataFile();                // 保存数据文件
+    void loadDataFile();                // 从文件加载数据
     QString& getServerUrl();            // 获取服务器地址
     const KindAndTag* getKindAndTagsClassPtr();		// 获取所有分类
     const QString& getLoginSessionId() const ;		// 获取sessionId
@@ -58,10 +61,11 @@ public:
                                 const QString& authcodeId);     // 验证码登录
     void loginWithPasswordAsync(const QString& phoneNum,
                                 const QString& password);       // 账号密码登录
-
+    void loginSessionAsync();                                   // 会话登录
 
 private:
     explicit DataCenter(QObject *parent = nullptr);
+    ~DataCenter();
     static DataCenter* instance;
     QString serverURL = "http://127.0.0.1:8000";
     network::NetClient netClient;
@@ -97,7 +101,8 @@ signals:
     void loginWithMessageFailed(const QString& errorInfo);          // 验证码登录失败
     void loginWithPasswordDone();                                   // 账号密码登录成功
     void loginWithPasswordFailed(const QString& errorInfo);         // 账号密码登录失败
-
+    void loginSessionDone(bool isTemper);                           // 会话登录成功
+    void loginSessionFailed(const QString& errorInfo);         // 会话登录失败
 };
 
 }	// namespace model

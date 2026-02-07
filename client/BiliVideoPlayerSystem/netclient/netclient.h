@@ -39,6 +39,7 @@ public:
                           const QString& authcodeId);       // 验证码登录
     void loginWithPassword(const QString& phoneNum,
                            const QString& password);        // 账号密码登录
+    void loginSession();                                    // 会话登录
 private:
     static QString makeRequeId();
     QNetworkReply* sendHttpRequest(const QString& resourcePath, QJsonObject& jsonBody);

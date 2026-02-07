@@ -134,6 +134,11 @@ bool MockServer::init()
     httpServer.route("/HttpService/passwdLogin", [=](const QHttpServerRequest& req){
         return this->passwdLogin(req);
     });
+
+    // session登录
+    httpServer.route("/HttpService/sessionLogin", [=](const QHttpServerRequest& req){
+        return this->sessionLogin(req);
+    });
     return 8000 == ret;
 }
 
@@ -992,6 +997,30 @@ QHttpServerResponse MockServer::passwdLogin(const QHttpServerRequest &req)
     jsonResp["requestId"] = jsonReq["requestId"].toString();
     jsonResp["errorCode"] = errorCode;
     jsonResp["errorMsg"] = errorMsg;
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonResp);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::sessionLogin(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG()<<"[sessionLogin] 收到 sessionLogin 请求， requestId = "
+          <<jsonReq["requestId"].toString() << "sessionId" << jsonReq["sessionId"].toString();
+
+    QJsonObject jsonResp;
+    jsonResp["requestId"] = jsonReq["requestId"].toString();
+    jsonResp["errorCode"] = 0;
+    jsonResp["errorMsg"] ="";
+
+    QJsonObject resultObj;
+    resultObj["isGuest"] = false;
+    jsonResp["result"] = resultObj;
 
     QJsonDocument docResp;
     docResp.setObject(jsonResp);

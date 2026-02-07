@@ -1,6 +1,9 @@
 #include "datacenter.h"
 
 #include <QJsonArray>
+#include <QStandardPaths>
+#include <QDir>
+#include <QJsonDocument>
 #include "util.h"
 
 namespace model {
@@ -13,6 +16,111 @@ DataCenter *DataCenter::getInstance()
         instance = new DataCenter();
     }
     return instance;
+}
+
+void DataCenter::initDataFile()
+{
+    QString basePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString filePath = basePath + "/BiliPlayer.json";
+    LOG() << filePath;
+    QDir dir;
+    // 路径不存在就创建
+    if(!dir.exists(basePath)) {
+        dir.mkpath(basePath);
+    }
+    // 写方式打开
+    QFile file(filePath);
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        LOG() << "打开文件失败: " << file.errorString();
+        return ;
+    }
+    // 写入空数据
+    QString data = "{\n\n}";
+    file.write(data.toUtf8());
+    file.close();
+}
+
+void DataCenter::saveDataFile()
+{
+    QString basePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString filePath = basePath + "/BiliPlayer.json";
+
+    // 写方式打开
+    QFile file(filePath);
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        LOG() << "打开文件失败: " << file.errorString();
+        return ;
+    }
+
+    // 构造json数据
+    QJsonObject jsonObj;
+    jsonObj["loginSessionId"] = loginSessionId;
+
+    QJsonArray roleTypeArray;
+    for(auto& idType : myselfInfo->roleType) {
+        roleTypeArray.append(idType);
+    }
+    jsonObj["roleType"] = roleTypeArray;
+
+    QJsonArray identityTypeArray;
+    for(auto& idType : myselfInfo->identityType) {
+        identityTypeArray.append(idType);
+    }
+    jsonObj["identityType"] = identityTypeArray;
+
+    // 写入文件
+    QJsonDocument jsonDoc(jsonObj);
+    QString s = jsonDoc.toJson();
+    file.write(s.toUtf8());
+    LOG() << "保存session文件成功";
+    file.close();
+}
+
+void DataCenter::loadDataFile()
+{
+    QString basePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString filePath = basePath + "/BiliPlayer.json";
+
+    // 查看文件是否存在
+    QFile fileInfo(filePath);
+    if(!fileInfo.exists()) {
+        initDataFile();
+    }
+
+    // 读方式打开
+    QFile file(filePath);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        LOG() << "打开文件失败: " << file.errorString();
+        return ;
+    }
+
+    // 读文件
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(file.readAll());
+    if(jsonDoc.isNull()) {
+        LOG() << "json文件解析失败";
+        file.close();
+        return ;
+    }
+
+    file.close();
+
+    // 读入内存
+    QJsonObject jsonObj = jsonDoc.object();
+    this->loginSessionId = jsonObj["loginSessionId"].toString();
+    if(myselfInfo == nullptr) {
+        myselfInfo = new UserInfo();
+    }
+
+    QJsonArray roleTypeArray = jsonObj["roleType"].toArray();
+    for(int i = 0; i < roleTypeArray.count(); i++) {
+        myselfInfo->roleType.append(i);
+    }
+
+    QJsonArray identityTypeArray = jsonObj["identityType"].toArray();
+    for(int i = 0; i < identityTypeArray.count(); i++) {
+        myselfInfo->identityType.append(i);
+    }
+    LOG() << "读入内存的数据:" << jsonObj;
 }
 
 QString &DataCenter::getServerUrl()
@@ -280,9 +388,19 @@ void DataCenter::loginWithPasswordAsync(const QString &phoneNum, const QString &
     netClient.loginWithPassword(phoneNum, password);
 }
 
+void DataCenter::loginSessionAsync()
+{
+    netClient.loginSession();
+}
+
 DataCenter::DataCenter(QObject *parent)
     : QObject{parent}
 {
     netClient.setServerUrl(serverURL);
+    loadDataFile(); // 加载session文件数据
+}
+
+DataCenter::~DataCenter()
+{
 }
 }	// namespace model

@@ -686,6 +686,31 @@ void NetClient::loginWithPassword(const QString &phoneNum, const QString &passwo
     });
 }
 
+void NetClient::loginSession()
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    LOG() << "sessionId: " << dataCenter->getLoginSessionId();
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/sessionLogin", reqBody);
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"loginSession 请求出错，reason = "<<reason;
+            emit dataCenter->loginSessionFailed(reason);
+            return;
+        }
+
+        QJsonObject jsonObj = replyObj["result"].toObject();
+        bool isGuest = jsonObj["isGuest"].toBool();
+        emit dataCenter->loginSessionDone(isGuest);
+        LOG()<<"loginSession 成功, resquestId = "<<replyObj["requestId"].toString();
+    });
+}
+
 QString NetClient::makeRequeId()
 {
     return "R" + QUuid::createUuid().toString().sliced(25, 12);

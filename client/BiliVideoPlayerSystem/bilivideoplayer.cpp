@@ -74,6 +74,8 @@ void BiliVideoPlayer::connectSignalAndSlot()
 {
     connect(ui->minBtn, &QPushButton::clicked, this, &QWidget::showMinimized);
     connect(ui->quitBtn, &QPushButton::clicked, this, [=]{
+        auto dataCenter = model::DataCenter::getInstance();
+        dataCenter->saveDataFile();     // 保存登录信息 session
         this->close();
     });
 
