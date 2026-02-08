@@ -8,6 +8,20 @@
 
 namespace model{
 
+
+// 视频信息描述
+class VideoDesc{
+public:
+    QString videoId;    // 视频文件id
+    QString photoId;    // 视频封面id
+    QString title;      // 视频标题
+    QString desc;       // 视频描述
+    QString kind;       // 视频分类
+    QList<QString> tags;// 视频标签
+    int64_t duration;   // 视频持续时长
+};
+
+
 // 视频状态
 enum VideoStatus {
     noStatus = 0,   // 无状态

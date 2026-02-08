@@ -73,7 +73,7 @@ void MyselfWidget::uploadViewBtnClicked()
         // 视频限制大小 4G
         QFileInfo fileInfo(videoFilePath);
         int64_t fileSize = fileInfo.size();
-        if(fileSize > 4 * 1024 * 1024) {
+        if(fileSize > (int64_t)4 * 1024 * 1024 * 1024) {
             LOG() << "视频文件必须小于4G";
             return ;
         }
@@ -198,7 +198,7 @@ void MyselfWidget::onUploadAvatarBtnClicked()
         LOG() << "头像文件读取失败";
         return ;
     }
-    dataCenter->uploadPhotoAsync(fileDate); // 上传图片到服务器
+    dataCenter->uploadPhotoAsync(fileDate, ui->avatarBtn); // 上传图片到服务器
 }
 
 void MyselfWidget::onNicknameBtnClicked()
@@ -350,8 +350,11 @@ void MyselfWidget::getAvatarDone(const QString &fileId, const QByteArray &data)
     }
 }
 
-void MyselfWidget::uploadAvatarDone1(const QString &fileId)
+void MyselfWidget::uploadAvatarDone1(const QString &fileId, QWidget* wndPtr)
 {
+    if(wndPtr != ui->avatarBtn) {
+        return ;
+    }
     // 图片上传成功之后，通过fileId修改服务器上用户头像id
     auto dataCenter = model::DataCenter::getInstance();
     dataCenter->setAvatarAsync(fileId);

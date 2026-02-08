@@ -224,7 +224,7 @@ void NetClient::downloadPhoto(const QString &photoFileId)
     });
 }
 
-void NetClient::uploadPhoto(const QByteArray &photoData)
+void NetClient::uploadPhoto(const QByteArray &photoData, QWidget* wndPtr)
 {
     // 1. 构造请求
     auto dataCenter = model::DataCenter::getInstance();
@@ -253,10 +253,10 @@ void NetClient::uploadPhoto(const QByteArray &photoData)
         }
         const QJsonObject resultObj = resultObject["result"].toObject();
         const QString fileId = resultObj["fileId"].toString();
-        emit dataCenter->uploadPhotoDone(fileId);
+        emit dataCenter->uploadPhotoDone(fileId, wndPtr);
 
         const QString requestId = resultObject["requestId"].toString();
-        LOG() << "uploadPhoto 请求结束, 图⽚上传成功, requestId= " << requestId;
+        LOG() << "uploadPhoto 请求结束, 图片上传成功, requestId= " << requestId;
 
         httpReply->deleteLater();
     });
@@ -330,9 +330,53 @@ void NetClient::uploadVideo(const QString &videoPath)
 
         const QString& requestId = resultObject["requestId"].toString();
         const QJsonObject resultObj = resultObject["result"].toObject();
-        const QString& fileId = resultObject["fileId"].toString();
+        const QString& fileId = resultObj["fileId"].toString();
         emit  dataCenter->uploadVideoDone(fileId);
-        LOG() << "uploadVideo请求结束, 视频上传成功, requestId= " << requestId << ", fileId=" << fileId;
+        LOG() << "uploadVideo 请求结束, 视频上传成功, requestId= " << requestId << ", fileId=" << fileId;
+    });
+}
+
+void NetClient::uploadVideoDesc(const model::VideoDesc &videoDesc)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+
+    QJsonObject videoJson;
+    videoJson["videoFileId"] = videoDesc.videoId;
+    videoJson["photoFileId"] = videoDesc.photoId;
+    videoJson["videoTitle"] = videoDesc.title;
+    videoJson["videoDesc"] = videoDesc.desc;
+    videoJson["duration"] = videoDesc.duration;
+
+    const model::KindAndTag* kindAndTag = dataCenter->getKindAndTagsClassPtr();
+    if("" != videoDesc.kind) {
+        // 用户没有选择分类，标签肯定也就没有
+        videoJson["videoType"] = kindAndTag->getKindId(videoDesc.kind);
+
+        QJsonArray tagArray;
+        for(auto& tag : videoDesc.tags) {
+            tagArray.append(kindAndTag->getTagId(videoDesc.kind, tag));
+        }
+        videoJson["videoTag"] = tagArray;
+    }
+    reqBody["videoInfo"] = videoJson;
+
+    // 2. 发送请求
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/newVideo", reqBody);
+
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject resultObject = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"uploadVideoDesc 请求出错，reason = "<<reason;
+            return;
+        }
+
+        emit dataCenter->uploadVideoDescDone();
+        LOG()<<"uploadVideoDesc 成功, resquestId = "<<resultObject["requestId"].toString();
     });
 }
 

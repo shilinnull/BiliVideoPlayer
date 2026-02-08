@@ -28,9 +28,11 @@ public:
     void getAllVideoInTagAsync(int tagId);                      // 获取标签视频列表
     void getVideosBySearchTextAsync(const QString& searchText); // 获取搜索视频列表
     void downloadPhotoAsync(const QString& photoFileId);        // 下载图片
-    void uploadPhotoAsync(const QByteArray& photoData);         // 上传图片
+    void uploadPhotoAsync(const QByteArray& photoData,
+                          QWidget* wndPtr = nullptr);           // 上传图片
     void downloadVideoAsync(const QString& videoFileId);        // 下载视频
     void uploadVideoAsync(const QString& videoPath);            // 上传视频
+    void uploadVideoDescAsync(const model::VideoDesc& videoDesc);// 上传视频描述信息
     void deleteVideoAsync(const QString& videoId);              // 删除视频
     void newAttentionAsync(const QString& userId);              // 新增关注
     void delAttentionAsync(const QString& userId);              // 取消关注
@@ -66,6 +68,7 @@ public:
     void logoutAsync();                                         // 退出登录
     void setPasswordAsync(const QString& password);             // 设置密码
     void setNickNameAsync(const QString& nickName);             // 修改昵称
+
 private:
     explicit DataCenter(QObject *parent = nullptr);
     ~DataCenter();
@@ -89,7 +92,9 @@ signals:
                            QByteArray imageData);       // 下载图片处理完毕
     void downloadVideoDone(const QString& videoFilePath,
                            const QString& videoFileId); // 下载视频处理完毕
-    void uploadVideoDone(const QString& videoId);       // 上传视频处理完毕
+    void uploadVideoDone(const QString& videoId,
+                         QWidget* wndPtr = nullptr);    // 上传视频处理完毕
+    void uploadVideoDescDone();                         // 上传视频描述信息完毕
     void deleteVideoDone(const QString& videoId);       // 删除视频完毕
     void newAttentionDone(const QString& userId);       // 新增关注完毕
     void delAttentionDone(const QString& userId);       // 取消关注完毕
@@ -97,7 +102,7 @@ signals:
     void getIsLikeVideoDone(const QString& videoId, bool isLike);   // 检测是否点赞成功
     void getMyselfInfoDone();                                       // 获取用户个人信息完毕
     void getOtherUserInfoDone();                                    // 获取其他用户信息完毕
-    void uploadPhotoDone(const QString& fileId);                    // 上传图片完毕
+    void uploadPhotoDone(const QString& fileId, QWidget* wndPtr);   // 上传图片完毕
     void setAvatarDone();                                           // 修改用户头像完毕
     void getUserVideoListDone(const QString& userId);               // 获取我的视频列表完毕
     void getAuthcodeDone(const QString& authcodeId);                // 获取验证码完毕

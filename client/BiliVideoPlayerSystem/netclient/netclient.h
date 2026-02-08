@@ -18,9 +18,11 @@ public:
     void getAllVideosInTag(int tagId);      // 获取标签下的所有视频
     void getVideosBySearchText(const QString& searchText);  // 根据文本获取视频
     void downloadPhoto(const QString& photoFileId);         // 下载图片
-    void uploadPhoto(const QByteArray& photoData);          // 上传图片
+    void uploadPhoto(const QByteArray& photoData,
+                     QWidget* wndPtr);                      // 上传图片
     void downloadVideo(const QString& videoFileId);         // 下载视频
     void uploadVideo(const QString& videoPath);             // 上传视频
+    void uploadVideoDesc(const model::VideoDesc& videoDesc);// 上传视频描述信息
     void deleteVideo(const QString& videoId);               // 删除视频
     void newAttention(const QString& userId);               // 新增关注
     void delAttention(const QString& userId);               // 取消关注

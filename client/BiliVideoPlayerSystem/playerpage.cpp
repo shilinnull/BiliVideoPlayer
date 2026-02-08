@@ -414,6 +414,7 @@ void PlayerPage::onQuitBtnClicked()
         emit updateLikeNum(likeCount);
     }
 
+    // 释放掉，防止内存泄漏
     this->deleteLater();
 }
 

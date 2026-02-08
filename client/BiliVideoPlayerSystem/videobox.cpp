@@ -27,8 +27,6 @@ VideoBox::VideoBox(model::VideoInfo videoInfo, QWidget *parent)
             this, &VideoBox::getUserImageDone);
 
     updateVideoInfoUI();		// 设置视频信息到界面
-    connect(dataCenter, &model::DataCenter::getVideoBarrageDone,
-            this, &VideoBox::getVideoBarrageSuccess);
     // ...按钮点击
     connect(ui->delVideoBtn, &QPushButton::clicked, this, &VideoBox::onMoreBtnClicked);
 
@@ -73,17 +71,10 @@ void VideoBox::showMoreBtn(bool isShow)
 
 void VideoBox::onPlayBtnClicked()
 {
+    // 获取1
     auto dataCenter = model::DataCenter::getInstance();
-    dataCenter->downloadVideoAsync(videoInfo.videoFileId);  // 获取视频
-    dataCenter->getVideoBarrageAsync(videoInfo.videoId);    // 获取弹幕
-    connect(dataCenter, &model::DataCenter::downloadVideoDone, this,
-            [=](const QString& videoFilePath, const QString& videoFileId){
-        if(videoInfo.videoFileId != videoFileId)
-            return;
-        if(playPage != nullptr) {
-            playPage->startPlaying();  // 开始播放
-        }
-    });
+    connect(dataCenter, &model::DataCenter::getVideoBarrageDone, this, &VideoBox::getVideoBarrageSuccess);
+    dataCenter->getVideoBarrageAsync(videoInfo.videoId);
 }
 
 void VideoBox::setVideoDuration(int64_t duration)
@@ -152,15 +143,11 @@ void VideoBox::getVideoBarrageSuccess(const QString &videoId)
 {
     if(videoId != videoInfo.videoId)
         return;
-    if(playPage) {
-        playPage->deleteLater();
-        playPage = nullptr;
-    }
-    playPage = new PlayerPage(videoInfo);
 
-    connect(playPage, &QObject::destroyed, this, [=](){
-        VideoBox::playPage = nullptr;  // 关闭后清空指针，避免悬空引用
-    });
+    playPage = new PlayerPage(videoInfo);
+    playPage->setUserIcon(userPixmap);
+    playPage->show();   // 显示播放窗口
+    playPage->startPlaying();
 
     // 更新videoBox播放数
     connect(playPage, &PlayerPage::increasePlayCount, this, [=](const QString& videoId){
@@ -171,16 +158,11 @@ void VideoBox::getVideoBarrageSuccess(const QString &videoId)
             return;
         }
     });
-
     connect(playPage, &PlayerPage::updateLikeNum, this, [=](int64_t likeCount){
         LOG()<<"更新 videoBox 点赞数";
         this->videoInfo.likeCount = likeCount;
         ui->likeNum->setText(intToString(videoInfo.likeCount));
     });
-
-    playPage->setUserIcon(userPixmap);  // 设置用户头像
-    playPage->show();
-    playPage->startPlaying();
 }
 
 void VideoBox::onMoreBtnClicked()

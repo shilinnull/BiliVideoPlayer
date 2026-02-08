@@ -98,6 +98,10 @@ void MpvPlayer::handleMpvEvent(mpv_event *event)
             int64_t seconds = *((int64_t*)eventProperty->data);
             curPlayTime = seconds;
             emit playPositionChanged(seconds);
+        } else if(0 == strcmp(eventProperty->name, "duration") && eventProperty->format == MPV_FORMAT_DOUBLE) {
+            // 获取视频总时长
+            int64_t duration = (int64_t)*(double*)eventProperty->data;
+            emit durationChanged(duration);
         }
         break;
     }

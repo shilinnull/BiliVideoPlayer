@@ -3,6 +3,7 @@
 #include "bilivideoplayer.h"
 #include "model/datacenter.h"
 #include "util.h"
+#include "toast.h"
 
 #include <QFileDialog>
 
@@ -26,6 +27,18 @@ UploadVideoPage::UploadVideoPage(QWidget *parent)
     connect(ui->changeButton, &QPushButton::clicked, this, &UploadVideoPage::onChangeBtnClicked);
     connect(ui->kinds, &QComboBox::currentTextChanged, this, &UploadVideoPage::onUpdateTags);
     connect(dataCenter, &model::DataCenter::uploadVideoDone, this, &UploadVideoPage::onUploadVideoDone);
+    connect(dataCenter, &model::DataCenter::uploadPhotoDone, this, [=](const QString& coverImageId, QWidget* wndPtr){
+        if(wndPtr != ui->imageLabel) {
+            return ;
+        }
+        this->coverImageId = coverImageId;
+        isUploadPhotoOk = true;     // 上传图片成功
+
+    });
+    connect(dataCenter, &model::DataCenter::uploadVideoDescDone, this, [=]{
+        resetPage();        // 清空上传视频页面
+        emit switchMySelfPage(MyselfPage);
+    });
 }
 
 UploadVideoPage::~UploadVideoPage()
@@ -94,8 +107,46 @@ void UploadVideoPage::addTagsByKind(const QString &kind)
 
 void UploadVideoPage::onCommitBtnClicked()
 {
-    // 视频上传成功，切换到我的页面
-    emit switchMySelfPage(MyselfPage);
+    if(!isUploadVideoOk) {
+        Toast::showMessage("等待视频上传完成！");
+        return ;
+    }
+    if(!isUploadPhotoOk) {
+        Toast::showMessage("等待封面图上传完成！");
+        return ;
+    }
+    if(!isDurationOk) {
+        Toast::showMessage("等待视频总时长完成！");
+        return ;
+    }
+    // 只有上面完成任务才能继续后续的上传视频
+    if(isUploadVideoOk && isUploadPhotoOk && isDurationOk) {
+        model::VideoDesc videoDesc;
+        videoDesc.videoId = videoId;
+        videoDesc.photoId = coverImageId;
+        videoDesc.title = ui->videoTittle->text();
+        videoDesc.desc = ui->plainTextEdit->toPlainText();
+        videoDesc.kind = ui->kinds->currentText();
+        videoDesc.duration = duration;
+
+        // 获取视频标签
+        QList<QPushButton*> tagBtns = ui->tagContent->findChildren<QPushButton*>();
+        for(auto& tagBtn : tagBtns){
+            if(tagBtn->isChecked()){
+                QString tag = tagBtn->text();
+                videoDesc.tags.append(tag);
+            }
+        }
+
+        if(videoDesc.tags.size() > 5){
+            Toast::showMessage("最多只能选择5个标签");
+            return;
+        }
+
+        // 新增视频信息到服务器
+        auto dataCenter = model::DataCenter::getInstance();
+        dataCenter->uploadVideoDescAsync(videoDesc);
+    }
 }
 
 void UploadVideoPage::onLineEditTextChanged(const QString &text)
@@ -152,6 +203,10 @@ void UploadVideoPage::onChangeBtnClicked()
         LOG()<<"封面图加载失败:"<<coverImagePath;
         return;
     }
+
+    // 上传服务器
+    uploadPhoto(coverImagePath);
+
     pixmap = pixmap.scaled(ui->imageLabel->size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     ui->imageLabel->setPixmap(pixmap);
 
@@ -169,5 +224,60 @@ void UploadVideoPage::onUploadVideoDone(const QString &videoId)
     ui->downIcon->show();
     this->videoId = videoId;
     isUploadVideoOk = true;
+    // 设置视频首帧
+    QString firstFrame= MpvPlayer::getVideoFirstFrame(videoFilePath);
+    QPixmap pixmap(firstFrame);
+    pixmap = pixmap.scaled(ui->imageLabel->size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    ui->imageLabel->setPixmap(pixmap);
+    // 上传到服务器
+    uploadPhoto(firstFrame);
+    // 然后删除图片
+    QFile::remove(firstFrame);
 
+    // 获取视频总时长
+    mpvPlayer = new MpvPlayer();
+    mpvPlayer->startPlay(videoFilePath);
+    mpvPlayer->pause();
+    connect(mpvPlayer, &MpvPlayer::durationChanged, this, &UploadVideoPage::getDurationDone);
+}
+
+void UploadVideoPage::uploadPhoto(const QString &photoPath)
+{
+    QByteArray fileData = loadFileToByteArray(photoPath);
+    if(fileData.isEmpty()) {
+        LOG() << "读取视频封面图片失败";
+        return ;
+    }
+    auto dataCenter = model::DataCenter::getInstance();
+    dataCenter->uploadPhotoAsync(fileData, ui->imageLabel);
+}
+
+void UploadVideoPage::resetPage()
+{
+    ui->imageLabel->setStyleSheet("#imageLabel{"
+                                  "border-image: url(:/images/uploadVideoPage/fenmian.png);}");
+    ui->videoTittle->setText("");
+    ui->plainTextEdit->setPlainText("");
+    ui->uploadProgress->setText("上传中");
+    ui->downIcon->hide();
+
+    addTagsByKind("");
+    isUploadPhotoOk = false;
+    isUploadVideoOk = false;
+    isDurationOk = false;
+    videoId = "";
+    coverImageId = "";
+    duration = 0;
+
+    // 默认不选中
+    ui->kinds->setCurrentIndex(-1);
+}
+
+void UploadVideoPage::getDurationDone(int64_t duration)
+{
+    this->duration = duration;
+    LOG() << "要上传的视频总时长为：" << duration;
+    this->isDurationOk = true;
+    delete mpvPlayer;
+    mpvPlayer = nullptr;
 }

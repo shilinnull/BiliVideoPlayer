@@ -161,6 +161,11 @@ bool MockServer::init()
         return this->setNickname(req);
     });
 
+    // 新增视频
+    httpServer.route("/HttpService/newVideo", [=](const QHttpServerRequest& req){
+        return this->newVideo(req);
+    });
+
     return 8000 == ret;
 }
 
@@ -659,6 +664,48 @@ QHttpServerResponse MockServer::uploadVideo(const QHttpServerRequest &req)
 
     QHttpServerResponse  httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
     httpResp.setHeader("Content-type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::newVideo(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+
+    LOG() << "[newVideo] 收到 newVideo 请求, requestId=" << jsonReq["requestId"].toString();
+
+    // 解析上传视频信息
+    QJsonObject videoInfo = jsonReq["videoInfo"].toObject();
+    QString videoFileID = videoInfo["videoFileId"].toString();
+    QString photoFileID = videoInfo["photoFileId"].toString();
+    QString videoTitle = videoInfo["videoTitle"].toString();
+    int videoType = videoInfo["videoType"].toInteger();
+    QString videoDesc = videoInfo["videoDesc"].toString();
+    int64_t duration = videoInfo["duration"].toInteger();
+    LOG()<<"videoFileID : "<< videoFileID;
+    LOG()<<"photoFileID : "<< photoFileID;
+    LOG()<<"videoTitle : "<< videoTitle;
+    LOG()<<"videoDesc : "<< videoDesc;
+    LOG()<<"videoType : "<< videoType;
+    LOG()<<"duration : "<< duration;
+
+    QJsonArray tagIds = videoInfo["videoTag"].toArray();
+    for(int i = 0; i < tagIds.size(); ++i){
+        QJsonObject tagJson = tagIds[i].toObject();
+    }
+
+    // 构造正文
+    QJsonObject jsonBody;
+    jsonBody["requestId"] = jsonReq["requestId"].toString();
+    jsonBody["errorCode"] = 0;
+    jsonBody["errorMsg"] = "";
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonBody);
+
+    // 构造 HTTP 响应
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
     return httpResp;
 }
 

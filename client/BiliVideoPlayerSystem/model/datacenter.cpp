@@ -200,9 +200,9 @@ void DataCenter::downloadPhotoAsync(const QString &photoFileId)
     netClient.downloadPhoto(photoFileId);
 }
 
-void DataCenter::uploadPhotoAsync(const QByteArray &photoData)
+void DataCenter::uploadPhotoAsync(const QByteArray &photoData, QWidget* wndPtr)
 {
-    netClient.uploadPhoto(photoData);
+    netClient.uploadPhoto(photoData, wndPtr);
 }
 
 void DataCenter::downloadVideoAsync(const QString &videoFileId)
@@ -214,6 +214,11 @@ void DataCenter::uploadVideoAsync(const QString &videoPath)
 {
     netClient.uploadVideo(videoPath);
 
+}
+
+void DataCenter::uploadVideoDescAsync(const model::VideoDesc &videoDesc)
+{
+    netClient.uploadVideoDesc(videoDesc);
 }
 
 void DataCenter::deleteVideoAsync(const QString &videoId)

@@ -49,7 +49,7 @@ private slots:
     void getMyselfInfoDone();       // 用户信息获取成功
     void getOtherUserInfoDone();    // 获取其他用户信息成功
     void getAvatarDone(const QString& fileId, const QByteArray& data);  // 获取用户头像
-    void uploadAvatarDone1(const QString& fileId);  // 上传图片
+    void uploadAvatarDone1(const QString& fileId, QWidget* wndPtr);     // 上传图片
     void uploadAvatarDone2();                       // 修改图片
     void getUserVideoListDone(const QString& userId);   // 获取用户视频列表成功
     void onSCrollAreaValueChanged(int value);           // 当QSCrollArea到底部的时候获取下一页视频

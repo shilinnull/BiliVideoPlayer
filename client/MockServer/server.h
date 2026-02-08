@@ -48,6 +48,7 @@ private:
     QHttpServerResponse downloadVideo(const QHttpServerRequest& req);   // 下载视频
     QHttpServerResponse downloadVideoSeg(const QString& fileName);      // 下载视频分片
     QHttpServerResponse uploadVideo(const QHttpServerRequest& req);     // 上传视频
+    QHttpServerResponse newVideo(const QHttpServerRequest& req);        // 新增视频
     QHttpServerResponse removeVideo(const QHttpServerRequest& req);     // 删除视频
     QHttpServerResponse newAttention(const QHttpServerRequest& req);    // 新增关注
     QHttpServerResponse delAttention(const QHttpServerRequest& req);    // 取消关注
