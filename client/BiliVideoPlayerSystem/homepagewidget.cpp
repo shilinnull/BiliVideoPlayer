@@ -262,7 +262,10 @@ void HomePageWidget::onTagBtnClicked(QPushButton *clickLabelBtn)
     auto dataCenter = model::DataCenter::getInstance();
     auto kindAndTagPtr = dataCenter->getKindAndTagsClassPtr();
     auto kinds = kindAndTagPtr->getAllKinds();
-    if(kinds.isEmpty()) {
+    if(curKind.isEmpty()) {
+        if(kinds.isEmpty()) {
+            return;
+        }
         curKind = kinds[0];
     }
     dataCenter->getAllVideoInTagAsync(kindAndTagPtr->getTagId(curKind, tagText));

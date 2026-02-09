@@ -73,7 +73,7 @@ ConfirmDialog::ConfirmDialog(QWidget *parent)
     });
 }
 
-bool ConfirmDialog::isConfirmPass() const
+bool ConfirmDialog::isConfirmPress() const
 {
     return isConfirm;
 }

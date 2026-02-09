@@ -80,6 +80,10 @@ public:
     void incrementPlayNum(const QString& videoId);
     // 更新播放数
     void updateLikeNum(const QString& videoId, int64_t likeCount);
+    // 修改视频审核信息
+    void updateVideoCheckInfo(const QString& videoId, VideoStatus videoStatus,
+                              const QString& nickname, const QString& checkerId,
+                              const QString& checkerAvatarId);
 
 
     QList<VideoInfo> videoInfos;	// 从服务器上获取下来的视频数据
@@ -115,19 +119,52 @@ public:
     int64_t playTime;       // 发送弹幕时播放时间
     QString text;           // 弹幕内容
 
-    void loadBarrageInfo(QJsonObject& barrageJson);
+    void loadBarrageInfo(const QJsonObject& barrageJson);
 };
 
-enum RoleTye{
+// 角色类型：注意 项的初始化 以及 次序和课堂保持一致
+enum RoleType{
     SuperAdmin = 1,
-    Admid,
+    Admin,
     User,
     TempUser
 };
 
+// 身份类型
 enum IdentityType{
     CUser = 1,      // C端用户
     BUser           // B端用户
+};
+
+// 管理员状态
+enum AdminStatus{
+    noAdminStatus,   // 无状态
+    enable,           // 启用
+    disable          // 禁用
+};
+
+// 管理员信息
+class AdminInfo{
+public:
+    QString userId;                 // 用户Id
+    QString phone;                  // 手机号
+    model::RoleType roleType;       // 用户角色
+    QString nickName;               // 用户昵称
+    AdminStatus userStatu;         // 用户状态
+    QString remark;                 // 备注
+    void loadAdminInfo(const QJsonObject& jsonObj);
+};
+
+// 管理员列表
+class AdminList {
+public:
+    QList<AdminInfo> adminList;         // 保存管理员信息
+    int totalCount;                     // 系统中包含的管理员总的个数
+    const static int PAGE_COUNT = 20;   // 一个页面显示的管理员信息
+
+    // 添加管理员
+    void addAdminInfo(const AdminInfo& adminInfo);
+    void setAdminStatus(const QString &userId, AdminStatus adminStatus);
 };
 
 class UserInfo{
@@ -151,6 +188,7 @@ public:
     bool isBUser() const ;
     bool isTempUser() const;
     void buildTempUser();
+    bool isAdminDisable() const;
 };
 
 

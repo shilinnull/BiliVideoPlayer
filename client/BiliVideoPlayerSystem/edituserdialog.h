@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QDialog>
+#include "model/datacenter.h"
 
 namespace Ui {
 class EditUserDialog;
@@ -13,8 +14,10 @@ class EditUserDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit EditUserDialog(QWidget *parent = nullptr, const QString& text = "");
+    explicit EditUserDialog(QWidget *parent, const QString& text, model::AdminInfo& adminInfo);
     ~EditUserDialog();
+    bool getCommitResult()const;     // 确认用户是否提交
+    void setPhoneEditReadOnly(bool isReadOnly = true);  // 设置手机号是否只读
 
 private slots:
     void onCancelBtnClicked();
@@ -22,6 +25,8 @@ private slots:
 
 private:
     Ui::EditUserDialog *ui;
+    model::AdminInfo& adminInfo;
+    bool isCommit = false;
 };
 
 #endif // EDITUSERDIALOG_H

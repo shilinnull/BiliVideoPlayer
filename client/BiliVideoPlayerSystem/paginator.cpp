@@ -133,7 +133,8 @@ void Paginator::jumpToPage(int page)
         // 更新当前页数
         currentPage = page;
     }
-    // 发送信号
+    // 发送信号, 获取对应页的数据
+    currentPage = page;
     emit this->pageChanged(currentPage);
 }
 

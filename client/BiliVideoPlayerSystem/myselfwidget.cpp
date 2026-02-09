@@ -127,25 +127,6 @@ void MyselfWidget::initUI()
 {
     ui->attentionBtn->hide();
 
-#ifndef TEST_UI
-    // 往视频显示区域添加VideoBox-测试
-    int resourceId = 10000;
-    for(int i = 0; i < 20; ++i){
-        model::VideoInfo videoInfo;
-        resourceId++;
-        videoInfo.userAvatarId = "";
-        videoInfo.photoFileId = QString::number(resourceId++);
-        videoInfo.videoFileId = QString::number(resourceId++);
-        videoInfo.nickName = "用户昵称";
-        videoInfo.likeCount = 1234;
-        videoInfo.playCount = 23456;
-        videoInfo.videoTitle = "【北京旅游攻略】一条视频告诉你去了北京该怎么玩";
-        videoInfo.videoDuration = 10;
-        videoInfo.videoUpTime = "9-16 12:28:58";
-        VideoBox* videoBox =  new VideoBox(videoInfo);
-        ui->layout->addWidget(videoBox, i/4, i%4);
-    }
-#endif
 }
 
 void MyselfWidget::connectSignalAndSlots()
@@ -231,7 +212,7 @@ void MyselfWidget::onQuitBtnClicked()
     ConfirmDialog confirmDlg;
     confirmDlg.setOperatorText("确定退出登录吗？");
     confirmDlg.exec();
-    if(confirmDlg.isConfirmPass()) {
+    if(confirmDlg.isConfirmPress()) {
         auto dataCenter = model::DataCenter::getInstance();
         dataCenter->logoutAsync();      // 发送退出请求
     }
@@ -394,7 +375,7 @@ void MyselfWidget::onSCrollAreaValueChanged(int value)
     if(value == ui->scrollArea->verticalScrollBar()->maximum()) {
         auto dataCenter = model::DataCenter::getInstance();
         auto userVideoListPtr = dataCenter->getUserVideoList();
-        dataCenter->getUserVideoListAsync(userId, userVideoListPtr->getPageIndex());
+        dataCenter->getUserVideoListAsync(userId, userVideoListPtr->getPageIndex(), "myPage");
         userVideoListPtr->setPageIndex(userVideoListPtr->getPageIndex() + 1);
     }
 }
@@ -519,14 +500,21 @@ void MyselfWidget::hideWidget(bool isHide)
 
 void MyselfWidget::getUserVideoList(const QString &userId, int pageIndex)
 {
+    // 如果获取的是第一页的视频，将界面中的视频信息 以及 DataCenter中保存的视频信息全部清空
+    auto dataCenter = model::DataCenter::getInstance();
+    auto myselfInfo = dataCenter->getMyselfInfo();
+    if(myselfInfo && myselfInfo->isTempUser()){
+        LOG()<<"临时用户，无需获取用户视频列表";
+        return;
+    }
+
     //如果获取的是第一页的视频时，需要将之前界面上的视频元素清空
-    auto* dataCenter = model::DataCenter::getInstance();
     auto userVideoList = dataCenter->getUserVideoList();
     if(pageIndex == 1) {
         userVideoList->clearVideoList();    // 清空视频列表
         clearVideoList();                   // 删除界面元素
     }
-    dataCenter->getUserVideoListAsync(userId, pageIndex);
+    dataCenter->getUserVideoListAsync(userId, pageIndex, "myPage");
     // page+1，滚动条向下动时就可以获取下一页视频
     userVideoList->setPageIndex(pageIndex + 1);
 }

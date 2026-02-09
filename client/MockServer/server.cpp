@@ -16,7 +16,7 @@ MockServer::~MockServer() {}
 
 bool MockServer::init()
 {
-    int ret = httpServer.listen(QHostAddress::Any, 8000);
+    const bool ok = httpServer.listen(QHostAddress::Any, 8000);
 
     // 临时用户登录
     httpServer.route("/HttpService/tempLogin", [=](const QHttpServerRequest& req){
@@ -166,7 +166,56 @@ bool MockServer::init()
         return this->newVideo(req);
     });
 
-    return 8000 == ret;
+    // 获取状态视频列表
+    httpServer.route("/HttpService/statusVideoList", [=](const QHttpServerRequest& req){
+        return this->statusVideoList(req);
+    });
+
+    // 获取状态视频列表
+    httpServer.route("/HttpService/checkVideo", [=](const QHttpServerRequest& req){
+        return this->checkVideo(req);
+    });
+
+    // 上架视频
+    httpServer.route("/HttpService/saleVideo", [=](const QHttpServerRequest& req){
+        return this->saleVideo(req);
+    });
+
+    // 下架视频
+    httpServer.route("/HttpService/haltVideo", [=](const QHttpServerRequest& req){
+        return this->haltVideo(req);
+    });
+
+    // 通过手机号获取管理员信息
+    httpServer.route("/HttpService/getAdminByPhone", [=](const QHttpServerRequest& req){
+        return this->getAdminByPhone(req);
+    });
+    // 通过管理员状态获取管理员信息
+    httpServer.route("/HttpService/getAdminListByStatus", [=](const QHttpServerRequest& req){
+        return this->getAdminListByStatus(req);
+    });
+
+    // 新增管理员
+    httpServer.route("/HttpService/newAdministrator", [=](const QHttpServerRequest& req){
+        return this->newAdministrator(req);
+    });
+
+    // 新增管理员
+    httpServer.route("/HttpService/setAdministrator", [=](const QHttpServerRequest& req){
+        return this->setAdministrator(req);
+    });
+
+    // 新增管理员
+    httpServer.route("/HttpService/setStatus", [=](const QHttpServerRequest& req){
+        return this->setStatus(req);
+    });
+
+    // 删除管理员
+    httpServer.route("/HttpService/delAdministrator", [=](const QHttpServerRequest& req){
+        return this->delAdministrator(req);
+    });
+
+    return ok;
 }
 
 MockServer* MockServer::getInstance()
@@ -182,7 +231,7 @@ QHttpServerResponse MockServer::tempLogin(const QHttpServerRequest &req)
 {
     QJsonDocument docReq = QJsonDocument::fromJson(req.body());
     const QJsonObject& jsonReq = docReq.object();
-    LOG() << "[tempLogin] 收到 tempLogin 请求, requestId=" << jsonReq["requ estId"].toString();
+    LOG() << "[tempLogin] 收到 tempLogin 请求, requestId=" << jsonReq["requestId"].toString();
 
     roleType = TempUser;		// 设置临时用户登录
 
@@ -471,6 +520,12 @@ void MockServer::buildResponseData()
         idPathTable.insert(QString::number(resourceId++), "/videos/111.m3u8");
     }
     idPathTable.insert(QString::number(60000), "/videos/");
+    resourceId = 70000;
+    for(int i = 0; i < 100; i++) {
+        idPathTable.insert(QString::number(resourceId++), "/images/touxiang3.png");
+        idPathTable.insert(QString::number(resourceId++), "/images/videoImage3.png");
+        idPathTable.insert(QString::number(resourceId++), "/videos/111.m3u8");
+    }
 }
 
 QHttpServerResponse MockServer::downloadPhoto(const QHttpServerRequest &req)
@@ -561,6 +616,77 @@ QHttpServerResponse MockServer::removeVideo(const QHttpServerRequest &req)
     QJsonDocument docResp;
     docResp.setObject(jsonBody);
 
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::checkVideo(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG() << "[checkVideo] 收到 checkVideo 请求, requestId=" << jsonReq["requestId"].toString()
+          << "videoId: " << jsonReq["videoId"].toString();
+
+    bool checkResult = jsonReq["checkResult"].isBool();
+    QString videoId = jsonReq["videoId"].toString();
+    if(checkResult) {
+        LOG() << "视频: " << videoId  << "审核通过";
+    } else {
+        LOG() << "视频: " << videoId  << "审核驳回";
+    }
+    QJsonObject jsonBody;
+    jsonBody["requestId"] = jsonReq["requestId"].toString();
+    jsonBody["errorCode"] = 0;
+    jsonBody["errorMsg"] = "";
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonBody);
+
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::saleVideo(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG() << "[saleVideo] 收到 saleVideo 请求, requestId="
+          << jsonReq["requestId"].toString();
+
+    QString videoId = jsonReq["videoId"].toString();
+    LOG()<<"视频 "<< videoId <<"上架";
+
+    // 构造响应体
+    QJsonObject jsonBody;
+    jsonBody["requestId"] = jsonReq["requestId"].toString();
+    jsonBody["errorCode"] = 0;
+    jsonBody["errorMsg"] = "";
+    QJsonDocument docResp;
+    docResp.setObject(jsonBody);
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::haltVideo(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG() << "[haltVideo] 收到 haltVideo 请求, requestId="
+          << jsonReq["requestId"].toString();
+
+    QString videoId = jsonReq["videoId"].toString();
+    LOG()<<"视频 "<< videoId <<"下架";
+
+    // 构造响应体
+    QJsonObject jsonBody;
+    jsonBody["requestId"] = jsonReq["requestId"].toString();
+    jsonBody["errorCode"] = 0;
+    jsonBody["errorMsg"] = "";
+    QJsonDocument docResp;
+    docResp.setObject(jsonBody);
     QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
     httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
     return httpResp;
@@ -704,6 +830,73 @@ QHttpServerResponse MockServer::newVideo(const QHttpServerRequest &req)
     docResp.setObject(jsonBody);
 
     // 构造 HTTP 响应
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::statusVideoList(const QHttpServerRequest &req)
+{
+    // 1. 获取到请求中数据
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG()<<"[statusVideoList] 收到 statusVideoList 请求， requestId = "<<jsonReq["requestId"].toString();
+
+    int videoId = 70000;
+    int userId = 70000;
+    int resourceId = 70000;
+    QJsonArray videoLists;
+    int pageCount = jsonReq["pageCount"].toInt();
+    for(int i = 0; i < pageCount; ++i){
+        QJsonObject videoJsonObj;
+        videoJsonObj["videoId"] = QString::number(videoId++);
+        videoJsonObj["userId"] = QString::number(userId++);
+        videoJsonObj["userAvatarId"] = QString::number(resourceId++);
+        videoJsonObj["nickname"] = "王五";
+        videoJsonObj["photoFileId"] = QString::number(resourceId++);
+        videoJsonObj["videoFileId"] = QString::number(resourceId++);
+        videoJsonObj["likeCount"] = 1234;
+        videoJsonObj["playCount"] = 3456;
+        videoJsonObj["videoSize"] = 10240;
+        videoJsonObj["videoDesc"] = "【北京旅游攻略】一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩~";
+        videoJsonObj["videoTitle"] = "【北京旅游攻略】一条视频告诉你去了北京该怎么玩";
+        videoJsonObj["videoDuration"] = 10;
+        videoJsonObj["videoUpTime"] = "9-16 12:28:58";
+        int videoStatus = jsonReq["videoStatus"].toInt();
+        if(0 == videoStatus){
+            videoJsonObj["videoStatus"] = rand()%4+1;
+        }else{
+            videoJsonObj["videoStatus"] = videoStatus;
+        }
+
+        videoJsonObj["checkerId"] = "12345";
+        videoJsonObj["checkerName"] = "李四";
+        videoJsonObj["checkerAvatar"] = "50000";
+
+        videoLists.append(videoJsonObj);
+    }
+
+    // 2. 构造响应体
+    QJsonObject jsonResp;
+    jsonResp["requestId"] = jsonReq["requestId"].toString();
+    jsonResp["errorCode"] = 0;
+    jsonResp["errorMsg"] = "";
+
+    QJsonObject resultJson;
+    resultJson["videoList"] = videoLists;
+    resultJson["totalCount"] = 200;
+    jsonResp["result"] = resultJson;
+
+    // 3. 返回响应
+    QJsonDocument docResp;
+    docResp.setObject(jsonResp);
+
     QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
     httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
     return httpResp;
@@ -953,12 +1146,9 @@ QHttpServerResponse MockServer::setAvatar(const QHttpServerRequest &req)
 
 QHttpServerResponse MockServer::userVideoList(const QHttpServerRequest &req)
 {
-    // 1. 获取到请求中数据
     QJsonDocument docReq = QJsonDocument::fromJson(req.body());
     const QJsonObject& jsonReq = docReq.object();
     LOG()<<"[userVideoList] 收到 userVideoList 请求， requestId = "<<jsonReq["requestId"].toString();
-
-
 
     QJsonArray videoListObject;
     int videoId = 10000;
@@ -1002,7 +1192,6 @@ QHttpServerResponse MockServer::userVideoList(const QHttpServerRequest &req)
     jsonResp["errorCode"] = 0;
     jsonResp["result"] = resultObject;
 
-    // 3. 返回响应
     QJsonDocument docResp;
     docResp.setObject(jsonResp);
 
@@ -1199,6 +1388,222 @@ QHttpServerResponse MockServer::setNickname(const QHttpServerRequest &req)
     QJsonDocument docResp;
     docResp.setObject(jsonResp);
 
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::getAdminByPhone(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG() << "[getAdminByPhone] 收到 getAdminByPhone 请求, requestId="
+          << jsonReq["requestId"].toString();
+    QString phoneNumber = jsonReq["phoneNumber"].toString();
+    LOG()<<"管理员手机号: "<< phoneNumber;
+
+    // 构造响应体
+    QJsonObject jsonBody;
+    jsonBody["requestId"] = jsonReq["requestId"].toString();
+    jsonBody["errorCode"] = 0;
+    jsonBody["errorMsg"] = "";
+
+    int userId = 1234;
+    QJsonObject userInfoJson;
+    userInfoJson["userId"] = QString::number(userId);
+    userInfoJson["nickname"] = "平台管理员";
+    userInfoJson["roleType"] = 2; // 平台管理员
+    userInfoJson["phoneNumber"] = phoneNumber;
+    userInfoJson["userStatu"] = rand()%2 + 1; // 状态为1-启用 2-禁止
+    userInfoJson["userMemo"] = "我是一个平台管理员，我拥有审核视频等权限";
+
+    QJsonObject resultJson;
+    resultJson["userInfo"] = userInfoJson;
+    jsonBody["result"] = resultJson;
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonBody);
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::getAdminListByStatus(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG() << "[getAdminListByStatus] 收到 getAdminListByStatus 请求, requestId="
+          << jsonReq["requestId"].toString();
+
+    int adminStatus = jsonReq["userStatus"].toInt();
+    if(0 == adminStatus){
+        LOG()<<"获取所有管理员信息列表";
+    }else if(1 == adminStatus){
+        LOG()<<"获取启用管理员信息列表";
+    }else{
+        LOG()<<"获取禁止管理员信息列表";
+    }
+    // 构造响应体
+    QJsonObject jsonBody;
+    jsonBody["requestId"] = jsonReq["requestId"].toString();
+    jsonBody["errorCode"] = 0;
+    jsonBody["errorMsg"] = "";
+
+    QJsonObject resultJson;
+    resultJson["totalCount"] = 199;
+    // 构造一页的管理员信息
+    QJsonArray adminListJson;
+    int pageCount = jsonReq["pageCount"].toInt();
+    QStringList remarks = {"视频审核", "运营人员", "后台工作人员"};
+    QStringList nickNames = {"张三", "李四", "王五", "赵六", "田七", "七七", "小小七"};
+    int userId = 1234;
+    long long phoneNumber = 17612344321;
+    for(int i = 0; i < pageCount;++i){
+        QJsonObject adminInfoJson;
+        adminInfoJson["userId"] = QString::number(userId++);
+        adminInfoJson["nickname"] = nickNames[rand()%7];
+        adminInfoJson["roleType"] = (rand() % 2) + 1; // 1-超级管理员 2-平台管理员
+        adminInfoJson["phoneNumber"] = QString::number(phoneNumber++);
+        if(0 == adminStatus){
+            adminInfoJson["userStatu"] = rand()%2 + 1; // 状态为1-启用 2-禁止
+        }else{
+            // 获取所有状态为禁止 或者 启用 的管理员
+            adminInfoJson["userStatu"] = adminStatus;
+        }
+        adminInfoJson["userMemo"] = remarks[rand()%3];
+        adminListJson.append(adminInfoJson);
+    }
+    resultJson["userList"] = adminListJson;
+    jsonBody["result"] = resultJson;
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonBody);
+    QHttpServerResponse httpResp(docResp.toJson(),
+                                 QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::newAdministrator(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG() << "[newAdministrator] 收到 newAdministrator 请求, requestId="
+          << jsonReq["requestId"].toString();
+
+    QJsonObject adminJson = jsonReq["userInfo"].toObject();
+    LOG()<<"新增管理员信息：";
+    LOG()<<"nickName: "<<adminJson["nickname"].toString();
+
+    int roleType = adminJson["roleType"].toInt();
+    if(1 == roleType){
+        LOG()<<"roleType: 超级管理员";
+    }else if(2 == roleType){
+        LOG()<<"roleType: 普通管理员";
+    }
+
+    int userStatue = adminJson["userStatu"].toInt();
+    if(1 == userStatue){
+        LOG()<<"userStatu: 启用";
+    }else if(2 == userStatue){
+        LOG()<<"userStatu: 禁止";
+    }
+    LOG()<<"userMemo: "<<adminJson["userMemo"].toString();
+    LOG()<<"phoneNum: "<<adminJson["phoneNumber"].toString();
+
+    // 构造响应体
+    QJsonObject jsonBody;
+    jsonBody["requestId"] = jsonReq["requestId"].toString();
+    jsonBody["errorCode"] = 0;
+    jsonBody["errorMsg"] = "";
+
+    QJsonObject resultJson;
+    resultJson["userId"] = "1234";
+    jsonBody["result"] = resultJson;
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonBody);
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::setAdministrator(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG() << "[setAdministrator] 收到 setAdministrator 请求, requestId=" <<
+        jsonReq["requestId"].toString();
+    QJsonObject adminJson = jsonReq["userInfo"].toObject();
+    LOG()<<"编辑管理员"<<adminJson["userId"].toString()<<"信息:";
+    LOG()<<"nickName: "<<adminJson["nickname"].toString();
+
+    int userStatus = adminJson["userStatus"].toInt();
+    if(1 == userStatus){
+        LOG()<<"userStatus: 启用";
+    }else if(2 == userStatus){
+        LOG()<<"userStatus: 禁止";
+    }
+    LOG()<<"userMemo: "<<adminJson["userMemo"].toString();
+
+    // 构造响应体
+    QJsonObject jsonBody;
+    jsonBody["requestId"] = jsonReq["requestId"].toString();
+    jsonBody["errorCode"] = 0;
+    jsonBody["errorMsg"] = "";
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonBody);
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::setStatus(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG() << "[setStatus] 收到 setStatus 请求, requestId=" <<
+        jsonReq["requestId"].toString();
+
+    int adminStatus = jsonReq["userStatus"].toInt();
+    QString adminId = jsonReq["userId"].toString();
+    QString status = "启用";
+    if(adminStatus == 2){
+        status = "禁用";
+    }
+    LOG()<<"管理员: "<<adminId<<"状态修改为"<<status;
+
+    // 构造响应体
+    QJsonObject jsonBody;
+    jsonBody["requestId"] = jsonReq["requestId"].toString();
+    jsonBody["errorCode"] = 0;
+    jsonBody["errorMsg"] = "";
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonBody);
+    QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
+    httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
+    return httpResp;
+}
+
+QHttpServerResponse MockServer::delAdministrator(const QHttpServerRequest &req)
+{
+    QJsonDocument docReq = QJsonDocument::fromJson(req.body());
+    const QJsonObject& jsonReq = docReq.object();
+    LOG() << "[delAdministrator] 收到 delAdministrator 请求, requestId=" <<
+        jsonReq["requestId"].toString();
+    QString adminId = jsonReq["userId"].toString();
+    LOG()<<"管理员 "<<adminId<<"删除成功";
+
+    // 构造响应体
+    QJsonObject jsonBody;
+    jsonBody["requestId"] = jsonReq["requestId"].toString();
+    jsonBody["errorCode"] = 0;
+    jsonBody["errorMsg"] = "";
+
+    QJsonDocument docResp;
+    docResp.setObject(jsonBody);
     QHttpServerResponse httpResp(docResp.toJson(), QHttpServerResponse::StatusCode::Ok);
     httpResp.setHeader("Content-Type", "application/json; charset=utf-8");
     return httpResp;

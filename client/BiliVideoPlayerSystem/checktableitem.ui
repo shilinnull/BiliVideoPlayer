@@ -82,7 +82,7 @@
 }</string>
       </property>
       <property name="text">
-       <string>1</string>
+       <string/>
       </property>
       <property name="alignment">
        <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -101,7 +101,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>视频用户1</string>
+       <string/>
       </property>
       <property name="alignment">
        <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -120,7 +120,7 @@
        <string notr="true">#videoTitleLabel { padding-left: 34px; padding-right: 34px; }</string>
       </property>
       <property name="text">
-       <string>【北京旅游攻略】⼀条视频告诉你去了北京</string>
+       <string/>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -139,11 +139,17 @@
        <string notr="true">#videoBtn { 
 	background-color: transparent; 
 	border: none; 
-	border-image:url(:/images/admin/defaultVideoCover.png); 
+	/*border-image:url(:/images/admin/defaultVideoCover.png); */
 }</string>
       </property>
       <property name="text">
-       <string>清空</string>
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>160</width>
+        <height>88</height>
+       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="statusBtn">
@@ -166,7 +172,7 @@
 }</string>
       </property>
       <property name="text">
-       <string>已审核</string>
+       <string/>
       </property>
      </widget>
      <widget class="QLabel" name="checkerLabel">
@@ -179,7 +185,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>张三</string>
+       <string/>
       </property>
       <property name="alignment">
        <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -198,7 +204,7 @@
        <string notr="true">#operationBtn { color: #3686FF; border: none; background-color: transparent; }</string>
       </property>
       <property name="text">
-       <string>通过</string>
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="operationBtn2">
@@ -214,7 +220,7 @@
        <string notr="true">#operationBtn2 { color: #FD6A6A; border: none; background-color: transparent; }</string>
       </property>
       <property name="text">
-       <string>驳回</string>
+       <string/>
       </property>
      </widget>
     </widget>

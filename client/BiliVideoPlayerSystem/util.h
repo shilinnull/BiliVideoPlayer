@@ -8,8 +8,6 @@
 #include <QPainter>
 #include <QPainterPath>
 
-#define TEST_UI
-
 static inline QString getFileName(const QString& path) {
     QFileInfo fileinfo(path);
     return fileinfo.fileName();

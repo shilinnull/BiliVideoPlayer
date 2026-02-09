@@ -59,7 +59,6 @@ StartupPage::StartupPage(QDialog *parent)
 void StartupPage::startTimer()
 {
     QTimer* timer = new QTimer(this);
-	timer->setSingleShot(true);		// 设置为周期定时
     connect(timer, &QTimer::timeout, this, [=]{
         if(loginSuccess && mySelfInfoSuccess) {
             timer->stop();

@@ -156,7 +156,22 @@ void VideoList::updateLikeNum(const QString &videoId, int64_t likeCount)
     }
 }
 
-void BarrageInfo::loadBarrageInfo(QJsonObject &barrageJson)
+void VideoList::updateVideoCheckInfo(const QString &videoId, VideoStatus videoStatus,
+                                     const QString &nickname, const QString &checkerId,
+                                     const QString &checkerAvatarId)
+{
+    for(auto& videoInfo : videoInfos){
+        if(videoInfo.videoId == videoId){
+            videoInfo.videoStatus = videoStatus;
+            videoInfo.checkerId = checkerId;
+            videoInfo.checkerName = nickname;
+            videoInfo.checkerAvatar = checkerAvatarId;
+            return;
+        }
+    }
+}
+
+void BarrageInfo::loadBarrageInfo(const QJsonObject &barrageJson)
 {
     barrageId = barrageJson["barrageId"].toString();
     userId = barrageJson["userId"].toString();
@@ -230,6 +245,36 @@ void UserInfo::buildTempUser()
     userMemo = "";
     userCTime = "";
     avatarFileId = "";
+}
+
+bool UserInfo::isAdminDisable() const
+{
+    return AdminStatus::disable == userStatus;
+}
+
+void AdminInfo::loadAdminInfo(const QJsonObject &jsonObj)
+{
+    userId = jsonObj["userId"].toString();
+    nickName = jsonObj["nickname"].toString();
+    roleType = static_cast<RoleType>(jsonObj["roleType"].toInt());
+    phone = jsonObj["phoneNumber"].toString();
+    userStatu = static_cast<AdminStatus>(jsonObj["userStatu"].toInt());
+    remark = jsonObj["userMemo"].toString();
+}
+
+void AdminList::addAdminInfo(const AdminInfo &adminInfo)
+{
+    adminList.append(adminInfo);
+}
+
+void AdminList::setAdminStatus(const QString &userId, AdminStatus adminStatus)
+{
+    for(auto& adminInfo : adminList){
+        if(adminInfo.userId == userId){
+            adminInfo.userStatu = adminStatus;
+            return;
+        }
+    }
 }
 
 }

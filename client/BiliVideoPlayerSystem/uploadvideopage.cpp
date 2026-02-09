@@ -48,6 +48,7 @@ UploadVideoPage::~UploadVideoPage()
 
 void UploadVideoPage::setVideoTitle(const QString &videoFilePath)
 {
+    resetPage();
     this->videoFilePath = videoFilePath;
 
     // 截图文件名设置到界面

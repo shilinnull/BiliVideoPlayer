@@ -29,7 +29,7 @@ public:
     void startPlaying();
     void buildBulletScreenData();                   // 加载弹幕数据
     void showBulletScreen();						// 显示弹幕
-    void setUserIcon(QPixmap& userPixmap);          // 设置用户头像
+    void setUserIcon(const QPixmap& userPixmap);          // 设置用户头像
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;
@@ -49,7 +49,7 @@ private slots:
     void onSendBulletScreenBtnClicked(const QString& text);// 发送弹幕
 
 private:
-    QString secondToTime(int64_t second);           // 转换时间
+    QString secondToTime(int64_t second) const;           // 转换时间
     void initBarrageArea();							// 弹幕区域布局
     void updateVideoInfoUI();                       // 设置视频信息
     void updataPlayCount();                         // 更新播放数

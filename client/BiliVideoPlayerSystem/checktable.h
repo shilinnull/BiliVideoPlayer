@@ -20,12 +20,17 @@ private slots:
     void onResetBtnClicked();
     // 查询按钮点击槽函数
     void onQueryBtnClicked();
+    // 获取视频列表
+    void getVideoList(int page);
+    // 重置视频列表
+    void resetPaginator(int pageCount);
 
 private:
-    void updateCheckTable();            // 更新审核页面
+    void updateCheckTable(const QString& userId, const QString& whichPage); // 更新审核页面
 private:
     Ui::CheckTable *ui;
     Paginator* paginator = nullptr;     // 分页器指针
+    int page = 1;                       // 获取当前第几页
 };
 
 #endif // CHECKTABLE_H

@@ -10,6 +10,7 @@
 #include <QKeySequence>
 #include <QTimer>
 #include "bilivideoplayer.h"
+#include <QJsonArray>
 
 PlayerPage::PlayerPage(const model::VideoInfo& videoInfo, QWidget *parent)
     : QWidget(parent)
@@ -148,7 +149,7 @@ void PlayerPage::showBulletScreen()
     }
 }
 
-void PlayerPage::setUserIcon(QPixmap& userPixmap)
+void PlayerPage::setUserIcon(const QPixmap& userPixmap)
 {
     ui->userAvatar->setIcon(QIcon(userPixmap));
 }
@@ -199,8 +200,16 @@ void PlayerPage::onLikeImageBtnClicked()
     auto myself = dataCenter->getMyselfInfo();
     if(myself->isTempUser()) {
         Toast::showMessage("先登录/注册后才能点赞！", login);
+        return;
     }
 
+    // 如果是视频审核状态
+    if(videoInfo.videoStatus == model::VideoStatus::waitForChecking) {
+        Toast::showMessage("视频审核中禁止点赞！");
+        return ;
+    }
+
+    // 更新点赞
     isLike = !isLike;
     if(isLike) {
         likeCount++;
@@ -284,6 +293,11 @@ void PlayerPage::onBulletScreenClicked()
 
 void PlayerPage::onSendBulletScreenBtnClicked(const QString &text)
 {
+    // 视频在审核就不能发送弹幕
+    if(videoInfo.videoStatus == model::VideoStatus::waitForChecking) {
+        Toast::showMessage("视频在审核时不能发送弹幕");
+        return ;
+    }
     // 弹幕关闭就不继续执行
     if(!isStartBS) {
         Toast::showMessage("请打开弹幕开关...");
@@ -292,7 +306,7 @@ void PlayerPage::onSendBulletScreenBtnClicked(const QString &text)
 
     auto dataCenter = model::DataCenter::getInstance();
     auto myself = dataCenter->getMyselfInfo();
-    if(myself->isTempUser()) {
+    if(myself == nullptr || myself->isTempUser()) {
         Toast::showMessage("请先登录/注册才能发评论！", login);
         return;
     }
@@ -313,11 +327,11 @@ void PlayerPage::onSendBulletScreenBtnClicked(const QString &text)
     model::BarrageInfo barrageInfo;
     barrageInfo.playTime = mpvPlayer->getPlayTime();
     barrageInfo.text = text;
-    barrageInfo.userId = videoInfo.userId;
+    barrageInfo.userId = myself->userId;
     dataCenter->loadupBarragesAsync(videoInfo.videoId, barrageInfo);
 }
 
-QString PlayerPage::secondToTime(int64_t second)
+QString PlayerPage::secondToTime(int64_t second) const
 {
     QString time;
     time.reserve(20);
@@ -380,6 +394,10 @@ void PlayerPage::updateVideoInfoUI()
 
 void PlayerPage::updataPlayCount()
 {
+    // 如果视频在审核，就不更新播放数
+    if(videoInfo.videoStatus == model::VideoStatus::waitForChecking) {
+        return ;
+    }
     // 判断是否有效点击
     if(isUpdatePlayNum)
         return;
@@ -388,7 +406,22 @@ void PlayerPage::updataPlayCount()
     auto dataCenter = model::DataCenter::getInstance();
     auto videoList = dataCenter->getVideoListPtr();
     videoList->incrementPlayNum(videoInfo.videoId);
+
     // 我的页面视频列表
+    auto myVideoList = dataCenter->getUserVideoList();
+    if(myVideoList->videoInfos.isEmpty()){
+        return;
+    }else{
+        myVideoList->incrementPlayNum(videoInfo.videoId);
+    }
+
+    // 管理员视频列表
+    auto statusVideoList = dataCenter->getStatusVideoList();
+    if(statusVideoList->videoInfos.isEmpty()){
+        return;
+    }else{
+        statusVideoList->incrementPlayNum(videoInfo.videoId);
+    }
 
     // 更新服务器上的该视频播放数
     dataCenter->setPlayNumberAsync(videoInfo.videoId);
@@ -400,21 +433,42 @@ void PlayerPage::updataPlayCount()
 
 void PlayerPage::onQuitBtnClicked()
 {
+    auto dataCenter = model::DataCenter::getInstance();
+    auto videoListPtr = dataCenter->getVideoListPtr();
     if(likeCount != videoInfo.likeCount){
         // 视频的点赞信息发生改变，给服务器同步
-        auto dataCenter = model::DataCenter::getInstance();
         dataCenter->setLikeNumberAsync(videoInfo.videoId);
 
         // 更新视频列表中的videoId视频的点赞信息：首页 和 我的页面
-        auto videoListPtr = dataCenter->getVideoListPtr();
         videoListPtr->updateLikeNum(videoInfo.videoId, likeCount);
         videoInfo.likeCount = likeCount;
 
         // 通知videoBox更新点赞数据
         emit updateLikeNum(likeCount);
     }
+    dataCenter->setBarragesData(QJsonArray());
+
+    // 更新首页视频列表 和 我的视频列表
+    videoListPtr->updateLikeNum(videoInfo.videoId, likeCount);
+
+    // 用户视频列表
+    auto myVideoList = dataCenter->getUserVideoList();
+    if(myVideoList->videoInfos.isEmpty()){
+        return;
+    }else{
+        myVideoList->updateLikeNum(videoInfo.videoId, likeCount);
+    }
+
+    // 管理员视频列表
+    auto statusVideoList = dataCenter->getStatusVideoList();
+    if(statusVideoList->videoInfos.isEmpty()){
+        return;
+    }else{
+        statusVideoList->updateLikeNum(videoInfo.videoId, likeCount);
+    }
 
     // 释放掉，防止内存泄漏
+    this->close();
     this->deleteLater();
 }
 

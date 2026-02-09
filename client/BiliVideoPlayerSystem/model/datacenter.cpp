@@ -113,17 +113,17 @@ void DataCenter::loadDataFile()
 
     QJsonArray roleTypeArray = jsonObj["roleType"].toArray();
     for(int i = 0; i < roleTypeArray.count(); i++) {
-        myselfInfo->roleType.append(i);
+        myselfInfo->roleType.append(roleTypeArray[i].toInt());
     }
 
     QJsonArray identityTypeArray = jsonObj["identityType"].toArray();
     for(int i = 0; i < identityTypeArray.count(); i++) {
-        myselfInfo->identityType.append(i);
+        myselfInfo->identityType.append(identityTypeArray[i].toInt());
     }
     LOG() << "读入内存的数据:" << jsonObj;
 }
 
-QString &DataCenter::getServerUrl()
+const QString &DataCenter::getServerUrl() const
 {
     return serverURL;
 }
@@ -171,6 +171,9 @@ void DataCenter::setVideoList(const QJsonObject &videoListJsonObj)
         videoListPtr->addVideo(videoInfo);
     }
     videoListPtr->setVideoTotalCount(videoListJsonObj["totalCount"].toInt());
+    if(videoListArray.isEmpty()) {
+        videoListPtr->setPageIndex(videoListPtr->getPageIndex() - 1);
+    }
 }
 
 VideoList *DataCenter::getVideoListPtr()
@@ -224,6 +227,21 @@ void DataCenter::uploadVideoDescAsync(const model::VideoDesc &videoDesc)
 void DataCenter::deleteVideoAsync(const QString &videoId)
 {
     netClient.deleteVideo(videoId);
+}
+
+void DataCenter::checkVideoAsync(const QString &videoId, bool result)
+{
+    netClient.checkVideo(videoId, result);
+}
+
+void DataCenter::putawayVideoAsync(const QString &videoId)
+{
+    netClient.putawayVideo(videoId);
+}
+
+void DataCenter::discardVideoAsync(const QString &videoId)
+{
+    netClient.discardVideo(videoId);
 }
 
 void DataCenter::newAttentionAsync(const QString &userId)
@@ -379,9 +397,37 @@ VideoList *DataCenter::getUserVideoList()
     return userVideoList;
 }
 
-void DataCenter::getUserVideoListAsync(const QString &userId, int pageIndex)
+void DataCenter::setStatusVideoList(const QJsonObject &videoListObj)
 {
-    netClient.getUserVideoList(userId, pageIndex);
+    getStatusVideoList();
+    // 设置总数页
+    QJsonArray videoListArray = videoListObj["videoList"].toArray();
+    for(int i = 0; i < videoListArray.size(); i++) {
+        QJsonObject videoInfoObj = videoListArray[i].toObject();
+        VideoInfo videoInfo;
+        videoInfo.loadVideoInfo(videoInfoObj);
+        statusVideoList->videoInfos.push_back(videoInfo);
+    }
+    statusVideoList->setVideoTotalCount(videoListObj["totalCount"].toInt());
+    LOG() << "状态视频列表总共有：" << statusVideoList->getVideoCount();
+}
+
+VideoList *DataCenter::getStatusVideoList()
+{
+    if(nullptr == statusVideoList) {
+        statusVideoList = new VideoList();
+    }
+    return statusVideoList;
+}
+
+void DataCenter::getUserVideoListAsync(const QString &userId, int pageIndex, const QString& whichPage)
+{
+    netClient.getUserVideoList(userId, pageIndex, whichPage);
+}
+
+void DataCenter::getStatusVideoListAsync(int videoStatus, int pageIndex)
+{
+    netClient.getStatusVideoList(videoStatus, pageIndex);
 }
 
 void DataCenter::getAuthcodeAsync(const QString &phoneNum)
@@ -417,6 +463,68 @@ void DataCenter::setPasswordAsync(const QString &password)
 void DataCenter::setNickNameAsync(const QString &nickName)
 {
     netClient.setNickName(nickName);
+}
+
+void DataCenter::setAdminsList(const QJsonObject &adminsJson, bool isAdminStatus)
+{
+    getAdminsList();
+    if(isAdminStatus){
+        // 通过状态获取管理员列表
+        // 设置总的页数
+        int totalCount = adminsJson["totalCount"].toInt();
+        adminListPtr->totalCount = totalCount;
+        QJsonArray adminListArray = adminsJson["userList"].toArray();
+        for(int i = 0; i < adminListArray.size(); i++) {
+            QJsonObject adminInfoObj = adminListArray[i].toObject();
+            AdminInfo adminInfo;
+            adminInfo.loadAdminInfo(adminInfoObj);
+            adminListPtr->addAdminInfo(adminInfo);
+        }
+    } else {
+        // 通过手机号
+        AdminInfo adminInfo;
+        adminInfo.loadAdminInfo(adminsJson["userInfo"].toObject());
+        adminListPtr->addAdminInfo(adminInfo);
+        adminListPtr->totalCount = 1;
+    }
+}
+
+AdminList *DataCenter::getAdminsList()
+{
+    if (adminListPtr == nullptr) {
+        adminListPtr = new AdminList();
+    }
+    return adminListPtr;
+}
+
+void DataCenter::getAdminByPhoneAsync(const QString &phoneNumber)
+{
+    netClient.getAdminByPhone(phoneNumber);
+}
+
+void DataCenter::getAdminListByStatusAsync(int pageIndex, AdminStatus adminStatus)
+{
+    netClient.getAdminListByStatus(pageIndex, adminStatus);
+}
+
+void DataCenter::newAdminAsync(const AdminInfo &userInfo)
+{
+    netClient.newAdmin(userInfo);
+}
+
+void DataCenter::editAdminAsync(const AdminInfo &userInfo)
+{
+    netClient.editAdmin(userInfo);
+}
+
+void DataCenter::setAdminStatusAsync(const AdminInfo &userInfo)
+{
+    netClient.setAdminStatus(userInfo);
+}
+
+void DataCenter::delAdminAsync(const QString &adminId)
+{
+    netClient.delAdmin(adminId);
 }
 
 DataCenter::DataCenter(QObject *parent)
