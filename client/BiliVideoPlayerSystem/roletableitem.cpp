@@ -3,6 +3,7 @@
 
 #include "edituserdialog.h"
 #include "toast.h"
+#include "model/datacenter.h"
 
 RoleTableItem::RoleTableItem(QWidget *parent, model::AdminInfo& adminInfo, int seqNumber)
     : QWidget(parent)
@@ -15,13 +16,13 @@ RoleTableItem::RoleTableItem(QWidget *parent, model::AdminInfo& adminInfo, int s
     updateUI(seqNumber);    // 更新界面UI
     connect(ui->editBtn, &QPushButton::clicked, this, &RoleTableItem::onEditBtnClicked);
     auto dataCenter = model::DataCenter::getInstance();
-    connect(dataCenter, &model::DataCenter::newAdminDone, this, [=]{
-        ui->phoneLabel->setText(this->adminInfo.phone);
+    connect(dataCenter, &model::DataCenter::editAdminDone, this, [=]{
+        ui->emailLabel->setText(this->adminInfo.email);
         ui->nameLabel->setText(this->adminInfo.nickName);
         // 设置启用和禁用状态
-        if(model::enable == this->adminInfo.userStatu) {
+        if(model::Enable == this->adminInfo.userStatu) {
             ui->statusButton->setText("禁用");
-        } else if(model::disable == this->adminInfo.userStatu){
+        } else if(model::Disable == this->adminInfo.userStatu){
             ui->statusButton->setText("启用");
         }
         // 修改按钮样式
@@ -41,23 +42,23 @@ RoleTableItem::~RoleTableItem()
 
 void RoleTableItem::initStyleSheet()
 {
-    styleSheet.insert("启用", "border:none;"
-                              "background-color:#EBF3FF;"
-                              "border-radius:10px;"
-                              "border:1px solid #EBEDF0;"
-                              "font-size:12px;"
-                              "color:#3686FF;");
-    styleSheet.insert("禁止", "border:none;"
-                              "background-color:#FFF0F0;"
-                              "border-radius:10px;"
-                              "border:1px solid #EBEDF0;"
-                              "font-size:12px;"
-                              "color:#FD6A6A;");
-    styleSheet.insert("--", "border:none;"
-                            "background-color:#FFFFFF;"
-                            "border-radius:10px;"
-                            "font-size:14px;"
-                            "color:#222222;");
+    styleSheet.insert("启用", "border: none; "
+                              "background-color: #EBF3FF; "
+                              "border-radius: 10px; "
+                              "border: 1px solid #EBEDF0; "
+                              "font-size: 12px; "
+                              "color: #3686FF;");
+    styleSheet.insert("禁用", "border: none; "
+                              "background-color: #FFF0F0; "
+                              "border-radius: 10px; "
+                              "border: 1px solid #EBEDF0; "
+                              "font-size: 12px; "
+                              "color: #FD6A6A;");
+    styleSheet.insert("--", "border: none; "
+                            "background-color: #FFFFFF; "
+                            "border-radius: 10px; "
+                            "font-size: 14px; "
+                            "color: #222222;");
 }
 
 void RoleTableItem::updateUI(int seqNumber)
@@ -77,13 +78,13 @@ void RoleTableItem::updateUI(int seqNumber)
         ui->editBtn->setStyleSheet(styleSheet["--"]);
         ui->editBtn->setEnabled(false);
     }
-    ui->phoneLabel->setText(adminInfo.phone);   // 手机号
+    ui->emailLabel->setText(adminInfo.email);   // 邮箱
     ui->nameLabel->setText(adminInfo.nickName); // 用户昵称
 
     // 状态
-    if(model::enable == adminInfo.userStatu){
-        ui->statusButton->setText("禁止");
-    }else if(model::disable == adminInfo.userStatu){
+    if(model::Enable == adminInfo.userStatu){
+        ui->statusButton->setText("禁用");
+    }else if(model::Disable == adminInfo.userStatu){
         ui->statusButton->setText("启用");
     }
     ui->statusButton->setStyleSheet(styleSheet[ui->statusButton->text()]);
@@ -92,21 +93,15 @@ void RoleTableItem::updateUI(int seqNumber)
     ui->commentLabel->setText(adminInfo.remark);
 }
 
-bool RoleTableItem::logUserisAdminMyself(const QString &text)
+bool RoleTableItem::logUserIsAdminMyself(const QString &text)
 {
     auto dataCenter = model::DataCenter::getInstance();
-    auto myself = dataCenter->getMyselfInfo();
-    if(myself == nullptr) {
-        return false;
-    }
-    if(!adminInfo.userId.isEmpty() && adminInfo.userId == myself->userId) {
+    auto myselfInfo = dataCenter->getMyselfInfo();
+    if(myselfInfo->userId == adminInfo.userId){
         Toast::showMessage(text);
         return true;
     }
-    if(!adminInfo.phone.isEmpty() && !myself->phoneNum.isEmpty() && adminInfo.phone == myself->phoneNum) {
-        Toast::showMessage(text);
-        return true;
-    }
+
     return false;
 }
 
@@ -119,41 +114,42 @@ void RoleTableItem::onEditBtnClicked()
     }else if("平台管理员" == userRole){
         adminInfo.roleType = model::Admin;
     }
-    adminInfo.phone = ui->phoneLabel->text();
+    adminInfo.email = ui->emailLabel->text();
     adminInfo.nickName = ui->nameLabel->text();
     if(ui->statusButton->text() == "启用"){
-        adminInfo.userStatu = model::disable;
+        adminInfo.userStatu = model::Disable;
     }else{
-        adminInfo.userStatu = model::enable;
+        adminInfo.userStatu = model::Enable;
     }
     adminInfo.remark = ui->commentLabel->text();
     // 在编辑页面修改管理员信息
-    EditUserDialog* editUserDlg = new EditUserDialog(nullptr, "编辑后台用户", adminInfo);
-    editUserDlg->exec();
+    EditUserDialog* editAdminDlg = new EditUserDialog(nullptr, "编辑后台用户", adminInfo);
+    editAdminDlg->setEmailEditReadOnly(true);
+    editAdminDlg->exec();
     // 如果用户点击了确认，向服务器发送编辑用户请求
-    if(editUserDlg->getCommitResult()){
+    if(editAdminDlg->getCommitResult()){
         auto dataCenter = model::DataCenter::getInstance();
-        dataCenter->newAdminAsync(adminInfo);
+        dataCenter->editAdminAsync(adminInfo);
     }
-    delete editUserDlg;
+    delete editAdminDlg;
 }
 
 void RoleTableItem::onStatusBtnClicked()
 {
-    if(logUserisAdminMyself("无法启用或者禁用自己")) {
+    if(logUserIsAdminMyself("无法启用或者禁用自己")) {
         return ;
     }
     if(adminInfo.roleType == model::RoleType::SuperAdmin){
-        Toast::showMessage("不能启用或禁用超级管理员!!!");
+        Toast::showMessage("不能启用或禁用超级管理员！");
         return;
     }
     QString btnText = ui->statusButton->text();
     if("启用" == btnText){
-        btnText = "禁止";
-        adminInfo.userStatu = model::enable;
+        btnText = "禁用";
+        adminInfo.userStatu = model::Enable;
     }else{
         btnText = "启用";
-        adminInfo.userStatu = model::disable;
+        adminInfo.userStatu = model::Disable;
     }
     ui->statusButton->setText(btnText);
     ui->statusButton->setStyleSheet(styleSheet[btnText]);
@@ -167,11 +163,11 @@ void RoleTableItem::onStatusBtnClicked()
 
 void RoleTableItem::onDelBtnClicked()
 {
-    if(logUserisAdminMyself("禁止删除自己")){
+    if(logUserIsAdminMyself("禁止删除自己")){
         return;
     }
     if(adminInfo.roleType == model::RoleType::SuperAdmin){
-        Toast::showMessage("不能删除超级管理员!!!");
+        Toast::showMessage("不能删除超级管理员！");
         return;
     }
     auto dataCenter = model::DataCenter::getInstance();

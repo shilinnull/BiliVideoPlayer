@@ -209,7 +209,7 @@
              <string>密码登录</string>
             </property>
            </widget>
-           <widget class="QPushButton" name="messageBtn">
+           <widget class="QPushButton" name="emailBtn">
             <property name="geometry">
              <rect>
               <x>300</x>
@@ -219,7 +219,7 @@
              </rect>
             </property>
             <property name="styleSheet">
-             <string notr="true">#messageBtn{ 
+             <string notr="true">#emailBtn{ 
 	font-size : 22px; 
 	color : #EC5D85; 
 	font-weight:bold; 
@@ -228,7 +228,7 @@
 }</string>
             </property>
             <property name="text">
-             <string>短信登录</string>
+             <string>邮箱登录</string>
             </property>
            </widget>
            <widget class="QWidget" name="passwordWidget" native="true">
@@ -335,7 +335,7 @@ QLineEdit{
                </rect>
               </property>
               <property name="placeholderText">
-               <string>请输入手机号</string>
+               <string>请输入邮箱或用户昵称</string>
               </property>
              </widget>
             </widget>
@@ -372,7 +372,7 @@ QLineEdit{
              </property>
             </widget>
            </widget>
-           <widget class="QWidget" name="messageWidget" native="true">
+           <widget class="QWidget" name="emailWidget" native="true">
             <property name="geometry">
              <rect>
               <x>0</x>
@@ -394,7 +394,7 @@ QLineEdit{
 } 
 QLabel{ font-weight : bold; }</string>
             </property>
-            <widget class="QFrame" name="phoneFrame">
+            <widget class="QFrame" name="emailFrame">
              <property name="geometry">
               <rect>
                <x>0</x>
@@ -409,7 +409,7 @@ QLabel{ font-weight : bold; }</string>
              <property name="frameShadow">
               <enum>QFrame::Shadow::Raised</enum>
              </property>
-             <widget class="QLabel" name="phoneLabel">
+             <widget class="QLabel" name="emailLabel">
               <property name="geometry">
                <rect>
                 <x>40</x>
@@ -419,10 +419,10 @@ QLabel{ font-weight : bold; }</string>
                </rect>
               </property>
               <property name="text">
-               <string>+86</string>
+               <string>邮箱</string>
               </property>
              </widget>
-             <widget class="QLineEdit" name="phoneNum">
+             <widget class="QLineEdit" name="emailNum">
               <property name="geometry">
                <rect>
                 <x>108</x>
@@ -432,7 +432,7 @@ QLabel{ font-weight : bold; }</string>
                </rect>
               </property>
               <property name="placeholderText">
-               <string>请输入手机号</string>
+               <string>请输入邮箱</string>
               </property>
              </widget>
              <widget class="QPushButton" name="authcodeBtn">

@@ -1,10 +1,13 @@
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
+#include <QValidator>
+
 #include "roletable.h"
 #include "ui_roletable.h"
 
-#include "util.h"
-#include "roletableitem.h"
 #include "edituserdialog.h"
 #include "model/datacenter.h"
+#include "roletableitem.h"
 #include "toast.h"
 
 RoleTable::RoleTable(QWidget *parent)
@@ -15,7 +18,7 @@ RoleTable::RoleTable(QWidget *parent)
 
     ui->userStatus->addItem("全部分类");
     ui->userStatus->addItem("启用");
-    ui->userStatus->addItem("停用");
+    ui->userStatus->addItem("禁用");
     ui->userStatus->setCurrentIndex(0);
 
     // 水平布局器中的元素向上对齐，否则如果只有一个元素会垂直居中
@@ -26,18 +29,18 @@ RoleTable::RoleTable(QWidget *parent)
     paginator->move(0, 20);
     paginator->show();
 
-    // 限制编辑框只能输入手机号
-    QRegularExpression regExp("^1\\d{10}$");
+    // 限制编辑框只能输入邮箱
+    QRegularExpression regExp(R"([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$)");
     QValidator* validator = new QRegularExpressionValidator(regExp, this);
-    ui->phone->setValidator(validator);
+    ui->email->setValidator(validator);
 
     connect(ui->resetBtn, &QPushButton::clicked, this, &RoleTable::onResetBtnClicked);
     connect(ui->queryBtn, &QPushButton::clicked, this, &RoleTable::onQueryBtnClicked);
     connect(ui->insertBtn, &QPushButton::clicked, this, &RoleTable::onInsertBtnClicked);
 
-    // 通过手机号或者管理员的状态信息进行获取管理员的信息
+    // 通过邮箱或者管理员的状态信息进行获取管理员的信息
     auto dataCenter = model::DataCenter::getInstance();
-    connect(dataCenter, &model::DataCenter::getAdminByPhoneDone, this, &RoleTable::updateAdminListUI);
+    connect(dataCenter, &model::DataCenter::getAdminByEmailDone, this, &RoleTable::updateAdminListUI);
     connect(dataCenter, &model::DataCenter::getAdminListByStatusDone, this, &RoleTable::updateAdminListUI);
     // 新增管理员
     connect(dataCenter, &model::DataCenter::newAdminDone, this, [=] {
@@ -63,7 +66,7 @@ void RoleTable::onResetBtnClicked()
     // 设置按钮样式
     ui->resetBtn->setStyleSheet(styleSheet["选中"]);
     ui->queryBtn->setStyleSheet(styleSheet["未选中"]);
-    ui->phone->setText("");
+    ui->email->setText("");
     ui->userStatus->setCurrentIndex(0);
 
     auto dataCenter = model::DataCenter::getInstance();
@@ -150,6 +153,7 @@ void RoleTable::onInsertBtnClicked()
     // 显示新增后台用户对话框
     model::AdminInfo adminInfo;
     EditUserDialog* editAdminDlg = new EditUserDialog(nullptr, "新增后台用户", adminInfo);
+    editAdminDlg->setEmailEditReadOnly(false);
     editAdminDlg->exec();
     // 如果用户确实点击了确认按钮，向服务器发送新增用户请求
     if(editAdminDlg->getCommitResult()){
@@ -165,15 +169,15 @@ void RoleTable::getAdminList(int page)
     auto dataCenter = model::DataCenter::getInstance();
     auto adminListPtr = dataCenter->getAdminsList();
     adminListPtr->adminList.clear();        // 先将旧的数据进行清空
-    // 优先按照手机号获取
-    const QString phoneNumber = ui->phone->text();
-    if(!phoneNumber.isEmpty()) {
-        // 通过手机号获取管理员信息
-        if(phoneNumber.size() != 11) {
-            Toast::showMessage("输入手机号有错，请重新输入！");
+    // 优先按邮箱获取
+    const QString email = ui->email->text();
+    if(!email.isEmpty()) {
+        // 通过邮箱获取管理员信息
+        if(!ui->email->hasAcceptableInput()) {
+            Toast::showMessage("输入邮箱有错，请重新输入！");
             return ;
         }
-        dataCenter->getAdminByPhoneAsync(phoneNumber);
+        dataCenter->getAdminByEmailAsync(email);
     } else {
         // 通过状态获取管理员信息
         model::AdminStatus videoStatus = static_cast<model::AdminStatus>(ui->userStatus->currentIndex());

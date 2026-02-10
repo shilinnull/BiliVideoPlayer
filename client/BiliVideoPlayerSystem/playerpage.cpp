@@ -1,16 +1,17 @@
+#include <QShortcut>
+#include <QKeySequence>
+#include <QJsonArray>
+
 #include "playerpage.h"
 #include "ui_playerpage.h"
 
-#include "util.h"
+#include "bilivideoplayer.h"
+#include "bulletscreenitem.h"
 #include "login.h"
 #include "toast.h"
+#include "util.h"
 #include "volume.h"
-#include "bulletscreenitem.h"
-#include <QShortcut>
-#include <QKeySequence>
-#include <QTimer>
-#include "bilivideoplayer.h"
-#include <QJsonArray>
+#include "model/datacenter.h"
 
 PlayerPage::PlayerPage(const model::VideoInfo& videoInfo, QWidget *parent)
     : QWidget(parent)

@@ -1,8 +1,10 @@
 #ifndef PageSwitchButton_H
 #define PageSwitchButton_H
 
-#include <QPushButton>
 #include <QLabel>
+#include <QMouseEvent>
+#include <QPushButton>
+#include <QString>
 
 class PageSwitchButton : public QPushButton
 {

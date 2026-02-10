@@ -1,17 +1,18 @@
 #ifndef PLAYERPAGE_H
 #define PLAYERPAGE_H
 
-#include <QWidget>
-#include <QMouseEvent>
 #include <QDialog>
 #include <QFrame>
+#include <QHash>
+#include <QMouseEvent>
+#include <QPixmap>
+#include <QWidget>
 
-#include "volume.h"
-#include "playspeed.h"
-#include "mpv/mpvplayer.h"
-#include "model/datacenter.h"
-#include "model/data.h"
 #include "login.h"
+#include "model/data.h"
+#include "mpv/mpvplayer.h"
+#include "playspeed.h"
+#include "volume.h"
 
 namespace Ui {
 class PlayerPage;

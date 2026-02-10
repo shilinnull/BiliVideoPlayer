@@ -3,7 +3,11 @@
 
 #include <QFrame>
 #include <QLabel>
+#include <QPixmap>
 #include <QPropertyAnimation>
+#include <QString>
+
+#include <cstdint>
 
 class BulletScreenInfo
 {

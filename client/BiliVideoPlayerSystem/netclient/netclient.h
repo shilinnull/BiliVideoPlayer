@@ -1,8 +1,12 @@
 #ifndef NETCLIENT_H
 #define NETCLIENT_H
 
-#include <QObject>
+#include <QJsonObject>
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QObject>
+#include <QWidget>
+
 #include "model/data.h"
 
 namespace network {
@@ -41,21 +45,21 @@ public:
                           int pageIndex,
                           const QString& whichPage);        // 获取指定用户视频列表
     void getStatusVideoList(int videoStatus, int pageIndex);// 获取状态视频列表
-    void getAuthcode(const QString& phoneNum);              // 获取验证码
-    void loginWithMessage(const QString& phoneNum,
+    void getAuthcode(const QString& email);                 // 获取验证码
+    void loginWithEmail(const QString& email,
                           const QString& authcode,
                           const QString& authcodeId);       // 验证码登录
-    void loginWithPassword(const QString& phoneNum,
+    void loginWithPassword(const QString& userName,
                            const QString& password);        // 账号密码登录
     void loginSession();                                    // 会话登录
     void logout();                                          // 退出登录
     void setPassword(const QString& newPassword);           // 设置密码
     void setNickName(const QString& nickName);              // 修改昵称
-    void getAdminByPhone(const QString &phoneNumber);       // 通过手机号获取管理员信息
-    void getAdminListByStatus(int pageIndex, model::AdminStatus adminStatus);    // 通过状态获取管理员列表-获取管理员列表
-    void newAdmin(const model::AdminInfo& adminInfo);        // 新增管理员
-    void editAdmin(const model::AdminInfo& userInfo);        // 编辑管理员
-    void setAdminStatus(const model::AdminInfo& userInfo);   // 设置管理员状态
+    void getAdminByEmail(const QString &email);       // 通过邮箱获取管理员信息
+    void getAdminListByStatus(int pageIndex, model::AdminStatus adminStatus);    // 通过状态获取管理员列表
+    void newAdmin(const model::AdminInfo& adminInfo);       // 新增管理员
+    void editAdmin(const model::AdminInfo& userInfo);       // 编辑管理员
+    void setAdminStatus(const model::AdminInfo& userInfo);  // 设置管理员状态
     void delAdmin(const QString& adminId);                  // 删除管理员
 
 private:

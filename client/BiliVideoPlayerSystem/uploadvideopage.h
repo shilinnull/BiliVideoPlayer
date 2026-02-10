@@ -1,8 +1,12 @@
 #ifndef UPLOADVIDEOPAGE_H
 #define UPLOADVIDEOPAGE_H
 
+#include <QString>
 #include <QWidget>
+
 #include "./mpv/mpvplayer.h"
+
+#include <cstdint>
 
 namespace Ui {
 class UploadVideoPage;

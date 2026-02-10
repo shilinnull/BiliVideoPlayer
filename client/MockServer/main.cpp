@@ -1,8 +1,7 @@
-#include "server.h"
-
 #include <QApplication>
 #include <QWidget>
 
+#include "server.h"
 #include "util.h"
 
 int main(int argc, char *argv[])

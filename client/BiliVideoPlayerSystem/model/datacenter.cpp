@@ -1,9 +1,11 @@
-#include "datacenter.h"
-
-#include <QJsonArray>
-#include <QStandardPaths>
 #include <QDir>
+#include <QFile>
+#include <QJsonArray>
 #include <QJsonDocument>
+#include <QJsonObject>
+#include <QStandardPaths>
+
+#include "datacenter.h"
 #include "util.h"
 
 namespace model {
@@ -430,19 +432,19 @@ void DataCenter::getStatusVideoListAsync(int videoStatus, int pageIndex)
     netClient.getStatusVideoList(videoStatus, pageIndex);
 }
 
-void DataCenter::getAuthcodeAsync(const QString &phoneNum)
+void DataCenter::getAuthcodeAsync(const QString &emial)
 {
-    netClient.getAuthcode(phoneNum);
+    netClient.getAuthcode(emial);
 }
 
-void DataCenter::loginWithMessageAsync(const QString &phoneNum, const QString &authcode, const QString &authcodeId)
+void DataCenter::loginWithEmailAsync(const QString &email, const QString &authcode, const QString &authcodeId)
 {
-    netClient.loginWithMessage(phoneNum, authcode, authcodeId);
+    netClient.loginWithEmail(email, authcode, authcodeId);
 }
 
-void DataCenter::loginWithPasswordAsync(const QString &phoneNum, const QString &password)
+void DataCenter::loginWithPasswordAsync(const QString &userName, const QString &password)
 {
-    netClient.loginWithPassword(phoneNum, password);
+    netClient.loginWithPassword(userName, password);
 }
 
 void DataCenter::loginSessionAsync()
@@ -481,7 +483,7 @@ void DataCenter::setAdminsList(const QJsonObject &adminsJson, bool isAdminStatus
             adminListPtr->addAdminInfo(adminInfo);
         }
     } else {
-        // 通过手机号
+        // 通过邮箱获取管理员信息，目前只有一个管理员信息
         AdminInfo adminInfo;
         adminInfo.loadAdminInfo(adminsJson["userInfo"].toObject());
         adminListPtr->addAdminInfo(adminInfo);
@@ -497,9 +499,9 @@ AdminList *DataCenter::getAdminsList()
     return adminListPtr;
 }
 
-void DataCenter::getAdminByPhoneAsync(const QString &phoneNumber)
+void DataCenter::getAdminByEmailAsync(const QString &email)
 {
-    netClient.getAdminByPhone(phoneNumber);
+    netClient.getAdminByEmail(email);
 }
 
 void DataCenter::getAdminListByStatusAsync(int pageIndex, AdminStatus adminStatus)

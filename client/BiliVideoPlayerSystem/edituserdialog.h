@@ -1,9 +1,10 @@
 #ifndef EDITUSERDIALOG_H
 #define EDITUSERDIALOG_H
 
-#include <QWidget>
 #include <QDialog>
-#include "model/datacenter.h"
+#include <QString>
+
+#include "model/data.h"
 
 namespace Ui {
 class EditUserDialog;
@@ -17,7 +18,7 @@ public:
     explicit EditUserDialog(QWidget *parent, const QString& text, model::AdminInfo& adminInfo);
     ~EditUserDialog();
     bool getCommitResult()const;     // 确认用户是否提交
-    void setPhoneEditReadOnly(bool isReadOnly = true);  // 设置手机号是否只读
+    void setEmailEditReadOnly(bool isReadOnly = true);  // 设置邮箱是否只读
 
 private slots:
     void onCancelBtnClicked();

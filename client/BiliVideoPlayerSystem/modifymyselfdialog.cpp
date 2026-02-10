@@ -1,10 +1,11 @@
 #include "modifymyselfdialog.h"
 #include "ui_modifymyselfdialog.h"
 
-#include <QGraphicsDropShadowEffect>
-#include "util.h"
-#include "newpassworddialog.h"
+#include <QIcon>
+
 #include "model/datacenter.h"
+#include "newpassworddialog.h"
+#include "util.h"
 
 ModifyMyselfDialog::ModifyMyselfDialog(QWidget *parent)
     : QDialog(parent)
@@ -16,7 +17,7 @@ ModifyMyselfDialog::ModifyMyselfDialog(QWidget *parent)
     // 加载个人数据到界面上
     auto dataCenter = model::DataCenter::getInstance();
     auto myself = dataCenter->getMyselfInfo();
-    ui->phoneNumberLabel->setText(hidePhoneNum(myself->phoneNum));
+    ui->emailNumberLabel->setText(hideEmail(myself->email));
     ui->nicknameEdit->setText(myself->nickname);
 
     setWindowIcon(QIcon(":/images/homePage/logo.png"));

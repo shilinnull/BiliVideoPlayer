@@ -1,8 +1,11 @@
 #ifndef ROLETABLEITEM_H
 #define ROLETABLEITEM_H
 
+#include <QMap>
+#include <QString>
 #include <QWidget>
-#include "model/datacenter.h"
+
+#include "model/data.h"
 
 namespace Ui {
 class RoleTableItem;
@@ -21,7 +24,7 @@ private:
     // 更新界面
     void updateUI(int seqNumber);
     // 检测当前登录用户是否是管理员自己
-    bool logUserisAdminMyself(const QString& text);
+    bool logUserIsAdminMyself(const QString& text);
 
 private slots:
     void onEditBtnClicked();        // 编辑按钮点击

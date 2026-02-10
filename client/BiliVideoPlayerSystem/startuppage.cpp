@@ -1,4 +1,9 @@
 #include "startuppage.h"
+
+#include <QLabel>
+#include <QPixmap>
+#include <QTimer>
+
 #include "./model/datacenter.h"
 #include "util.h"
 

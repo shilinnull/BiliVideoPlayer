@@ -1,7 +1,7 @@
 #include "volume.h"
 #include "ui_volume.h"
 
-#include "util.h"
+#include <QCursor>
 
 Volume::Volume(QWidget *parent)
     : QWidget(parent)

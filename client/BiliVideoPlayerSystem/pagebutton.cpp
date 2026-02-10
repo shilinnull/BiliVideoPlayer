@@ -1,5 +1,8 @@
 #include "pagebutton.h"
 
+#include <QSize>
+#include <QString>
+
 PageButton::PageButton(int page, QWidget *parent)
     : QPushButton{parent}
 {

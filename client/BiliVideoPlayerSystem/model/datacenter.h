@@ -1,10 +1,15 @@
 #ifndef DATACENTER_H
 #define DATACENTER_H
 
+#include <QByteArray>
+#include <QHash>
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QObject>
+#include <QString>
 
-#include "data.h"
 #include "../netclient/netclient.h"
+#include "data.h"
 
 namespace model {
 
@@ -65,20 +70,20 @@ public:
                                int pageIndex,
                                const QString& whichPage);       // 获取我的视频列表
     void getStatusVideoListAsync(int videoStatus,int pageIndex);// 获取状态视频列表
-    void getAuthcodeAsync(const QString& phoneNum);             // 获取验证码
-    void loginWithMessageAsync(const QString& phoneNum,
+    void getAuthcodeAsync(const QString& email);                // 获取验证码
+    void loginWithEmailAsync(const QString& email,
                                 const QString& authcode,
-                                const QString& authcodeId);     // 验证码登录
-    void loginWithPasswordAsync(const QString& phoneNum,
+                                const QString& authcodeId);     // 邮箱登录
+    void loginWithPasswordAsync(const QString& userName,
                                 const QString& password);       // 账号密码登录
     void loginSessionAsync();                                   // 会话登录
     void logoutAsync();                                         // 退出登录
     void setPasswordAsync(const QString& password);             // 设置密码
     void setNickNameAsync(const QString& nickName);             // 修改昵称
     void setAdminsList(const QJsonObject& adminJson,            // 设置管理员列表
-                      bool isAdminStatus = true);               // 是否使用管理员状态进行获取，false: 使用手机号
+                      bool isAdminStatus = true);               // 是否使用管理员状态进行获取，false: 使用邮箱
     AdminList* getAdminsList();                                 // 获取管理员列表
-    void getAdminByPhoneAsync(const QString& phoneNumber);      // 通过手机号获取管理员列表
+    void getAdminByEmailAsync(const QString& email);      // 通过邮箱获取管理员列表
     void getAdminListByStatusAsync(int pageIndex, AdminStatus adminStatus);  // 通过状态获取管理员列表
     void newAdminAsync(const AdminInfo& userInfo);              // 新增管理员信息
     void editAdminAsync(const AdminInfo& userInfo);             // 编辑管理员
@@ -129,8 +134,8 @@ signals:
                               const QString& whichPage);            // 获取我的视频列表完毕
     void getStatusVideoListDone();                                  // 获取状态视频列表完成
     void getAuthcodeDone(const QString& authcodeId);                // 获取验证码完毕
-    void loginWithMessageDone();                                    // 验证码登录完毕
-    void loginWithMessageFailed(const QString& errorInfo);          // 验证码登录失败
+    void loginWithEmailDone();                                      // 验证码登录完毕
+    void loginWithEmailFailed(const QString& errorInfo);            // 验证码登录失败
     void loginWithPasswordDone();                                   // 账号密码登录成功
     void loginWithPasswordFailed(const QString& errorInfo);         // 账号密码登录失败
     void loginSessionDone(bool isTemper);                           // 会话登录成功
@@ -138,7 +143,7 @@ signals:
     void logoutDone();                                              // 退出登录成功
     void setPasswordDone();                                         // 设置密码成功
     void setNickNameDone(const QString& nickName);                  // 修改昵称成功
-    void getAdminByPhoneDone();                                     // 通过手机号获取管理员列表完毕
+    void getAdminByEmailDone();                                     // 通过邮箱获取管理员列表完毕
     void getAdminListByStatusDone();                                // 通过状态获取管理员列表完毕
     void newAdminDone();                                            // 新增管理员完毕
     void editAdminDone();                                           // 编辑管理员完毕

@@ -1,10 +1,12 @@
 #ifndef DATA_H
 #define DATA_H
 
-#include <QString>
-#include <QList>
 #include <QHash>
+#include <QList>
 #include <QJsonObject>
+#include <QString>
+
+#include <cstdint>
 
 namespace model{
 
@@ -138,19 +140,19 @@ enum IdentityType{
 
 // 管理员状态
 enum AdminStatus{
-    noAdminStatus,   // 无状态
-    enable,           // 启用
-    disable          // 禁用
+    NoAdminStatus,   // 无状态
+    Enable,          // 启用
+    Disable          // 禁用
 };
 
 // 管理员信息
 class AdminInfo{
 public:
     QString userId;                 // 用户Id
-    QString phone;                  // 手机号
+    QString email;                  // 邮箱
     model::RoleType roleType;       // 用户角色
     QString nickName;               // 用户昵称
-    AdminStatus userStatu;         // 用户状态
+    AdminStatus userStatu;          // 用户状态
     QString remark;                 // 备注
     void loadAdminInfo(const QJsonObject& jsonObj);
 };
@@ -170,7 +172,7 @@ public:
 class UserInfo{
 public:
     QString userId;
-    QString phoneNum;
+    QString email;
     QString nickname;
     QList<int> roleType;
     QList<int> identityType;
@@ -179,7 +181,7 @@ public:
     int64_t followedCount;
     int64_t followerCount;
     int userStatus;
-    int isFollowing;
+    bool isFollowing;
     QString userMemo;
     QString userCTime;
     QString avatarFileId;

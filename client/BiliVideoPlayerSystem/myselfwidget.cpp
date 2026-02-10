@@ -1,15 +1,17 @@
-#include "myselfwidget.h"
-#include "ui_myselfwidget.h"
-#include "videobox.h"
-#include "modifymyselfdialog.h"
-#include "bilivideoplayer.h"
-#include "model/datacenter.h"
-#include "toast.h"
-#include "confirmdialog.h"
-
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QScrollBar>
 
+#include "myselfwidget.h"
+#include "ui_myselfwidget.h"
+
+#include "bilivideoplayer.h"
+#include "confirmdialog.h"
+#include "model/datacenter.h"
+#include "modifymyselfdialog.h"
+#include "toast.h"
+#include "util.h"
+#include "videobox.h"
 
 AttentionButton::AttentionButton(QWidget *parent)
     : QPushButton(parent)

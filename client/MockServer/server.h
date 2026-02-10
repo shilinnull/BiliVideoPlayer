@@ -1,10 +1,16 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include <QObject>
 #include <QHttpServer>
-#include <QHttpServerResponse>
 #include <QHttpServerRequest>
+#include <QHttpServerResponse>
+#include <QHash>
+#include <QList>
+#include <QMap>
+#include <QObject>
+#include <QString>
+
+#include <cstdint>
 
 enum RoleType{
     SuperAdmin = 1, // 超级管理员
@@ -71,7 +77,7 @@ private:
     QHttpServerResponse logout(const QHttpServerRequest& req);          // 退出登录
     QHttpServerResponse setPassword(const QHttpServerRequest& req);     // 设置用户密码
     QHttpServerResponse setNickname(const QHttpServerRequest& req);     // 设置用户昵称
-    QHttpServerResponse getAdminByPhone(const QHttpServerRequest &req); // 通过手机号获取管理员信息
+    QHttpServerResponse getAdminByEmail(const QHttpServerRequest &req); // 通过邮箱获取管理员信息
     QHttpServerResponse getAdminListByStatus(const QHttpServerRequest &req);// 通过管理员状态获取管理员信息
     QHttpServerResponse newAdministrator(const QHttpServerRequest &req);// 新增管理员
     QHttpServerResponse setAdministrator(const QHttpServerRequest &req);// 编辑管理员

@@ -1,8 +1,10 @@
 #ifndef HomePageWidget_H
 #define HomePageWidget_H
 
-#include <QWidget>
 #include <QPushButton>
+#include <QList>
+#include <QString>
+#include <QWidget>
 
 namespace Ui {
 class HomePageWidget;

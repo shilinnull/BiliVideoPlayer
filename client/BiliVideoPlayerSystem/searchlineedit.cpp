@@ -1,7 +1,8 @@
 #include "searchlineedit.h"
-#include "util.h"
 
+#include <QCursor>
 #include <QHBoxLayout>
+#include <QPixmap>
 
 SearchLineEdit::SearchLineEdit(QWidget *parent)
     : QLineEdit{parent}

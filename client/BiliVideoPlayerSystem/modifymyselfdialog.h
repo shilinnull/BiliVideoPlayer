@@ -2,6 +2,7 @@
 #define MODIFYMYSELFDIALOG_H
 
 #include <QDialog>
+#include <QString>
 
 namespace Ui {
 class ModifyMyselfDialog;

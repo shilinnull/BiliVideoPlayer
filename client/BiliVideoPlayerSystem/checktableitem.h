@@ -1,7 +1,10 @@
 #ifndef CHECKTABLEITEM_H
 #define CHECKTABLEITEM_H
 
+#include <QMap>
+#include <QPixmap>
 #include <QWidget>
+
 #include "model/datacenter.h"
 #include "playerpage.h"
 

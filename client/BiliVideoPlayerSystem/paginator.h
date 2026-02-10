@@ -1,8 +1,11 @@
 #ifndef PAGINATOR_H
 #define PAGINATOR_H
 
-#include <QWidget>
 #include <QLineEdit>
+#include <QList>
+#include <QPushButton>
+#include <QWidget>
+
 #include "pagebutton.h"
 
 class Paginator : public QWidget

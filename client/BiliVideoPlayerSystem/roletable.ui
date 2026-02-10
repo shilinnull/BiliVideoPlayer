@@ -82,7 +82,7 @@
           <number>27</number>
          </property>
          <item>
-          <widget class="QWidget" name="adminPhoneBox" native="true">
+          <widget class="QWidget" name="adminEmailBox" native="true">
            <property name="minimumSize">
             <size>
              <width>345</width>
@@ -112,14 +112,14 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QLabel" name="phoneLabel">
+             <widget class="QLabel" name="emailLabel">
               <property name="text">
-               <string>用户手机号：</string>
+               <string>用户邮箱：</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="phone">
+             <widget class="QLineEdit" name="email">
               <property name="minimumSize">
                <size>
                 <width>0</width>
@@ -133,7 +133,7 @@
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">#phone{ 
+               <string notr="true">#email{ 
 	background : #FFFFFF; 
 	border-radius : 4px; 
 	border : 1px solid #DCDEE0; 
@@ -141,7 +141,7 @@
 }</string>
               </property>
               <property name="placeholderText">
-               <string>请输入手机号：</string>
+               <string>请输入邮箱：</string>
               </property>
              </widget>
             </item>
@@ -492,7 +492,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="telphoneLabel">
+          <widget class="QLabel" name="emailNumLabel">
            <property name="minimumSize">
             <size>
              <width>220</width>
@@ -506,7 +506,7 @@
             </size>
            </property>
            <property name="text">
-            <string>手机号</string>
+            <string>邮箱</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignmentFlag::AlignCenter</set>

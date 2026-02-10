@@ -1,11 +1,11 @@
 #ifndef SearchLineEdit_H
 #define SearchLineEdit_H
 
-#include <QLineEdit>
 #include <QEvent>
-#include <QPushButton>
 #include <QLabel>
-#include <QWidget>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QString>
 
 
 class SearchLineEdit : public QLineEdit

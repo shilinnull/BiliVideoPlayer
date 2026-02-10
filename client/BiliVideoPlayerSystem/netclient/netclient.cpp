@@ -1,14 +1,17 @@
-#include "netclient.h"
-
-#include <QtNetwork/QNetworkRequest>
-#include <QtNetwork/QNetworkReply>
-#include <QJsonObject>
+#include <QFile>
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QJsonObject>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QStandardPaths>
+#include <QUrl>
+#include <QUrlQuery>
+
+#include "netclient.h"
 #include "../util.h"
 #include "model/datacenter.h"
-#include <QUrlQuery>
 
 namespace network {
 
@@ -794,12 +797,12 @@ void NetClient::getStatusVideoList(int videoStatus, int pageIndex)
     });
 }
 
-void NetClient::getAuthcode(const QString &phoneNum)
+void NetClient::getAuthcode(const QString &email)
 {
     auto dataCenter = model::DataCenter::getInstance();
     QJsonObject reqBody;
     reqBody["sessionId"] = dataCenter->getLoginSessionId();
-    reqBody["phoneNumber"] = phoneNum;
+    reqBody["email"] = email;
 
     QNetworkReply* httpReply = sendHttpRequest("/HttpService/getCode", reqBody);
 
@@ -822,12 +825,12 @@ void NetClient::getAuthcode(const QString &phoneNum)
     });
 }
 
-void NetClient::loginWithMessage(const QString &phoneNum, const QString &authcode, const QString &authcodeId)
+void NetClient::loginWithEmail(const QString &email, const QString &authcode, const QString &authcodeId)
 {
     auto dataCenter = model::DataCenter::getInstance();
     QJsonObject reqBody;
     reqBody["sessionId"] = dataCenter->getLoginSessionId();
-    reqBody["phoneNumber"] = phoneNum;
+    reqBody["email"] = email;
     reqBody["verifyCode"] = authcode;
     reqBody["codeId"] = authcodeId;
 
@@ -841,21 +844,21 @@ void NetClient::loginWithMessage(const QString &phoneNum, const QString &authcod
 
         if(!ok){
             LOG()<<"vcodeLogin 请求出错，reason = "<<reason;
-            emit dataCenter->loginWithMessageFailed(reason);
+            emit dataCenter->loginWithEmailFailed(reason);
             return;
         }
 
-        emit dataCenter->loginWithMessageDone();
+        emit dataCenter->loginWithEmailDone();
         LOG()<<"vcodeLogin 成功, resquestId = "<<replyObj["requestId"].toString();
     });
 }
 
-void NetClient::loginWithPassword(const QString &phoneNum, const QString &password)
+void NetClient::loginWithPassword(const QString &userName, const QString &password)
 {
     auto dataCenter = model::DataCenter::getInstance();
     QJsonObject reqBody;
     reqBody["sessionId"] = dataCenter->getLoginSessionId();
-    reqBody["phoneNumber"] = phoneNum;
+    reqBody["username"] = userName;
     reqBody["password"] = password;
 
 
@@ -970,27 +973,27 @@ void NetClient::setNickName(const QString &nickName)
     });
 }
 
-void NetClient::getAdminByPhone(const QString &phoneNumber)
+void NetClient::getAdminByEmail(const QString &email)
 {
     auto dataCenter = model::DataCenter::getInstance();
     QJsonObject reqBody;
     reqBody["sessionId"] = dataCenter->getLoginSessionId();
-    reqBody["phoneNumber"] = phoneNumber;
+    reqBody["email"] = email;
 
-    QNetworkReply* httpReply = sendHttpRequest("/HttpService/getAdminByPhone", reqBody);
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/getAdminByEmail", reqBody);
     connect(httpReply, &QNetworkReply::finished, this, [=](){
         bool ok = false;
         QString reason;
         QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
 
         if(!ok){
-            LOG()<<"getAdminByPhone 请求出错，reason = "<<reason;
+            LOG()<<"getAdminByEmail 请求出错，reason = "<<reason;
             return;
         }
         dataCenter->setAdminsList(replyObj["result"].toObject(), false);
 
-        emit dataCenter->getAdminByPhoneDone();
-        LOG()<<"getAdminByPhone 成功, resquestId = "<<replyObj["requestId"].toString();
+        emit dataCenter->getAdminByEmailDone();
+        LOG()<<"getAdminByEmail 成功, resquestId = "<<replyObj["requestId"].toString();
     });
 }
 
@@ -1028,9 +1031,9 @@ void NetClient::newAdmin(const model::AdminInfo &adminInfo)
     QJsonObject adminJson;
     adminJson["nickname"] = adminInfo.nickName;
     adminJson["roleType"] = static_cast<int>(adminInfo.roleType);
-    adminJson["userStatu"] = static_cast<int>(adminInfo.userStatu);
+    adminJson["userStatus"] = static_cast<int>(adminInfo.userStatu);
     adminJson["userMemo"] = adminInfo.remark;
-    adminJson["phoneNumber"] = adminInfo.phone;
+    adminJson["email"] = adminInfo.email;
     reqJsonObj["userInfo"] = adminJson;
 
     QNetworkReply* httpReply = sendHttpRequest("/HttpService/newAdministrator", reqJsonObj);

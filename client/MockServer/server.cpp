@@ -1,10 +1,9 @@
-#include "server.h"
-
+#include <QDir>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonArray>
-#include <QtGlobal>
-#include <QDir>
+
+#include "server.h"
 #include "util.h"
 
 MockServer::MockServer()
@@ -186,9 +185,9 @@ bool MockServer::init()
         return this->haltVideo(req);
     });
 
-    // 通过手机号获取管理员信息
-    httpServer.route("/HttpService/getAdminByPhone", [=](const QHttpServerRequest& req){
-        return this->getAdminByPhone(req);
+    // 通过邮箱获取管理员信息
+    httpServer.route("/HttpService/getAdminByEmail", [=](const QHttpServerRequest& req){
+        return this->getAdminByEmail(req);
     });
     // 通过管理员状态获取管理员信息
     httpServer.route("/HttpService/getAdminListByStatus", [=](const QHttpServerRequest& req){
@@ -1062,7 +1061,7 @@ QHttpServerResponse MockServer::getUserInfo(const QHttpServerRequest &req)
     if(userId.isEmpty()) {
         // 获取个人信息
         userInfoObj["userId"] = "1000001";    // 用户id
-        userInfoObj["phoneNum"] = "15012345678";   // 手机号码
+        userInfoObj["email"] = "zhangsan@example.com"; // 邮箱
         userInfoObj["nickname"] = "张三";    // 用户昵称
 
         // 角色类型：0-未知，1-超级管理员，2-普通管理员，3-普通用户，4-临时用户
@@ -1088,7 +1087,7 @@ QHttpServerResponse MockServer::getUserInfo(const QHttpServerRequest &req)
     } else {
         // 获取其他用户信息
         userInfoObj["userId"] = "1000002";
-        userInfoObj["phoneNum"] = "15022345678";
+        userInfoObj["email"] = "lisi@example.com";
         userInfoObj["nickname"] = "李四";
 
         // 角色类型：0-未知，1-超级管理员，2-普通管理员，3-普通用户，4-临时用户
@@ -1207,8 +1206,8 @@ QHttpServerResponse MockServer::getCode(const QHttpServerRequest &req)
     LOG()<<"[getCode] 收到 getCode 请求， requestId = "
           <<jsonReq["requestId"].toString();
 
-    QString phoneNum = jsonReq["phoneNumber"].toString();
-    LOG() << "给手机号: " << phoneNum << "发送验证码: 123456";
+    QString email = jsonReq["email"].toString();
+    LOG() << "给邮箱: " << email << "发送验证码: 123456";
 
 
     QJsonObject jsonResp;
@@ -1235,16 +1234,16 @@ QHttpServerResponse MockServer::vcodeLogin(const QHttpServerRequest &req)
     LOG()<<"[vcodeLogin] 收到 vcodeLogin 请求， requestId = "
           <<jsonReq["requestId"].toString();
 
-    QString phoneNum = jsonReq["phoneNumber"].toString();
+    QString email = jsonReq["email"].toString();
     QString authcode = jsonReq["verifyCode"].toString();
     QString codeId = jsonReq["codeId"].toString();
-    LOG() << "给手机号: " << phoneNum << "发送验证码: " << authcode << "验证码id: " << codeId;
+    LOG() << "给邮箱: " << email << "发送验证码: " << authcode << "验证码id: " << codeId;
 
     int errorCode = 0;
     QString errorMsg;
-    if(phoneNum != "10000000000") {
+    if(email != "256652753@qq.com") {
         errorCode = 600;
-        errorMsg = "手机号输入有误！";
+        errorMsg = "邮箱输入有误！";
     }
     if(authcode != "123456") {
         errorCode  = 601;
@@ -1275,15 +1274,15 @@ QHttpServerResponse MockServer::passwdLogin(const QHttpServerRequest &req)
     LOG()<<"[passwdLogin] 收到 passwdLogin 请求， requestId = "
           <<jsonReq["requestId"].toString();
 
-    QString phoneNum = jsonReq["phoneNumber"].toString();
+    QString userName = jsonReq["username"].toString();
     QString password = jsonReq["password"].toString();
-    LOG() << "passwdLogin 收到账户: " << phoneNum << "登录密码: " << password;
+    LOG() << "passwdLogin 收到账户: " << userName << "登录密码: " << password;
 
     int errorCode = 0;
     QString errorMsg;
-    if(phoneNum != "10000000000") {
+    if(userName != "256652753@qq.com") {
         errorCode = 603;
-        errorMsg = "手机号输入有误！";
+        errorMsg = "账号输入有误！";
     }
     if(password != "hello123"){
         errorCode = 604;
@@ -1393,14 +1392,14 @@ QHttpServerResponse MockServer::setNickname(const QHttpServerRequest &req)
     return httpResp;
 }
 
-QHttpServerResponse MockServer::getAdminByPhone(const QHttpServerRequest &req)
+QHttpServerResponse MockServer::getAdminByEmail(const QHttpServerRequest &req)
 {
     QJsonDocument docReq = QJsonDocument::fromJson(req.body());
     const QJsonObject& jsonReq = docReq.object();
-    LOG() << "[getAdminByPhone] 收到 getAdminByPhone 请求, requestId="
+    LOG() << "[getAdminByEmail] 收到 getAdminByEmail 请求, requestId="
           << jsonReq["requestId"].toString();
-    QString phoneNumber = jsonReq["phoneNumber"].toString();
-    LOG()<<"管理员手机号: "<< phoneNumber;
+    QString email = jsonReq["email"].toString();
+    LOG()<<"管理员邮箱: "<< email;
 
     // 构造响应体
     QJsonObject jsonBody;
@@ -1413,7 +1412,7 @@ QHttpServerResponse MockServer::getAdminByPhone(const QHttpServerRequest &req)
     userInfoJson["userId"] = QString::number(userId);
     userInfoJson["nickname"] = "平台管理员";
     userInfoJson["roleType"] = 2; // 平台管理员
-    userInfoJson["phoneNumber"] = phoneNumber;
+    userInfoJson["email"] = email;
     userInfoJson["userStatu"] = rand()%2 + 1; // 状态为1-启用 2-禁止
     userInfoJson["userMemo"] = "我是一个平台管理员，我拥有审核视频等权限";
 
@@ -1457,15 +1456,15 @@ QHttpServerResponse MockServer::getAdminListByStatus(const QHttpServerRequest &r
     QStringList remarks = {"视频审核", "运营人员", "后台工作人员"};
     QStringList nickNames = {"张三", "李四", "王五", "赵六", "田七", "七七", "小小七"};
     int userId = 1234;
-    long long phoneNumber = 17612344321;
+    const QString email = "256652753@qq.com";
     for(int i = 0; i < pageCount;++i){
         QJsonObject adminInfoJson;
         adminInfoJson["userId"] = QString::number(userId++);
         adminInfoJson["nickname"] = nickNames[rand()%7];
         adminInfoJson["roleType"] = (rand() % 2) + 1; // 1-超级管理员 2-平台管理员
-        adminInfoJson["phoneNumber"] = QString::number(phoneNumber++);
+        adminInfoJson["email"] = email;
         if(0 == adminStatus){
-            adminInfoJson["userStatu"] = rand()%2 + 1; // 状态为1-启用 2-禁止
+            adminInfoJson["userStatus"] = rand()%2 + 1; // 状态为1-启用 2-禁止
         }else{
             // 获取所有状态为禁止 或者 启用 的管理员
             adminInfoJson["userStatu"] = adminStatus;
@@ -1492,8 +1491,6 @@ QHttpServerResponse MockServer::newAdministrator(const QHttpServerRequest &req)
           << jsonReq["requestId"].toString();
 
     QJsonObject adminJson = jsonReq["userInfo"].toObject();
-    LOG()<<"新增管理员信息：";
-    LOG()<<"nickName: "<<adminJson["nickname"].toString();
 
     int roleType = adminJson["roleType"].toInt();
     if(1 == roleType){
@@ -1508,8 +1505,8 @@ QHttpServerResponse MockServer::newAdministrator(const QHttpServerRequest &req)
     }else if(2 == userStatue){
         LOG()<<"userStatu: 禁止";
     }
-    LOG()<<"userMemo: "<<adminJson["userMemo"].toString();
-    LOG()<<"phoneNum: "<<adminJson["phoneNumber"].toString();
+    LOG()<<"新增管理员备注："<<adminJson["userMemo"].toString();
+    LOG()<<"管理员邮箱信息: "<<adminJson["nickname"].toString();
 
     // 构造响应体
     QJsonObject jsonBody;

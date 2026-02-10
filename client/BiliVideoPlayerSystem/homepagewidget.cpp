@@ -1,12 +1,12 @@
-#include "homepagewidget.h"
-#include "ui_homepagewidget.h"
-#include "util.h"
-#include "videobox.h"
-
-#include "./model/datacenter.h"
-
 #include <QVBoxLayout>
 #include <QScrollBar>
+
+#include "homepagewidget.h"
+#include "ui_homepagewidget.h"
+
+#include "model/datacenter.h"
+#include "util.h"
+#include "videobox.h"
 
 HomePageWidget::HomePageWidget(QWidget *parent)
     : QWidget(parent)

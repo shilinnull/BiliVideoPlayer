@@ -1,7 +1,9 @@
 #ifndef CHECKTABLE_H
 #define CHECKTABLE_H
 
+#include <QString>
 #include <QWidget>
+
 #include "paginator.h"
 
 namespace Ui {

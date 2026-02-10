@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QLabel>
+#include <QString>
 
 class ConfirmDialog : public QDialog
 {

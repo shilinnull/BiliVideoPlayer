@@ -1,7 +1,10 @@
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
+#include <QValidator>
+
 #include "checktable.h"
 #include "ui_checktable.h"
 
-#include "util.h"
 #include "checktableitem.h"
 #include "model/datacenter.h"
 #include "toast.h"

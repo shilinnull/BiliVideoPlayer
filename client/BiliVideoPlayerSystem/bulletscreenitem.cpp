@@ -1,6 +1,7 @@
 #include "bulletscreenitem.h"
 
 #include <QHBoxLayout>
+#include <QPoint>
 
 BulletScreenInfo::BulletScreenInfo(const QString &userId, int64_t playTime, const QString &text)
     : userId(userId)

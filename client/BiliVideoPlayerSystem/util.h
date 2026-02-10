@@ -98,4 +98,11 @@ static inline QString hidePhoneNum(const QString& phoneNum) {
     return phoneNum.left(3) +"****" + phoneNum.right(4);
 }
 
+// 隐藏邮箱
+static inline QString hideEmail(const QString& email) {
+    int pos = email.indexOf('@');
+    return email.left(3) + QString(pos - 3, '*') + email.mid(pos);
+}
+
+
 #endif // UTIL_H

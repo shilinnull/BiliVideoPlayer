@@ -1,10 +1,15 @@
 #include "videobox.h"
 #include "ui_videobox.h"
-#include "util.h"
-#include "model/datacenter.h"
-#include <QDir>
-#include <QPixmap>
+
+#include <QAction>
+#include <QBrush>
+#include <QCursor>
 #include <QMenu>
+#include <QPalette>
+
+#include "model/datacenter.h"
+#include "playerpage.h"
+#include "util.h"
 
 PlayerPage* VideoBox::playPage = nullptr;
 

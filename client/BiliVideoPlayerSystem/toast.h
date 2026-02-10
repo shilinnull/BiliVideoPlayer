@@ -2,6 +2,8 @@
 #define TOAST_H
 
 #include <QDialog>
+#include <QString>
+#include <QWidget>
 
 class Toast : public QDialog
 {

@@ -1,7 +1,10 @@
 #ifndef ROLETABLE_H
 #define ROLETABLE_H
 
+#include <QMap>
+#include <QString>
 #include <QWidget>
+
 #include "paginator.h"
 
 namespace Ui {

@@ -1,7 +1,9 @@
 #include "paginator.h"
 
 #include <QHBoxLayout>
+#include <QIcon>
 #include <QLabel>
+
 #include "pagebutton.h"
 
 Paginator::Paginator(int count, QWidget *parent)

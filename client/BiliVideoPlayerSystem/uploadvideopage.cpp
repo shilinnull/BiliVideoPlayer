@@ -1,11 +1,16 @@
+#include <QFileDialog>
+#include <QFile>
+#include <QLayoutItem>
+#include <QPixmap>
+#include <QTextCursor>
+
 #include "uploadvideopage.h"
 #include "ui_uploadvideopage.h"
+
 #include "bilivideoplayer.h"
 #include "model/datacenter.h"
-#include "util.h"
 #include "toast.h"
-
-#include <QFileDialog>
+#include "util.h"
 
 UploadVideoPage::UploadVideoPage(QWidget *parent)
     : QWidget(parent)

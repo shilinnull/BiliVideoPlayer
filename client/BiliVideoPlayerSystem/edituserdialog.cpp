@@ -1,7 +1,13 @@
 #include "edituserdialog.h"
 #include "ui_edituserdialog.h"
 
+#include <QPoint>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
+#include <QTextCursor>
+
 #include "bilivideoplayer.h"
+#include "model/datacenter.h"
 #include "toast.h"
 
 EditUserDialog::EditUserDialog(QWidget *parent, const QString& text, model::AdminInfo& adminInfo)
@@ -18,23 +24,24 @@ EditUserDialog::EditUserDialog(QWidget *parent, const QString& text, model::Admi
     BiliVideoPlayer* player = BiliVideoPlayer::getInstance();
     this->move(player->mapToGlobal(QPoint(0, 0)));
 
-    // 限制手机号
-    QRegularExpression regExp("^1\\d{10}$");
+    // 限制邮箱
+    QRegularExpression regExp(R"([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$)");
     QValidator* validator = new QRegularExpressionValidator(regExp, this);
-    ui->phoneEdit->setValidator(validator);
+    ui->emailEdit->setValidator(validator);
 
     // 设置管理员角色
     ui->roleComboBox->addItem("平台管理员");
     ui->roleComboBox->setCurrentIndex(0);
     // 如果id不空，说明是编辑用户，否则是新增用户
     if(!adminInfo.userId.isEmpty()){
-        ui->phoneEdit->setText(adminInfo.phone);
+        ui->emailEdit->setText(adminInfo.email);
         // 目前角色只有一个
         if(model::Admin == adminInfo.roleType){
             ui->roleComboBox->setCurrentIndex(0);
         }
+
         ui->nameEdit->setText(adminInfo.nickName);
-        if(model::enable == adminInfo.userStatu){
+        if(model::Enable == adminInfo.userStatu){
             ui->startRadioBtn->setChecked(true);
         }else{
             ui->stopRadioBtn->setChecked(true);
@@ -70,9 +77,9 @@ bool EditUserDialog::getCommitResult() const
     return isCommit;
 }
 
-void EditUserDialog::setPhoneEditReadOnly(bool isReadOnly)
+void EditUserDialog::setEmailEditReadOnly(bool isReadOnly)
 {
-    ui->phoneEdit->setReadOnly(isReadOnly);
+    ui->emailEdit->setReadOnly(isReadOnly);
 }
 
 void EditUserDialog::onCancelBtnClicked()
@@ -82,23 +89,29 @@ void EditUserDialog::onCancelBtnClicked()
 
 void EditUserDialog::onSubmitBtnClicked()
 {
-    adminInfo.phone = ui->phoneEdit->text();
-    // 角色只能选择平台管理员
-    adminInfo.roleType = model::Admin;
-    adminInfo.nickName = ui->nameEdit->text();
-    model::AdminStatus adminStatus = model::enable;
-    if(!ui->startRadioBtn->isChecked()){
-        adminStatus = model::disable;
+    if(!ui->emailEdit->hasAcceptableInput()) {
+        Toast::showMessage("管理员邮箱格式有误！");
+        return ;
     }
+    model::AdminStatus adminStatus = model::Enable;
+    adminInfo.userStatu = adminStatus;
 
-    // 注意：禁止管理员自己禁用自己
+    // 禁止管理员自己禁用自己
     auto dataCenter = model::DataCenter::getInstance();
     auto myselfInfo = dataCenter->getMyselfInfo();
     if(myselfInfo->userId == adminInfo.userId && adminStatus != adminInfo.userStatu){
         Toast::showMessage("禁止管理员启用或禁用自己！");
         return;
     }
-    adminInfo.userStatu = adminStatus;
+    adminInfo.email = ui->emailEdit->text();
+
+    if(!ui->startRadioBtn->isChecked()){
+        adminStatus = model::Disable;
+    }
+
+    // 角色只能选择平台管理员
+    adminInfo.roleType = model::Admin;
+    adminInfo.nickName = ui->nameEdit->text();
     adminInfo.remark = ui->commentTextEdit->toPlainText();
     isCommit = true;
 
