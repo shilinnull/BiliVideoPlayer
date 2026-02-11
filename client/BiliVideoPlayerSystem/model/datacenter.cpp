@@ -4,6 +4,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QStandardPaths>
+#include <QSettings>
 
 #include "datacenter.h"
 #include "util.h"
@@ -122,7 +123,20 @@ void DataCenter::loadDataFile()
     for(int i = 0; i < identityTypeArray.count(); i++) {
         myselfInfo->identityType.append(identityTypeArray[i].toInt());
     }
-    LOG() << "读入内存的数据:" << jsonObj;
+
+    // 从文件中读取配置信息
+    QDir dir(QDir::currentPath());
+    QString configPath = dir.absolutePath();
+    configPath += "/config.ini";
+
+    // 读取ini文件信息
+    QSettings config(configPath, QSettings::IniFormat);
+    config.beginGroup("server");    // 进入session节
+    serverURL += "http://";
+    serverURL += config.value("serverIp").toString();
+    serverURL += ":";
+    serverURL += config.value("serverPort").toString();
+    LOG() << serverURL;
 }
 
 const QString &DataCenter::getServerUrl() const
@@ -532,8 +546,10 @@ void DataCenter::delAdminAsync(const QString &adminId)
 DataCenter::DataCenter(QObject *parent)
     : QObject{parent}
 {
+    // 加载配置文件数据
+    loadDataFile();
+    // 先构造好netClient设置好url
     netClient.setServerUrl(serverURL);
-    loadDataFile(); // 加载session文件数据
 }
 
 DataCenter::~DataCenter()

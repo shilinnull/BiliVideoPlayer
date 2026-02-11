@@ -94,7 +94,7 @@ private:
     explicit DataCenter(QObject *parent = nullptr);
     ~DataCenter();
     static DataCenter* instance;
-    QString serverURL = "http://127.0.0.1:8000";
+    QString serverURL;
     network::NetClient netClient;
     KindAndTag* kindsAndTags = nullptr;
     QString loginSessionId = "";					// 当前客户端登录到服务器会话的id

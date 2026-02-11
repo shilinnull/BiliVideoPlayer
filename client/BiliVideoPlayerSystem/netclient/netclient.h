@@ -15,7 +15,7 @@ class NetClient : public QObject
     Q_OBJECT
 public:
     NetClient(QObject *parent = nullptr);
-    void setServerUrl(const QString& url);         // 设置服务器地址
+    void setServerUrl(const QString& url);  // 设置服务器地址
     void tempLogin();						// 临时用户登录请求
     void getAllVideoList();					// 获取所有视频
     void getAllVideosInKind(int kindId);	// 获取分类下的所有视频
