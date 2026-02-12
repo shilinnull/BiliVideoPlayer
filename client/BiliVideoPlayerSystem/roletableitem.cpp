@@ -16,22 +16,37 @@ RoleTableItem::RoleTableItem(QWidget *parent, model::AdminInfo& adminInfo, int s
     updateUI(seqNumber);    // 更新界面UI
     connect(ui->editBtn, &QPushButton::clicked, this, &RoleTableItem::onEditBtnClicked);
     auto dataCenter = model::DataCenter::getInstance();
-    connect(dataCenter, &model::DataCenter::editAdminDone, this, [=]{
+    connect(dataCenter, &model::DataCenter::editAdminDone, this, [=](const QString& adminId){
+        // 修改当前项的管理员信息时再更新到界面
+        if(adminId != adminInfo.userId) {
+            return ;
+        }
         ui->emailLabel->setText(this->adminInfo.email);
         ui->nameLabel->setText(this->adminInfo.nickName);
         // 设置启用和禁用状态
         if(model::Enable == this->adminInfo.userStatu) {
-            ui->statusButton->setText("禁用");
-        } else if(model::Disable == this->adminInfo.userStatu){
             ui->statusButton->setText("启用");
+        } else if(model::Disable == this->adminInfo.userStatu){
+            ui->statusButton->setText("禁用");
         }
         // 修改按钮样式
         ui->statusButton->setStyleSheet(styleSheet[ui->statusButton->text()]);
         // 设置备注
         ui->commentLabel->setText(this->adminInfo.remark);
+
+        // 更新dataCenter
+        auto& adminLists = dataCenter->getAdminsList()->adminList;
+        for(auto& admin : adminLists){
+            if(admin.userId == adminId){
+                admin.nickName = this->adminInfo.nickName;
+                admin.userStatu = this->adminInfo.userStatu;
+                admin.remark = this->adminInfo.remark;
+                break;
+            }
+        }
     });
     // 状态按钮点击
-    connect(ui->statusButton, &QPushButton::clicked, this, &RoleTableItem::onStatusBtnClicked);
+    // connect(ui->statusButton, &QPushButton::clicked, this, &RoleTableItem::onStatusBtnClicked);
     connect(ui->delBtn, &QPushButton::clicked, this, &RoleTableItem::onDelBtnClicked);
 }
 
@@ -83,11 +98,12 @@ void RoleTableItem::updateUI(int seqNumber)
 
     // 状态
     if(model::Enable == adminInfo.userStatu){
-        ui->statusButton->setText("禁用");
-    }else if(model::Disable == adminInfo.userStatu){
         ui->statusButton->setText("启用");
+    }else if(model::Disable == adminInfo.userStatu){
+        ui->statusButton->setText("禁用");
     }
     ui->statusButton->setStyleSheet(styleSheet[ui->statusButton->text()]);
+    ui->statusButton->setEnabled(false);
 
     // 超级管理员不允许启用或禁用，但保留按钮可点以弹出提示
     ui->commentLabel->setText(adminInfo.remark);
@@ -117,9 +133,9 @@ void RoleTableItem::onEditBtnClicked()
     adminInfo.email = ui->emailLabel->text();
     adminInfo.nickName = ui->nameLabel->text();
     if(ui->statusButton->text() == "启用"){
-        adminInfo.userStatu = model::Disable;
-    }else{
         adminInfo.userStatu = model::Enable;
+    }else{
+        adminInfo.userStatu = model::Disable;
     }
     adminInfo.remark = ui->commentLabel->text();
     // 在编辑页面修改管理员信息

@@ -731,7 +731,7 @@ void NetClient::setAvatar(const QString &fileId)
     });
 }
 
-void NetClient::getUserVideoList(const QString &userId, int pageIndex, const QString& whichPage)
+void NetClient::getUserVideoList(const QString &userId, int pageIndex, model::VideoStatus videoStatus, const QString& whichPage)
 {
     auto dataCenter = model::DataCenter::getInstance();
     QJsonObject reqBody;
@@ -741,6 +741,7 @@ void NetClient::getUserVideoList(const QString &userId, int pageIndex, const QSt
     }
     reqBody["pageIndex"] = pageIndex;
     reqBody["pageCount"] = model::VideoList::PAGE_COUNT;
+    reqBody["videoStatus"] = videoStatus;
 
     QNetworkReply* httpReply = sendHttpRequest("/HttpService/userVideoList", reqBody);
 
@@ -1053,16 +1054,16 @@ void NetClient::newAdmin(const model::AdminInfo &adminInfo)
     });
 }
 
-void NetClient::editAdmin(const model::AdminInfo &userInfo)
+void NetClient::editAdmin(const model::AdminInfo &adminInfo)
 {
     auto dataCenter = model::DataCenter::getInstance();
     QJsonObject reqJsonObj;
     reqJsonObj["sessionId"] = dataCenter->getLoginSessionId();
     QJsonObject adminJson;
-    adminJson["userId"] = userInfo.userId;
-    adminJson["nickname"] = userInfo.nickName;
-    adminJson["userStatus"] = static_cast<int>(userInfo.userStatu);
-    adminJson["userMemo"] = userInfo.remark;
+    adminJson["userId"] = adminInfo.userId;
+    adminJson["nickname"] = adminInfo.nickName;
+    adminJson["userStatus"] = static_cast<int>(adminInfo.userStatu);
+    adminJson["userMemo"] = adminInfo.remark;
     reqJsonObj["userInfo"] = adminJson;
 
     QNetworkReply* httpReply = sendHttpRequest("/HttpService/setAdministrator", reqJsonObj);
@@ -1076,7 +1077,7 @@ void NetClient::editAdmin(const model::AdminInfo &userInfo)
             return;
         }
 
-        emit dataCenter->editAdminDone();
+        emit dataCenter->editAdminDone(adminInfo.userId);
         LOG()<<"setAdministrator 成功, resquestId = "<<replyObj["requestId"].toString();
     });
 }

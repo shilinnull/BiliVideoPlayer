@@ -76,8 +76,11 @@ void VideoBox::showMoreBtn(bool isShow)
 
 void VideoBox::onPlayBtnClicked()
 {
-    // 获取1
+    // 获取弹幕
     auto dataCenter = model::DataCenter::getInstance();
+    // 断开弹幕获取成功所绑定的所有槽函数
+    disconnect(dataCenter, &model::DataCenter::getVideoBarrageDone, nullptr, nullptr);
+    // 获取弹幕成功的信号槽绑定
     connect(dataCenter, &model::DataCenter::getVideoBarrageDone, this, &VideoBox::getVideoBarrageSuccess);
     dataCenter->getVideoBarrageAsync(videoInfo.videoId);
 }

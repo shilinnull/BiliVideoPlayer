@@ -436,9 +436,9 @@ VideoList *DataCenter::getStatusVideoList()
     return statusVideoList;
 }
 
-void DataCenter::getUserVideoListAsync(const QString &userId, int pageIndex, const QString& whichPage)
+void DataCenter::getUserVideoListAsync(const QString &userId, int pageIndex, VideoStatus videoStatus, const QString& whichPage)
 {
-    netClient.getUserVideoList(userId, pageIndex, whichPage);
+    netClient.getUserVideoList(userId, pageIndex, videoStatus, whichPage);
 }
 
 void DataCenter::getStatusVideoListAsync(int videoStatus, int pageIndex)
@@ -528,9 +528,9 @@ void DataCenter::newAdminAsync(const AdminInfo &userInfo)
     netClient.newAdmin(userInfo);
 }
 
-void DataCenter::editAdminAsync(const AdminInfo &userInfo)
+void DataCenter::editAdminAsync(const AdminInfo &adminId)
 {
-    netClient.editAdmin(userInfo);
+    netClient.editAdmin(adminId);
 }
 
 void DataCenter::setAdminStatusAsync(const AdminInfo &userInfo)

@@ -68,6 +68,7 @@ public:
     VideoList* getStatusVideoList();                            // 设置状态下的视频列表
     void getUserVideoListAsync(const QString& userId,
                                int pageIndex,
+                               VideoStatus videoStatus,
                                const QString& whichPage);       // 获取我的视频列表
     void getStatusVideoListAsync(int videoStatus,int pageIndex);// 获取状态视频列表
     void getAuthcodeAsync(const QString& email);                // 获取验证码
@@ -86,7 +87,7 @@ public:
     void getAdminByEmailAsync(const QString& email);      // 通过邮箱获取管理员列表
     void getAdminListByStatusAsync(int pageIndex, AdminStatus adminStatus);  // 通过状态获取管理员列表
     void newAdminAsync(const AdminInfo& userInfo);              // 新增管理员信息
-    void editAdminAsync(const AdminInfo& userInfo);             // 编辑管理员
+    void editAdminAsync(const AdminInfo& adminId);                // 编辑管理员
     void setAdminStatusAsync(const AdminInfo& userInfo);        // 设置管理员用户状态
     void delAdminAsync(const QString& adminId);                 // 删除管理员
 
@@ -146,7 +147,7 @@ signals:
     void getAdminByEmailDone();                                     // 通过邮箱获取管理员列表完毕
     void getAdminListByStatusDone();                                // 通过状态获取管理员列表完毕
     void newAdminDone();                                            // 新增管理员完毕
-    void editAdminDone();                                           // 编辑管理员完毕
+    void editAdminDone(const QString& adminInfo);                   // 编辑管理员完毕
     void setAdminStatusDone();                                      // 设置用户状态完成
     void delAdminDone();                                            // 删除管理员完毕
 

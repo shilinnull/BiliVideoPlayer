@@ -103,6 +103,8 @@ void CheckTable::onQueryBtnClicked()
     if(myselfInfo->isAdminDisable()) {
         Toast::showMessage("您已经被禁止了，无法进行操作");
     } else {
+        // 点击查询按钮查询时，获取管理员状态，通过分⻚器按钮查询时则无需获取
+        videoStatus = static_cast<model::VideoStatus>(ui->videoStatus->currentIndex());
         getVideoList(1);
     }
 }
@@ -117,11 +119,15 @@ void CheckTable::getVideoList(int page)
     // 优先按照用户ID获取视频
     QString userId = ui->userIdEdit->text();
     if(!userId.isEmpty()) {
+        // 获取指定用户视频列表
+        if(!ui->userIdEdit->hasAcceptableInput()){
+            Toast::showMessage("上传视频用户id格式错误！");
+            return;
+        }
         // 获取指定用户视频
-        dataCenter->getUserVideoListAsync(userId, page, "checkPage");
+        dataCenter->getUserVideoListAsync(userId, page, model::noStatus, "checkPage");
     } else {
         // 获取状态视频列表
-        model::VideoStatus videoStatus = static_cast<model::VideoStatus>(ui->videoStatus->currentIndex());
         dataCenter->getStatusVideoListAsync(videoStatus, page);
     }
 }

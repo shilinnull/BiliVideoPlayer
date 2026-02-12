@@ -26,7 +26,7 @@ class BulletScreenItem : public QFrame
 public:
     explicit BulletScreenItem(QWidget *parent = nullptr);
     void setBulletScreenText(const QString &content);	// 设置弹幕文本
-    void setBulletScreenIcon(QPixmap& pixmap);			// 设置弹幕用户头像
+    void setBulletScreenIcon(const QPixmap& pixmap);			// 设置弹幕用户头像
     void setBulletScreenAnimal(int x, int duration);	// 添加动画
     void startAnimal();									// 开启动画
 private:

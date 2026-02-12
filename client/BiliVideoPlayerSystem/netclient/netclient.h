@@ -43,6 +43,7 @@ public:
     void setAvatar(const QString& fileId);                  // 设置用户头像
     void getUserVideoList(const QString& userId,
                           int pageIndex,
+                          model::VideoStatus videoStatus,
                           const QString& whichPage);        // 获取指定用户视频列表
     void getStatusVideoList(int videoStatus, int pageIndex);// 获取状态视频列表
     void getAuthcode(const QString& email);                 // 获取验证码
@@ -58,7 +59,7 @@ public:
     void getAdminByEmail(const QString &email);       // 通过邮箱获取管理员信息
     void getAdminListByStatus(int pageIndex, model::AdminStatus adminStatus);    // 通过状态获取管理员列表
     void newAdmin(const model::AdminInfo& adminInfo);       // 新增管理员
-    void editAdmin(const model::AdminInfo& userInfo);       // 编辑管理员
+    void editAdmin(const model::AdminInfo& adminInfo);      // 编辑管理员
     void setAdminStatus(const model::AdminInfo& userInfo);  // 设置管理员状态
     void delAdmin(const QString& adminId);                  // 删除管理员
 

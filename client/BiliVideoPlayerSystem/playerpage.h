@@ -76,6 +76,7 @@ private:
     QFrame* bottom;
     bool isStartBS = true;
     QHash<int64_t, QList<model::BarrageInfo>> bulletScreens;    // 获取当前播放下的所有数据
+    QByteArray loginUserAvatar;
 signals:
     void increasePlayCount(const QString& videoId);
     void updateLikeNum(int64_t likeCount);

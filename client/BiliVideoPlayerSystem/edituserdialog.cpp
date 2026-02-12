@@ -93,21 +93,22 @@ void EditUserDialog::onSubmitBtnClicked()
         Toast::showMessage("管理员邮箱格式有误！");
         return ;
     }
+    const model::AdminStatus oldStatus = adminInfo.userStatu;
     model::AdminStatus adminStatus = model::Enable;
-    adminInfo.userStatu = adminStatus;
+    if(!ui->startRadioBtn->isChecked()) {
+        adminStatus = model::Disable;
+    }
 
     // 禁止管理员自己禁用自己
     auto dataCenter = model::DataCenter::getInstance();
     auto myselfInfo = dataCenter->getMyselfInfo();
-    if(myselfInfo->userId == adminInfo.userId && adminStatus != adminInfo.userStatu){
+    if(myselfInfo->userId == adminInfo.userId && adminStatus != oldStatus){
         Toast::showMessage("禁止管理员启用或禁用自己！");
         return;
     }
-    adminInfo.email = ui->emailEdit->text();
 
-    if(!ui->startRadioBtn->isChecked()){
-        adminStatus = model::Disable;
-    }
+    adminInfo.userStatu = adminStatus;
+    adminInfo.email = ui->emailEdit->text();
 
     // 角色只能选择平台管理员
     adminInfo.roleType = model::Admin;

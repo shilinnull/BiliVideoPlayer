@@ -43,7 +43,7 @@ void BulletScreenItem::setBulletScreenText(const QString &content)
     text->adjustSize();
 }
 
-void BulletScreenItem::setBulletScreenIcon(QPixmap &pixmap)
+void BulletScreenItem::setBulletScreenIcon(const QPixmap &pixmap)
 {
     imageLabel->setPixmap(pixmap);
     imageLabel->show();

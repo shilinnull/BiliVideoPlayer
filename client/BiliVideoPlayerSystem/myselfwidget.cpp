@@ -128,7 +128,7 @@ void MyselfWidget::loadOtherUser(const QString &userId)
 void MyselfWidget::initUI()
 {
     ui->attentionBtn->hide();
-
+    ui->layout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 }
 
 void MyselfWidget::connectSignalAndSlots()
@@ -231,7 +231,7 @@ void MyselfWidget::getMyselfInfoDone()
 {
     // 1. 获取用户数据
     auto dataCenter = model::DataCenter::getInstance();
-    const auto* myself = dataCenter->getMyselfInfo();
+    auto* myself = dataCenter->getMyselfInfo();
     // 当前用户可能是普通用户、管理员、临时用户
     if(myself->isTempUser()){
         // 如果是临时用户
@@ -273,6 +273,7 @@ void MyselfWidget::getMyselfInfoDone()
     // 3. 设置头像
     if(myself->avatarFileId.isEmpty()) {
         ui->avatarBtn->setIcon(QIcon(":/images/myself/defaultAvatar.png"));
+        myself->userAvatarData = loadFileToByteArray(":/images/myself/defaultAvatar.png");
     } else {
         dataCenter->downloadPhotoAsync(myself->avatarFileId);
     }
@@ -306,7 +307,13 @@ void MyselfWidget::getOtherUserInfoDone()
     ui->fansCountLabel->setText(intToString2(otherUserInfo->followerCount));
     ui->likeCountLabel->setText(intToString2(otherUserInfo->likeCount));
     ui->playCountLabel->setText(intToString2(otherUserInfo->playCount));
-    ui->attentionBtn->changeStatus(otherUserInfo->isFollowing == 1);
+    auto myselfInfo = dataCenter->getMyselfInfo();
+    if(otherUserInfo->userId == myselfInfo->userId){
+        ui->attentionBtn->hide();
+    } else {
+        ui->attentionBtn->show();
+        ui->attentionBtn->changeStatus(otherUserInfo->isFollowing);
+    }
     ui->myVideoLabel->setText("TA的视频");
 
     // 4. 更新用户头像
@@ -324,6 +331,7 @@ void MyselfWidget::getAvatarDone(const QString &fileId, const QByteArray &data)
     // 获取自己的头像
     auto* myself = model::DataCenter::getInstance()->getMyselfInfo();
     if(myself != nullptr && myself->avatarFileId == fileId) {
+        myself->userAvatarData = data;
         ui->avatarBtn->setIcon(QIcon(makeCircleIcon(data, ui->avatarBtn->width() / 2)));
     }
     // 获取其他用户的头像
@@ -377,7 +385,7 @@ void MyselfWidget::onSCrollAreaValueChanged(int value)
     if(value == ui->scrollArea->verticalScrollBar()->maximum()) {
         auto dataCenter = model::DataCenter::getInstance();
         auto userVideoListPtr = dataCenter->getUserVideoList();
-        dataCenter->getUserVideoListAsync(userId, userVideoListPtr->getPageIndex(), "myPage");
+        dataCenter->getUserVideoListAsync(userId, userVideoListPtr->getPageIndex(), model::putaway, "myPage");
         userVideoListPtr->setPageIndex(userVideoListPtr->getPageIndex() + 1);
     }
 }
@@ -516,7 +524,7 @@ void MyselfWidget::getUserVideoList(const QString &userId, int pageIndex)
         userVideoList->clearVideoList();    // 清空视频列表
         clearVideoList();                   // 删除界面元素
     }
-    dataCenter->getUserVideoListAsync(userId, pageIndex, "myPage");
+    dataCenter->getUserVideoListAsync(userId, pageIndex, model::putaway, "myPage");
     // page+1，滚动条向下动时就可以获取下一页视频
     userVideoList->setPageIndex(pageIndex + 1);
 }

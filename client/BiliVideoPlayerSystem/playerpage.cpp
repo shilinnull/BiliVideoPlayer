@@ -100,7 +100,8 @@ void PlayerPage::startPlaying()
     mpvPlayer->startPlay(m3u8FileUrl);
 
     isUpdatePlayNum = false;
-    ui->videoSlider->setPlayStep(0);
+    ui->videoSlider->setPlayStep(0);// 设置进度条
+    setVolume(volume->getVolume()); // 设置音量
     // 视频加载成功之后会立马播放，初始时先将其设置为暂停状态，当用户点击播放按钮之后再让视频播放起来
     mpvPlayer->pause();
 }
@@ -109,12 +110,22 @@ void PlayerPage::buildBulletScreenData()
 {
     auto dataCenter = model::DataCenter::getInstance();
     bulletScreens = dataCenter->getBarragesData();
+
+    auto myselfInfo = dataCenter->getMyselfInfo();
+    if(myselfInfo) {
+        loginUserAvatar = myselfInfo->userAvatarData;
+    }
 }
 
 void PlayerPage::showBulletScreen()
 {
     // 弹幕关闭
     if(!isStartBS) return ;
+
+    // 获取当前用户登录id
+    auto dataCenter = model::DataCenter::getInstance();
+    auto myselfInfo = dataCenter->getMyselfInfo();
+    QString logUserId = myselfInfo->userId;
 
     // 通过时间获取弹幕数据
     QList<model::BarrageInfo> bulletScreenList = bulletScreens.value(mpvPlayer->getPlayTime());
@@ -145,6 +156,11 @@ void PlayerPage::showBulletScreen()
             int duration = 10000 * xBottom / (double)(30 * 18 + 1450);
             bs->setBulletScreenAnimal(xBottom + 2 * 18, duration);
             xBottom += bs->width() + 18 * 4;		// 同一行隔四个汉字，18为每个汉字的大小
+        }
+        // 如果是当前用户发送的弹幕，就需要带头像
+        if(logUserId == bsInfo.userId) {
+            // bs->setBulletScreenIcon(ui->userAvatar->icon().pixmap(30, 30));
+            bs->setBulletScreenIcon(makeCircleIcon(loginUserAvatar, 13).pixmap(26, 26));
         }
         bs->startAnimal();
     }
@@ -321,6 +337,8 @@ void PlayerPage::onSendBulletScreenBtnClicked(const QString &text)
     QPixmap pixmap(":/images/homePage/touxiang.png");
     bs->setBulletScreenIcon(pixmap);
     bs->setBulletScreenText(text);
+    bs->setBulletScreenIcon(makeCircleIcon(loginUserAvatar, 13).pixmap(26, 26));
+
     int duration = 10000 * width() / (double)(30 * 18 + 1450);
     bs->setBulletScreenAnimal(top->width(), duration);
     bs->startAnimal();
@@ -330,6 +348,10 @@ void PlayerPage::onSendBulletScreenBtnClicked(const QString &text)
     barrageInfo.text = text;
     barrageInfo.userId = myself->userId;
     dataCenter->loadupBarragesAsync(videoInfo.videoId, barrageInfo);
+
+    auto& barrageDatas = dataCenter->getBarragesData();
+    barrageDatas[barrageInfo.playTime].push_back(barrageInfo);
+    ui->bulletScreenText->setText("");
 }
 
 QString PlayerPage::secondToTime(int64_t second) const
@@ -434,42 +456,33 @@ void PlayerPage::updataPlayCount()
 
 void PlayerPage::onQuitBtnClicked()
 {
-    auto dataCenter = model::DataCenter::getInstance();
-    auto videoListPtr = dataCenter->getVideoListPtr();
     if(likeCount != videoInfo.likeCount){
         // 视频的点赞信息发生改变，给服务器同步
+        auto dataCenter = model::DataCenter::getInstance();
         dataCenter->setLikeNumberAsync(videoInfo.videoId);
 
-        // 更新视频列表中的videoId视频的点赞信息：首页 和 我的页面
+        // 更新首页视频列表
+        auto videoListPtr = dataCenter->getVideoListPtr();
         videoListPtr->updateLikeNum(videoInfo.videoId, likeCount);
+
+        // 更新我的页面中的视频列表
+        auto userVideoListPtr = dataCenter->getUserVideoList();
+        if(!userVideoListPtr->videoInfos.isEmpty()){
+            userVideoListPtr->updateLikeNum(videoInfo.videoId, likeCount);
+        }
+
+        // 更新状态页面中的视频列表
+        auto statusVideoListPtr = dataCenter->getStatusVideoList();
+        if(!statusVideoListPtr->videoInfos.isEmpty()){
+            statusVideoListPtr->updateLikeNum(videoInfo.videoId, likeCount);
+        }
+
         videoInfo.likeCount = likeCount;
 
         // 通知videoBox更新点赞数据
         emit updateLikeNum(likeCount);
     }
-    dataCenter->setBarragesData(QJsonArray());
 
-    // 更新首页视频列表 和 我的视频列表
-    videoListPtr->updateLikeNum(videoInfo.videoId, likeCount);
-
-    // 用户视频列表
-    auto myVideoList = dataCenter->getUserVideoList();
-    if(myVideoList->videoInfos.isEmpty()){
-        return;
-    }else{
-        myVideoList->updateLikeNum(videoInfo.videoId, likeCount);
-    }
-
-    // 管理员视频列表
-    auto statusVideoList = dataCenter->getStatusVideoList();
-    if(statusVideoList->videoInfos.isEmpty()){
-        return;
-    }else{
-        statusVideoList->updateLikeNum(videoInfo.videoId, likeCount);
-    }
-
-    // 释放掉，防止内存泄漏
-    this->close();
     this->deleteLater();
 }
 

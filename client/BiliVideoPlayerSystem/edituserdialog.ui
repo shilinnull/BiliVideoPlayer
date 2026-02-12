@@ -428,7 +428,7 @@ QRadioButton::indicator::checked { image: url(:/images/admin/checked.png); }
 QRadioButton::indicator::unchecked { image: url(:/images/admin/unchecked.png); }</string>
          </property>
          <property name="text">
-          <string>停用</string>
+          <string>禁用</string>
          </property>
         </widget>
        </widget>

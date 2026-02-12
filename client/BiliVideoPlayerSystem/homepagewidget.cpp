@@ -51,7 +51,9 @@ void HomePageWidget::initKindsAndTags()
 {
     // 创建分类按钮
     QPushButton* kindBtn = buildSelectBtn(ui->classifys, "#FF6699", "分类");
+    kindBtn->setObjectName("kindBtn");
     ui->classifyHLayout->addWidget(kindBtn);
+    connect(kindBtn, &QPushButton::clicked, this, &HomePageWidget::onKindsBtnClicked);
 
     // 到数据中心获取所有分类数据
     auto dataCenter = model::DataCenter::getInstance();
@@ -69,11 +71,6 @@ void HomePageWidget::initKindsAndTags()
 
     ui->classifyHLayout->setSpacing(8);
 
-    // 启动时默认显示第一个分类的标签
-    if(!kinds.isEmpty()) {
-        auto tags = kindAndTagPtr->getTagsByKind(kinds[0]).keys();
-        resetTags(tags);
-    }
 }
 
 void HomePageWidget::initRefreshAndTop()
@@ -137,9 +134,35 @@ void HomePageWidget::clearLayoutVideos()
 
 void HomePageWidget::onSearchVideos(const QString &searchText)
 {
-    videoListStyle = SearchStyle;
-
+    // 清除视频列表
     clearLayoutVideos();
+
+    // 选中分类和标签
+    curKind = "分类";
+    curTag = "标签";
+
+    // 清除标签和分类上的颜色
+    QList<QPushButton*> kindBtns = ui->classifys->findChildren<QPushButton*>();
+    for(auto &kindBtn : kindBtns) {
+        kindBtn->setStyleSheet("color: #666666");
+    }
+    QPushButton* kind = ui->classifys->findChild<QPushButton*>("kindBtn");
+    if(kind != nullptr) {
+        kind->setStyleSheet("background-color: #ffecf1;"
+                            "color: #666666;");
+    }
+
+    QList<QPushButton*> tagBtns = ui->labels->findChildren<QPushButton*>();
+    for(auto &tagBtn : tagBtns) {
+        tagBtn->setStyleSheet("color: #666666;");
+    }
+    QPushButton* tag = ui->labels->findChild<QPushButton*>("tagBtn");
+    if(tag != nullptr) {
+        tag->setStyleSheet("background-color: #ffecf1;"
+                           "color: #666666;");
+    }
+
+    videoListStyle = SearchStyle;
     // 在服务器上进行模糊搜索进行返回
     auto dataCenter = model::DataCenter::getInstance();
     dataCenter->getVideosBySearchTextAsync(searchText);
@@ -189,7 +212,9 @@ void HomePageWidget::resetTags(const QList<QString> &tags)
 {
     // 创建标签
     QPushButton* tag = buildSelectBtn(ui->labels, "#FF6699", "标签");
+    tag->setObjectName("tagBtn");
     ui->labelHLayout->addWidget(tag);
+    connect(tag, &QPushButton::clicked, this, &HomePageWidget::onTagsBtnClicked);
 
     // 创建具体标签的按钮
     for(auto &tagText : tags)
@@ -219,7 +244,7 @@ void HomePageWidget::onKindBtnClicked(QPushButton *clickKindBtn)
     QList<QPushButton*> kindBtns = ui->classifys->findChildren<QPushButton*>();
     for(auto &kindBtn : kindBtns)
     {
-        if(kindBtn != clickKindBtn && kindBtn->text() != "分类")
+        if(kindBtn != clickKindBtn)
             kindBtn->setStyleSheet("color: #666666");
     }
 
@@ -255,7 +280,7 @@ void HomePageWidget::onTagBtnClicked(QPushButton *clickLabelBtn)
     QList<QPushButton*> tagBtns = ui->labels->findChildren<QPushButton*>();
     for(auto &tagBtn : tagBtns)
     {
-        if(tagBtn != clickLabelBtn && tagBtn->text() != "标签")
+        if(tagBtn != clickLabelBtn)
             tagBtn->setStyleSheet("color: #666666;");
     }
     clearLayoutVideos();
@@ -312,4 +337,48 @@ void HomePageWidget::updateVideoList()
         ui->videoGLayout->addWidget(videoBox, i/4, i%4);
     }
     LOG()<<"添加到layout中视频个数："<<ui->videoGLayout->count();
+}
+
+void HomePageWidget::onKindsBtnClicked()
+{
+    // 只显示分类不显示标签
+    QList<QPushButton*> tagBtns = ui->labels->findChildren<QPushButton*>();
+    for(auto &tag : tagBtns) {
+        ui->labelHLayout->removeWidget(tag);
+        delete tag;
+    }
+    clearLayoutVideos();
+    QList<QPushButton*> kindBtns = ui->classifys->findChildren<QPushButton*>();
+    for(auto& kind : kindBtns) {
+        kind->setStyleSheet("color : #222222;");
+    }
+    QPushButton* kind = ui->classifys->findChild<QPushButton*>("kindBtn");
+    kind->setStyleSheet("background-color : #FFECF1;"
+                                "color : #FF6699;");
+
+    // 获取所有视频列表
+    curKind = "";
+    curTag = "";
+    videoListStyle = AllStyle;
+    auto dataCenter = model::DataCenter::getInstance();
+    dataCenter->getAllVideoListAsync();
+}
+
+void HomePageWidget::onTagsBtnClicked()
+{
+    clearLayoutVideos();
+    QList<QPushButton*> tagBtns = ui->labels->findChildren<QPushButton*>();
+    for(auto& tag : tagBtns) {
+        tag->setStyleSheet("color: #666666;");
+    }
+    QPushButton* tag = ui->labels->findChild<QPushButton*>("tagBtn");
+    tag->setStyleSheet("background-color : #FFECF1;"
+                        "color: #FF6699;");
+
+    // 获取所有视频列表
+    curTag = "";
+    videoListStyle = KindStyle;
+    auto dataCenter = model::DataCenter::getInstance();
+    auto kindAndTagPtr = dataCenter->getKindAndTagsClassPtr();
+    dataCenter->getAllVideoInKindAsync(kindAndTagPtr->getKindId(curKind));
 }

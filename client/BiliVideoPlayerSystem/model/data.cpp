@@ -235,6 +235,8 @@ void UserInfo::buildTempUser()
     userId = "";
     email = "";
     nickname = "临时用户";
+    roleType.clear();
+    identityType.clear();
     roleType.append(TempUser);
     identityType.append(CUser);
     likeCount = 0;

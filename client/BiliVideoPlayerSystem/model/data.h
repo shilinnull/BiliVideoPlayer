@@ -5,6 +5,7 @@
 #include <QList>
 #include <QJsonObject>
 #include <QString>
+#include <QByteArray>
 
 #include <cstdint>
 
@@ -185,6 +186,9 @@ public:
     QString userMemo;
     QString userCTime;
     QString avatarFileId;
+
+    // 用户头像数据
+    QByteArray userAvatarData; // 客户端自己使用
 
     void loadUserInfo(const QJsonObject& jsonObj);
     bool isBUser() const ;

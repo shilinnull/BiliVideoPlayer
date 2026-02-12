@@ -50,7 +50,6 @@ void BarrageEdit::onSendBulletScreenBtn()
         }
         // 发送弹幕
         emit onSendScreenBtn(barrageText);
-        setText("");
     }
 }
 
