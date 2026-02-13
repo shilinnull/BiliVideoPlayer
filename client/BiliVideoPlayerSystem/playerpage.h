@@ -52,6 +52,7 @@ private slots:
 private:
     QString secondToTime(int64_t second) const;           // 转换时间
     void initBarrageArea();							// 弹幕区域布局
+    void syncLoginUserAvatar();                    // 同步当前登录用户头像
     void updateVideoInfoUI();                       // 设置视频信息
     void updataPlayCount();                         // 更新播放数
     void onQuitBtnClicked();                        // 退出
@@ -75,7 +76,7 @@ private:
     QFrame* middle;
     QFrame* bottom;
     bool isStartBS = true;
-    QHash<int64_t, QList<model::BarrageInfo>> bulletScreens;    // 获取当前播放下的所有数据
+    QHash<int64_t, QList<model::BarrageInfo>> barrages;    // 获取当前播放下的所有弹幕
     QByteArray loginUserAvatar;
 signals:
     void increasePlayCount(const QString& videoId);

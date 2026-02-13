@@ -1082,8 +1082,8 @@ QHttpServerResponse MockServer::getUserInfo(const QHttpServerRequest &req)
         userInfoObj["userStatus"] = 0;      // 用户状态
         userInfoObj["isFollowing"] = 0;      // 是否关注
         userInfoObj["userMemo"] = "";       // 用户备注信息
-        userInfoObj["userTime"] = "2038-12-18 12:28:58"; // 用户创建时间
-        userInfoObj["avatarFileID"] = "10001";    // 用户图像id
+        userInfoObj["userCTime"] = "2038-12-18 12:28:58"; // 用户创建时间
+        userInfoObj["avatarFileId"] = "10001";    // 用户图像id
     } else {
         // 获取其他用户信息
         userInfoObj["userId"] = "1000002";
@@ -1109,7 +1109,7 @@ QHttpServerResponse MockServer::getUserInfo(const QHttpServerRequest &req)
         userInfoObj["isFollowing"] = 0;
         userInfoObj["userMemo"] = "";
         userInfoObj["userCTime"] = "2038-12-18 12:28:58";
-        userInfoObj["avatarFileIdx"] = "10001";
+        userInfoObj["avatarFileId"] = "20000";
     }
 
     QJsonObject resultObj;

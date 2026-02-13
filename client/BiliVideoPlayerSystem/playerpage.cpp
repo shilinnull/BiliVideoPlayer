@@ -69,6 +69,18 @@ PlayerPage::PlayerPage(const model::VideoInfo& videoInfo, QWidget *parent)
         }
         this->isLike = isLike;
     });
+    connect(dataCenter, &model::DataCenter::downloadPhotoDone, this,
+            [=](const QString& imageId, const QByteArray& imageData){
+        auto myselfInfo = dataCenter->getMyselfInfo();
+        if(myselfInfo == nullptr || myselfInfo->avatarFileId.isEmpty()) {
+            return;
+        }
+        if(imageId != myselfInfo->avatarFileId || imageData.isEmpty()) {
+            return;
+        }
+        myselfInfo->userAvatarData = imageData;
+        loginUserAvatar = imageData;
+    });
     dataCenter->getIsLikeVideoAsync(videoInfo.videoId);
 
 }
@@ -109,60 +121,98 @@ void PlayerPage::startPlaying()
 void PlayerPage::buildBulletScreenData()
 {
     auto dataCenter = model::DataCenter::getInstance();
-    bulletScreens = dataCenter->getBarragesData();
+    barrages = dataCenter->getBarragesData();
 
+    syncLoginUserAvatar();
+}
+
+void PlayerPage::syncLoginUserAvatar()
+{
+    auto dataCenter = model::DataCenter::getInstance();
     auto myselfInfo = dataCenter->getMyselfInfo();
-    if(myselfInfo) {
-        loginUserAvatar = myselfInfo->userAvatarData;
+    if(myselfInfo == nullptr) {
+        return;
     }
+    if(!myselfInfo->userAvatarData.isEmpty()) {
+        loginUserAvatar = myselfInfo->userAvatarData;
+        return;
+    }
+    if(myselfInfo->avatarFileId.isEmpty()) {
+        myselfInfo->userAvatarData = loadFileToByteArray(":/images/myself/defaultAvatar.png");
+        loginUserAvatar = myselfInfo->userAvatarData;
+        return;
+    }
+    dataCenter->downloadPhotoAsync(myselfInfo->avatarFileId);
 }
 
 void PlayerPage::showBulletScreen()
 {
-    // 弹幕关闭
-    if(!isStartBS) return ;
+    // 视频进入播放时再开始加载弹幕
+    if(!isPlay){
+        return;
+    }
 
-    // 获取当前用户登录id
+    // 如果打开关闭时，则不需要添加弹幕到界面
+    if(!isStartBS){
+        return;
+    }
+
+    // 1. 获取当前playTime点的所有弹幕
+    QList<model::BarrageInfo> bulletScrrenList = barrages.value(mpvPlayer->getPlayTime());
+    BulletScreenItem* bsItem = nullptr;
+
+    if(loginUserAvatar.isEmpty()) {
+        syncLoginUserAvatar();
+    }
+
+    // 获取当前登录用户ID
     auto dataCenter = model::DataCenter::getInstance();
     auto myselfInfo = dataCenter->getMyselfInfo();
+    if(myselfInfo == nullptr) {
+        return;
+    }
     QString logUserId = myselfInfo->userId;
 
-    // 通过时间获取弹幕数据
-    QList<model::BarrageInfo> bulletScreenList = bulletScreens.value(mpvPlayer->getPlayTime());
-    // 显示弹幕
-    int xTop, xMid, xBottom;
-    xTop = xMid = xBottom = top->width();
-    BulletScreenItem* bs = nullptr;
-    for(int i = 0; i < bulletScreenList.size(); i++) {
-        model::BarrageInfo& bsInfo = bulletScreenList[i];
-        if(0 == i % 3) {
-            // 显示第一行
-            bs = new BulletScreenItem(top);
-            bs->setBulletScreenText(bsInfo.text);
-            int duration = 10000 * xTop / (double)(30 * 18 + 1450);
-            bs->setBulletScreenAnimal(xTop, duration);
-            xTop += bs->width() + 18 * 4;		// 同一行隔四个汉字，18为每个汉字的大小
-        } else if(1 == i % 3) {
-            // 显示第二行
-            bs = new BulletScreenItem(middle);
-            bs->setBulletScreenText(bsInfo.text);
-            int duration = 10000 * xMid/ (double)(30 * 18 + 1450);
-            bs->setBulletScreenAnimal(xMid, duration);
-            xMid += bs->width() + 18 * 4;		// 同一行隔四个汉字，18为每个汉字的大小
-        } else {
-            // 显示第三行
-            bs = new BulletScreenItem(bottom);
-            bs->setBulletScreenText(bsInfo.text);
-            int duration = 10000 * xBottom / (double)(30 * 18 + 1450);
-            bs->setBulletScreenAnimal(xBottom + 2 * 18, duration);
-            xBottom += bs->width() + 18 * 4;		// 同一行隔四个汉字，18为每个汉字的大小
+    // 2. 将弹幕显示出来
+    int xTop, xMiddle, xBottom;
+    xTop = xMiddle = xBottom = top->width();
+    for(int i = 0; i < bulletScrrenList.size(); ++i){
+        model::BarrageInfo& bsInfo = bulletScrrenList[i];
+        if(0 == i%3){
+            // 弹幕显示在第一行
+            bsItem = new BulletScreenItem(top);
+            bsItem->setBulletScreenText(bsInfo.text);
+
+            // 给弹幕设置动画属性
+            int duration = 10000*xTop / (double)(top->width() + 30*18);
+            bsItem->setBulletScreenAnimal(xTop, duration);
+            xTop += bsItem->width() + 4*18;
+
+        }else if(1 == i%3){
+            // 弹幕显示在第二行
+            bsItem = new BulletScreenItem(middle);
+            bsItem->setBulletScreenText(bsInfo.text);
+
+            // 给弹幕设置动画属性
+            int duration = 10000*xMiddle / (double)(middle->width() + 30*18);
+            bsItem->setBulletScreenAnimal(xMiddle, duration);
+            xMiddle += bsItem->width() + 4*18;
+        }else{
+            // 弹幕显示在第三行
+            bsItem = new BulletScreenItem(bottom);
+            bsItem->setBulletScreenText(bsInfo.text);
+
+            // 给弹幕设置动画属性
+            int duration = 10000*xBottom / (double)(bottom->width() + 30*18);
+            bsItem->setBulletScreenAnimal(xBottom + 2*18, duration);
+            xBottom += bsItem->width() + 4*18;
         }
-        // 如果是当前用户发送的弹幕，就需要带头像
-        if(logUserId == bsInfo.userId) {
-            // bs->setBulletScreenIcon(ui->userAvatar->icon().pixmap(30, 30));
-            bs->setBulletScreenIcon(makeCircleIcon(loginUserAvatar, 13).pixmap(26, 26));
+
+        // 检测如果是当前用户发送的弹幕，显示弹幕时需要加上用户头像
+        if(bsInfo.userId == logUserId && !loginUserAvatar.isEmpty()){
+            bsItem->setBulletScreenIcon(makeCircleIcon(loginUserAvatar, 13).pixmap(26, 26));
         }
-        bs->startAnimal();
+        bsItem->startAnimal();
     }
 }
 
@@ -333,11 +383,15 @@ void PlayerPage::onSendBulletScreenBtnClicked(const QString &text)
         return;
     }
 
+    if(loginUserAvatar.isEmpty()) {
+        syncLoginUserAvatar();
+    }
+
     BulletScreenItem* bs = new BulletScreenItem(top);	// 显示到top栏上
-    QPixmap pixmap(":/images/homePage/touxiang.png");
-    bs->setBulletScreenIcon(pixmap);
     bs->setBulletScreenText(text);
-    bs->setBulletScreenIcon(makeCircleIcon(loginUserAvatar, 13).pixmap(26, 26));
+    if(!loginUserAvatar.isEmpty()) {
+        bs->setBulletScreenIcon(makeCircleIcon(loginUserAvatar, 13).pixmap(26, 26));
+    }
 
     int duration = 10000 * width() / (double)(30 * 18 + 1450);
     bs->setBulletScreenAnimal(top->width(), duration);
@@ -349,6 +403,7 @@ void PlayerPage::onSendBulletScreenBtnClicked(const QString &text)
     barrageInfo.userId = myself->userId;
     dataCenter->loadupBarragesAsync(videoInfo.videoId, barrageInfo);
 
+    // 本地需要再保存一份
     auto& barrageDatas = dataCenter->getBarragesData();
     barrageDatas[barrageInfo.playTime].push_back(barrageInfo);
     ui->bulletScreenText->setText("");
