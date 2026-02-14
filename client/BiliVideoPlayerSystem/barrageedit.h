@@ -1,9 +1,11 @@
 #ifndef BARRAGEEDIT_H
 #define BARRAGEEDIT_H
 
-#include <QWidget>
 #include <QLineEdit>
+#include <QMouseEvent>
 #include <QPushButton>
+#include <QString>
+
 #include "login.h"
 
 class BarrageEdit : public QLineEdit

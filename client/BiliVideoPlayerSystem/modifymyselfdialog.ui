@@ -39,33 +39,33 @@
     <string>修改个人资料</string>
    </property>
   </widget>
-  <widget class="QLabel" name="phoneLabel">
+  <widget class="QLabel" name="emailLabel">
    <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>82</x>
      <y>72</y>
-     <width>46</width>
+     <width>32</width>
      <height>19</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">#phoneLabel{ font-family: 微软雅⿊; font-size: 14px; color: #222222; }</string>
+    <string notr="true">#emailLabel{ font-family: 微软雅⿊; font-size: 14px; color: #222222; }</string>
    </property>
    <property name="text">
-    <string>手机号</string>
+    <string>邮箱</string>
    </property>
   </widget>
-  <widget class="QLabel" name="phoneNumberLabel">
+  <widget class="QLabel" name="emailNumberLabel">
    <property name="geometry">
     <rect>
-     <x>132</x>
+     <x>122</x>
      <y>72</y>
-     <width>161</width>
+     <width>252</width>
      <height>19</height>
     </rect>
    </property>
    <property name="text">
-    <string/>
+    <string>256652753@qq.com</string>
    </property>
   </widget>
   <widget class="QLabel" name="passwordLabel">
@@ -185,7 +185,7 @@
     <rect>
      <x>122</x>
      <y>172</y>
-     <width>258</width>
+     <width>252</width>
      <height>38</height>
     </rect>
    </property>

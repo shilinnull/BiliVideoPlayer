@@ -1,7 +1,9 @@
 #include "confirmdialog.h"
 
-#include "bilivideoplayer.h"
+#include <QFrame>
 #include <QPushButton>
+
+#include "bilivideoplayer.h"
 
 ConfirmDialog::ConfirmDialog(QWidget *parent)
     :QDialog(parent)
@@ -73,7 +75,7 @@ ConfirmDialog::ConfirmDialog(QWidget *parent)
     });
 }
 
-bool ConfirmDialog::isConfirmPass() const
+bool ConfirmDialog::isConfirmPress() const
 {
     return isConfirm;
 }

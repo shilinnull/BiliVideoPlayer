@@ -47,6 +47,8 @@ qt_add_executable(BiliVideoPlayerSystem
     netclient/netclient.h netclient/netclient.cpp
     test/TestHttp.h
     confirmdialog.h confirmdialog.cpp
+    biliPlayer.rc
+
 )
 
 include_directories(
@@ -116,6 +118,7 @@ qt_add_resources(
     images/uploadVideoPage/wenjian.png
     images/uploadVideoPage/xiala.png
     images/uploadVideoPage/xuanze.png
+    images/biliPlayer.ico
 )
 
 target_link_libraries(BiliVideoPlayerSystem

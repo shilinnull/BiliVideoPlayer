@@ -1,15 +1,17 @@
-#include "myselfwidget.h"
-#include "ui_myselfwidget.h"
-#include "videobox.h"
-#include "modifymyselfdialog.h"
-#include "bilivideoplayer.h"
-#include "model/datacenter.h"
-#include "toast.h"
-#include "confirmdialog.h"
-
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QScrollBar>
 
+#include "myselfwidget.h"
+#include "ui_myselfwidget.h"
+
+#include "bilivideoplayer.h"
+#include "confirmdialog.h"
+#include "model/datacenter.h"
+#include "modifymyselfdialog.h"
+#include "toast.h"
+#include "util.h"
+#include "videobox.h"
 
 AttentionButton::AttentionButton(QWidget *parent)
     : QPushButton(parent)
@@ -126,26 +128,7 @@ void MyselfWidget::loadOtherUser(const QString &userId)
 void MyselfWidget::initUI()
 {
     ui->attentionBtn->hide();
-
-#ifndef TEST_UI
-    // 往视频显示区域添加VideoBox-测试
-    int resourceId = 10000;
-    for(int i = 0; i < 20; ++i){
-        model::VideoInfo videoInfo;
-        resourceId++;
-        videoInfo.userAvatarId = "";
-        videoInfo.photoFileId = QString::number(resourceId++);
-        videoInfo.videoFileId = QString::number(resourceId++);
-        videoInfo.nickName = "用户昵称";
-        videoInfo.likeCount = 1234;
-        videoInfo.playCount = 23456;
-        videoInfo.videoTitle = "【北京旅游攻略】一条视频告诉你去了北京该怎么玩";
-        videoInfo.videoDuration = 10;
-        videoInfo.videoUpTime = "9-16 12:28:58";
-        VideoBox* videoBox =  new VideoBox(videoInfo);
-        ui->layout->addWidget(videoBox, i/4, i%4);
-    }
-#endif
+    ui->layout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 }
 
 void MyselfWidget::connectSignalAndSlots()
@@ -231,7 +214,7 @@ void MyselfWidget::onQuitBtnClicked()
     ConfirmDialog confirmDlg;
     confirmDlg.setOperatorText("确定退出登录吗？");
     confirmDlg.exec();
-    if(confirmDlg.isConfirmPass()) {
+    if(confirmDlg.isConfirmPress()) {
         auto dataCenter = model::DataCenter::getInstance();
         dataCenter->logoutAsync();      // 发送退出请求
     }
@@ -248,7 +231,7 @@ void MyselfWidget::getMyselfInfoDone()
 {
     // 1. 获取用户数据
     auto dataCenter = model::DataCenter::getInstance();
-    const auto* myself = dataCenter->getMyselfInfo();
+    auto* myself = dataCenter->getMyselfInfo();
     // 当前用户可能是普通用户、管理员、临时用户
     if(myself->isTempUser()){
         // 如果是临时用户
@@ -290,6 +273,7 @@ void MyselfWidget::getMyselfInfoDone()
     // 3. 设置头像
     if(myself->avatarFileId.isEmpty()) {
         ui->avatarBtn->setIcon(QIcon(":/images/myself/defaultAvatar.png"));
+        myself->userAvatarData = loadFileToByteArray(":/images/myself/defaultAvatar.png");
     } else {
         dataCenter->downloadPhotoAsync(myself->avatarFileId);
     }
@@ -323,7 +307,13 @@ void MyselfWidget::getOtherUserInfoDone()
     ui->fansCountLabel->setText(intToString2(otherUserInfo->followerCount));
     ui->likeCountLabel->setText(intToString2(otherUserInfo->likeCount));
     ui->playCountLabel->setText(intToString2(otherUserInfo->playCount));
-    ui->attentionBtn->changeStatus(otherUserInfo->isFollowing == 1);
+    auto myselfInfo = dataCenter->getMyselfInfo();
+    if(otherUserInfo->userId == myselfInfo->userId){
+        ui->attentionBtn->hide();
+    } else {
+        ui->attentionBtn->show();
+        ui->attentionBtn->changeStatus(otherUserInfo->isFollowing);
+    }
     ui->myVideoLabel->setText("TA的视频");
 
     // 4. 更新用户头像
@@ -341,6 +331,7 @@ void MyselfWidget::getAvatarDone(const QString &fileId, const QByteArray &data)
     // 获取自己的头像
     auto* myself = model::DataCenter::getInstance()->getMyselfInfo();
     if(myself != nullptr && myself->avatarFileId == fileId) {
+        myself->userAvatarData = data;
         ui->avatarBtn->setIcon(QIcon(makeCircleIcon(data, ui->avatarBtn->width() / 2)));
     }
     // 获取其他用户的头像
@@ -394,7 +385,7 @@ void MyselfWidget::onSCrollAreaValueChanged(int value)
     if(value == ui->scrollArea->verticalScrollBar()->maximum()) {
         auto dataCenter = model::DataCenter::getInstance();
         auto userVideoListPtr = dataCenter->getUserVideoList();
-        dataCenter->getUserVideoListAsync(userId, userVideoListPtr->getPageIndex());
+        dataCenter->getUserVideoListAsync(userId, userVideoListPtr->getPageIndex(), model::putaway, "myPage");
         userVideoListPtr->setPageIndex(userVideoListPtr->getPageIndex() + 1);
     }
 }
@@ -519,14 +510,21 @@ void MyselfWidget::hideWidget(bool isHide)
 
 void MyselfWidget::getUserVideoList(const QString &userId, int pageIndex)
 {
+    // 如果获取的是第一页的视频，将界面中的视频信息 以及 DataCenter中保存的视频信息全部清空
+    auto dataCenter = model::DataCenter::getInstance();
+    auto myselfInfo = dataCenter->getMyselfInfo();
+    if(myselfInfo && myselfInfo->isTempUser()){
+        LOG()<<"临时用户，无需获取用户视频列表";
+        return;
+    }
+
     //如果获取的是第一页的视频时，需要将之前界面上的视频元素清空
-    auto* dataCenter = model::DataCenter::getInstance();
     auto userVideoList = dataCenter->getUserVideoList();
     if(pageIndex == 1) {
         userVideoList->clearVideoList();    // 清空视频列表
         clearVideoList();                   // 删除界面元素
     }
-    dataCenter->getUserVideoListAsync(userId, pageIndex);
+    dataCenter->getUserVideoListAsync(userId, pageIndex, model::putaway, "myPage");
     // page+1，滚动条向下动时就可以获取下一页视频
     userVideoList->setPageIndex(pageIndex + 1);
 }

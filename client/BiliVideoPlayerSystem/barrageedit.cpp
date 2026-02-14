@@ -1,6 +1,9 @@
 #include "barrageedit.h"
-#include "toast.h"
+
+#include <QCursor>
+
 #include "model/datacenter.h"
+#include "toast.h"
 BarrageEdit::BarrageEdit(QWidget *parent)
     : QLineEdit{parent}
 {
@@ -47,7 +50,6 @@ void BarrageEdit::onSendBulletScreenBtn()
         }
         // 发送弹幕
         emit onSendScreenBtn(barrageText);
-        setText("");
     }
 }
 

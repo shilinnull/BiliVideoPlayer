@@ -2,11 +2,8 @@
 #define BILIVIDEOPLAYER_H
 
 #include <QWidget>
-#include <QGraphicsDropShadowEffect>
 #include <QMouseEvent>
-
-#include "util.h"
-#include "playerpage.h"
+#include <QPoint>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

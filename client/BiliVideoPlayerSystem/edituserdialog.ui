@@ -103,7 +103,7 @@
           <string>*</string>
          </property>
         </widget>
-        <widget class="QLabel" name="phoneLabel">
+        <widget class="QLabel" name="emailLabel">
          <property name="geometry">
           <rect>
            <x>38</x>
@@ -113,13 +113,13 @@
           </rect>
          </property>
          <property name="styleSheet">
-          <string notr="true">#phoneLabel{ line-height: 19px; font-weight: 900; }</string>
+          <string notr="true">#emailLabel{ line-height: 19px; font-weight: 900; }</string>
          </property>
          <property name="text">
-          <string>用户手机号</string>
+          <string>用户邮箱</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="phoneEdit">
+        <widget class="QLineEdit" name="emailEdit">
          <property name="geometry">
           <rect>
            <x>122</x>
@@ -129,7 +129,7 @@
           </rect>
          </property>
          <property name="styleSheet">
-          <string notr="true">#phoneEdit { 
+          <string notr="true">#emailEdit { 
 	background-color: #F7F7F7; 
 	border: none; 
 	border-radius: 8px; 
@@ -140,7 +140,7 @@
 }</string>
          </property>
          <property name="placeholderText">
-          <string>请输入用户手机号</string>
+          <string>请输入用户邮箱</string>
          </property>
         </widget>
         <widget class="QLabel" name="starLabel2">
@@ -428,7 +428,7 @@ QRadioButton::indicator::checked { image: url(:/images/admin/checked.png); }
 QRadioButton::indicator::unchecked { image: url(:/images/admin/unchecked.png); }</string>
          </property>
          <property name="text">
-          <string>停用</string>
+          <string>禁用</string>
          </property>
         </widget>
        </widget>

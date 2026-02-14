@@ -1,10 +1,16 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include <QObject>
 #include <QHttpServer>
-#include <QHttpServerResponse>
 #include <QHttpServerRequest>
+#include <QHttpServerResponse>
+#include <QHash>
+#include <QList>
+#include <QMap>
+#include <QObject>
+#include <QString>
+
+#include <cstdint>
 
 enum RoleType{
     SuperAdmin = 1, // 超级管理员
@@ -49,7 +55,11 @@ private:
     QHttpServerResponse downloadVideoSeg(const QString& fileName);      // 下载视频分片
     QHttpServerResponse uploadVideo(const QHttpServerRequest& req);     // 上传视频
     QHttpServerResponse newVideo(const QHttpServerRequest& req);        // 新增视频
+    QHttpServerResponse statusVideoList(const QHttpServerRequest& req); // 获取状态视频列表
     QHttpServerResponse removeVideo(const QHttpServerRequest& req);     // 删除视频
+    QHttpServerResponse checkVideo(const QHttpServerRequest &req);      // 审核视频
+    QHttpServerResponse saleVideo(const QHttpServerRequest &req);       // 上架视频
+    QHttpServerResponse haltVideo(const QHttpServerRequest &req);       // 下架视频
     QHttpServerResponse newAttention(const QHttpServerRequest& req);    // 新增关注
     QHttpServerResponse delAttention(const QHttpServerRequest& req);    // 取消关注
     QHttpServerResponse getBarrage(const QHttpServerRequest& req);      // 获取弹幕数据
@@ -67,7 +77,12 @@ private:
     QHttpServerResponse logout(const QHttpServerRequest& req);          // 退出登录
     QHttpServerResponse setPassword(const QHttpServerRequest& req);     // 设置用户密码
     QHttpServerResponse setNickname(const QHttpServerRequest& req);     // 设置用户昵称
-
+    QHttpServerResponse getAdminByEmail(const QHttpServerRequest &req); // 通过邮箱获取管理员信息
+    QHttpServerResponse getAdminListByStatus(const QHttpServerRequest &req);// 通过管理员状态获取管理员信息
+    QHttpServerResponse newAdministrator(const QHttpServerRequest &req);// 新增管理员
+    QHttpServerResponse setAdministrator(const QHttpServerRequest &req);// 编辑管理员
+    QHttpServerResponse setStatus(const QHttpServerRequest &req);       // 设置管理员状态
+    QHttpServerResponse delAdministrator(const QHttpServerRequest &req);// 删除管理员
 private:
     MockServer();
     static MockServer* instance;

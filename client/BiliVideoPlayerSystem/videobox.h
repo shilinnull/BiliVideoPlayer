@@ -1,9 +1,16 @@
 #ifndef VIDEOBOX_H
 #define VIDEOBOX_H
 
+#include <QByteArray>
+#include <QEvent>
+#include <QPaintEvent>
+#include <QPixmap>
+#include <QString>
 #include <QWidget>
-#include "playerpage.h"
+
 #include "model/data.h"
+
+class PlayerPage;
 
 namespace Ui {
 class VideoBox;

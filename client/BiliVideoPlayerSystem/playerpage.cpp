@@ -1,15 +1,17 @@
+#include <QShortcut>
+#include <QKeySequence>
+#include <QJsonArray>
+
 #include "playerpage.h"
 #include "ui_playerpage.h"
 
-#include "util.h"
+#include "bilivideoplayer.h"
+#include "bulletscreenitem.h"
 #include "login.h"
 #include "toast.h"
+#include "util.h"
 #include "volume.h"
-#include "bulletscreenitem.h"
-#include <QShortcut>
-#include <QKeySequence>
-#include <QTimer>
-#include "bilivideoplayer.h"
+#include "model/datacenter.h"
 
 PlayerPage::PlayerPage(const model::VideoInfo& videoInfo, QWidget *parent)
     : QWidget(parent)
@@ -67,6 +69,18 @@ PlayerPage::PlayerPage(const model::VideoInfo& videoInfo, QWidget *parent)
         }
         this->isLike = isLike;
     });
+    connect(dataCenter, &model::DataCenter::downloadPhotoDone, this,
+            [=](const QString& imageId, const QByteArray& imageData){
+        auto myselfInfo = dataCenter->getMyselfInfo();
+        if(myselfInfo == nullptr || myselfInfo->avatarFileId.isEmpty()) {
+            return;
+        }
+        if(imageId != myselfInfo->avatarFileId || imageData.isEmpty()) {
+            return;
+        }
+        myselfInfo->userAvatarData = imageData;
+        loginUserAvatar = imageData;
+    });
     dataCenter->getIsLikeVideoAsync(videoInfo.videoId);
 
 }
@@ -98,7 +112,8 @@ void PlayerPage::startPlaying()
     mpvPlayer->startPlay(m3u8FileUrl);
 
     isUpdatePlayNum = false;
-    ui->videoSlider->setPlayStep(0);
+    ui->videoSlider->setPlayStep(0);// 设置进度条
+    setVolume(volume->getVolume()); // 设置音量
     // 视频加载成功之后会立马播放，初始时先将其设置为暂停状态，当用户点击播放按钮之后再让视频播放起来
     mpvPlayer->pause();
 }
@@ -106,49 +121,102 @@ void PlayerPage::startPlaying()
 void PlayerPage::buildBulletScreenData()
 {
     auto dataCenter = model::DataCenter::getInstance();
-    bulletScreens = dataCenter->getBarragesData();
+    barrages = dataCenter->getBarragesData();
+
+    syncLoginUserAvatar();
+}
+
+void PlayerPage::syncLoginUserAvatar()
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    auto myselfInfo = dataCenter->getMyselfInfo();
+    if(myselfInfo == nullptr) {
+        return;
+    }
+    if(!myselfInfo->userAvatarData.isEmpty()) {
+        loginUserAvatar = myselfInfo->userAvatarData;
+        return;
+    }
+    if(myselfInfo->avatarFileId.isEmpty()) {
+        myselfInfo->userAvatarData = loadFileToByteArray(":/images/myself/defaultAvatar.png");
+        loginUserAvatar = myselfInfo->userAvatarData;
+        return;
+    }
+    dataCenter->downloadPhotoAsync(myselfInfo->avatarFileId);
 }
 
 void PlayerPage::showBulletScreen()
 {
-    // 弹幕关闭
-    if(!isStartBS) return ;
+    // 视频进入播放时再开始加载弹幕
+    if(!isPlay){
+        return;
+    }
 
-    // 通过时间获取弹幕数据
-    QList<model::BarrageInfo> bulletScreenList = bulletScreens.value(mpvPlayer->getPlayTime());
-    // 显示弹幕
-    int xTop, xMid, xBottom;
-    xTop = xMid = xBottom = top->width();
-    BulletScreenItem* bs = nullptr;
-    for(int i = 0; i < bulletScreenList.size(); i++) {
-        model::BarrageInfo& bsInfo = bulletScreenList[i];
-        if(0 == i % 3) {
-            // 显示第一行
-            bs = new BulletScreenItem(top);
-            bs->setBulletScreenText(bsInfo.text);
-            int duration = 10000 * xTop / (double)(30 * 18 + 1450);
-            bs->setBulletScreenAnimal(xTop, duration);
-            xTop += bs->width() + 18 * 4;		// 同一行隔四个汉字，18为每个汉字的大小
-        } else if(1 == i % 3) {
-            // 显示第二行
-            bs = new BulletScreenItem(middle);
-            bs->setBulletScreenText(bsInfo.text);
-            int duration = 10000 * xMid/ (double)(30 * 18 + 1450);
-            bs->setBulletScreenAnimal(xMid, duration);
-            xMid += bs->width() + 18 * 4;		// 同一行隔四个汉字，18为每个汉字的大小
-        } else {
-            // 显示第三行
-            bs = new BulletScreenItem(bottom);
-            bs->setBulletScreenText(bsInfo.text);
-            int duration = 10000 * xBottom / (double)(30 * 18 + 1450);
-            bs->setBulletScreenAnimal(xBottom + 2 * 18, duration);
-            xBottom += bs->width() + 18 * 4;		// 同一行隔四个汉字，18为每个汉字的大小
+    // 如果打开关闭时，则不需要添加弹幕到界面
+    if(!isStartBS){
+        return;
+    }
+
+    // 1. 获取当前playTime点的所有弹幕
+    QList<model::BarrageInfo> bulletScrrenList = barrages.value(mpvPlayer->getPlayTime());
+    BulletScreenItem* bsItem = nullptr;
+
+    if(loginUserAvatar.isEmpty()) {
+        syncLoginUserAvatar();
+    }
+
+    // 获取当前登录用户ID
+    auto dataCenter = model::DataCenter::getInstance();
+    auto myselfInfo = dataCenter->getMyselfInfo();
+    if(myselfInfo == nullptr) {
+        return;
+    }
+    QString logUserId = myselfInfo->userId;
+
+    // 2. 将弹幕显示出来
+    int xTop, xMiddle, xBottom;
+    xTop = xMiddle = xBottom = top->width();
+    for(int i = 0; i < bulletScrrenList.size(); ++i){
+        model::BarrageInfo& bsInfo = bulletScrrenList[i];
+        if(0 == i%3){
+            // 弹幕显示在第一行
+            bsItem = new BulletScreenItem(top);
+            bsItem->setBulletScreenText(bsInfo.text);
+
+            // 给弹幕设置动画属性
+            int duration = 10000*xTop / (double)(top->width() + 30*18);
+            bsItem->setBulletScreenAnimal(xTop, duration);
+            xTop += bsItem->width() + 4*18;
+
+        }else if(1 == i%3){
+            // 弹幕显示在第二行
+            bsItem = new BulletScreenItem(middle);
+            bsItem->setBulletScreenText(bsInfo.text);
+
+            // 给弹幕设置动画属性
+            int duration = 10000*xMiddle / (double)(middle->width() + 30*18);
+            bsItem->setBulletScreenAnimal(xMiddle, duration);
+            xMiddle += bsItem->width() + 4*18;
+        }else{
+            // 弹幕显示在第三行
+            bsItem = new BulletScreenItem(bottom);
+            bsItem->setBulletScreenText(bsInfo.text);
+
+            // 给弹幕设置动画属性
+            int duration = 10000*xBottom / (double)(bottom->width() + 30*18);
+            bsItem->setBulletScreenAnimal(xBottom + 2*18, duration);
+            xBottom += bsItem->width() + 4*18;
         }
-        bs->startAnimal();
+
+        // 检测如果是当前用户发送的弹幕，显示弹幕时需要加上用户头像
+        if(bsInfo.userId == logUserId && !loginUserAvatar.isEmpty()){
+            bsItem->setBulletScreenIcon(makeCircleIcon(loginUserAvatar, 13).pixmap(26, 26));
+        }
+        bsItem->startAnimal();
     }
 }
 
-void PlayerPage::setUserIcon(QPixmap& userPixmap)
+void PlayerPage::setUserIcon(const QPixmap& userPixmap)
 {
     ui->userAvatar->setIcon(QIcon(userPixmap));
 }
@@ -199,8 +267,16 @@ void PlayerPage::onLikeImageBtnClicked()
     auto myself = dataCenter->getMyselfInfo();
     if(myself->isTempUser()) {
         Toast::showMessage("先登录/注册后才能点赞！", login);
+        return;
     }
 
+    // 如果是视频审核状态
+    if(videoInfo.videoStatus == model::VideoStatus::waitForChecking) {
+        Toast::showMessage("视频审核中禁止点赞！");
+        return ;
+    }
+
+    // 更新点赞
     isLike = !isLike;
     if(isLike) {
         likeCount++;
@@ -284,6 +360,11 @@ void PlayerPage::onBulletScreenClicked()
 
 void PlayerPage::onSendBulletScreenBtnClicked(const QString &text)
 {
+    // 视频在审核就不能发送弹幕
+    if(videoInfo.videoStatus == model::VideoStatus::waitForChecking) {
+        Toast::showMessage("视频在审核时不能发送弹幕");
+        return ;
+    }
     // 弹幕关闭就不继续执行
     if(!isStartBS) {
         Toast::showMessage("请打开弹幕开关...");
@@ -292,7 +373,7 @@ void PlayerPage::onSendBulletScreenBtnClicked(const QString &text)
 
     auto dataCenter = model::DataCenter::getInstance();
     auto myself = dataCenter->getMyselfInfo();
-    if(myself->isTempUser()) {
+    if(myself == nullptr || myself->isTempUser()) {
         Toast::showMessage("请先登录/注册才能发评论！", login);
         return;
     }
@@ -302,10 +383,16 @@ void PlayerPage::onSendBulletScreenBtnClicked(const QString &text)
         return;
     }
 
+    if(loginUserAvatar.isEmpty()) {
+        syncLoginUserAvatar();
+    }
+
     BulletScreenItem* bs = new BulletScreenItem(top);	// 显示到top栏上
-    QPixmap pixmap(":/images/homePage/touxiang.png");
-    bs->setBulletScreenIcon(pixmap);
     bs->setBulletScreenText(text);
+    if(!loginUserAvatar.isEmpty()) {
+        bs->setBulletScreenIcon(makeCircleIcon(loginUserAvatar, 13).pixmap(26, 26));
+    }
+
     int duration = 10000 * width() / (double)(30 * 18 + 1450);
     bs->setBulletScreenAnimal(top->width(), duration);
     bs->startAnimal();
@@ -313,11 +400,16 @@ void PlayerPage::onSendBulletScreenBtnClicked(const QString &text)
     model::BarrageInfo barrageInfo;
     barrageInfo.playTime = mpvPlayer->getPlayTime();
     barrageInfo.text = text;
-    barrageInfo.userId = videoInfo.userId;
+    barrageInfo.userId = myself->userId;
     dataCenter->loadupBarragesAsync(videoInfo.videoId, barrageInfo);
+
+    // 本地需要再保存一份
+    auto& barrageDatas = dataCenter->getBarragesData();
+    barrageDatas[barrageInfo.playTime].push_back(barrageInfo);
+    ui->bulletScreenText->setText("");
 }
 
-QString PlayerPage::secondToTime(int64_t second)
+QString PlayerPage::secondToTime(int64_t second) const
 {
     QString time;
     time.reserve(20);
@@ -380,6 +472,10 @@ void PlayerPage::updateVideoInfoUI()
 
 void PlayerPage::updataPlayCount()
 {
+    // 如果视频在审核，就不更新播放数
+    if(videoInfo.videoStatus == model::VideoStatus::waitForChecking) {
+        return ;
+    }
     // 判断是否有效点击
     if(isUpdatePlayNum)
         return;
@@ -388,7 +484,22 @@ void PlayerPage::updataPlayCount()
     auto dataCenter = model::DataCenter::getInstance();
     auto videoList = dataCenter->getVideoListPtr();
     videoList->incrementPlayNum(videoInfo.videoId);
+
     // 我的页面视频列表
+    auto myVideoList = dataCenter->getUserVideoList();
+    if(myVideoList->videoInfos.isEmpty()){
+        return;
+    }else{
+        myVideoList->incrementPlayNum(videoInfo.videoId);
+    }
+
+    // 管理员视频列表
+    auto statusVideoList = dataCenter->getStatusVideoList();
+    if(statusVideoList->videoInfos.isEmpty()){
+        return;
+    }else{
+        statusVideoList->incrementPlayNum(videoInfo.videoId);
+    }
 
     // 更新服务器上的该视频播放数
     dataCenter->setPlayNumberAsync(videoInfo.videoId);
@@ -405,16 +516,28 @@ void PlayerPage::onQuitBtnClicked()
         auto dataCenter = model::DataCenter::getInstance();
         dataCenter->setLikeNumberAsync(videoInfo.videoId);
 
-        // 更新视频列表中的videoId视频的点赞信息：首页 和 我的页面
+        // 更新首页视频列表
         auto videoListPtr = dataCenter->getVideoListPtr();
         videoListPtr->updateLikeNum(videoInfo.videoId, likeCount);
+
+        // 更新我的页面中的视频列表
+        auto userVideoListPtr = dataCenter->getUserVideoList();
+        if(!userVideoListPtr->videoInfos.isEmpty()){
+            userVideoListPtr->updateLikeNum(videoInfo.videoId, likeCount);
+        }
+
+        // 更新状态页面中的视频列表
+        auto statusVideoListPtr = dataCenter->getStatusVideoList();
+        if(!statusVideoListPtr->videoInfos.isEmpty()){
+            statusVideoListPtr->updateLikeNum(videoInfo.videoId, likeCount);
+        }
+
         videoInfo.likeCount = likeCount;
 
         // 通知videoBox更新点赞数据
         emit updateLikeNum(likeCount);
     }
 
-    // 释放掉，防止内存泄漏
     this->deleteLater();
 }
 

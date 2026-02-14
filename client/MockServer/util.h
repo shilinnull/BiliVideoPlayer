@@ -1,9 +1,11 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <QByteArray>
 #include <QDebug>
-#include <QString>
+#include <QFile>
 #include <QFileInfo>
+#include <QString>
 
 static inline QString getFileName(const QString& path) {
     QFileInfo fileinfo(path);

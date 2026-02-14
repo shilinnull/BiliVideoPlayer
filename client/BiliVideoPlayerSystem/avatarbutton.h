@@ -1,8 +1,10 @@
 #ifndef AVATARBUTTON_H
 #define AVATARBUTTON_H
 
-#include <QPushButton>
 #include <QLabel>
+#include <QPushButton>
+#include <QEnterEvent>
+#include <QEvent>
 
 class AvatarButton : public QPushButton
 {

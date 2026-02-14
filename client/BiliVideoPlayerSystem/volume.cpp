@@ -1,7 +1,7 @@
 #include "volume.h"
 #include "ui_volume.h"
 
-#include "util.h"
+#include <QCursor>
 
 Volume::Volume(QWidget *parent)
     : QWidget(parent)
@@ -57,4 +57,9 @@ void Volume::calcVolume()
 
     // 计算音量大小
     volumeRatio = ui->outLine->height() / (double)145 * 100;
+}
+
+int Volume::getVolume() const
+{
+    return volumeRatio;
 }

@@ -1,6 +1,7 @@
 #include "bulletscreenitem.h"
 
 #include <QHBoxLayout>
+#include <QPoint>
 
 BulletScreenInfo::BulletScreenInfo(const QString &userId, int64_t playTime, const QString &text)
     : userId(userId)
@@ -42,7 +43,7 @@ void BulletScreenItem::setBulletScreenText(const QString &content)
     text->adjustSize();
 }
 
-void BulletScreenItem::setBulletScreenIcon(QPixmap &pixmap)
+void BulletScreenItem::setBulletScreenIcon(const QPixmap &pixmap)
 {
     imageLabel->setPixmap(pixmap);
     imageLabel->show();

@@ -1,11 +1,16 @@
+#include <QFileDialog>
+#include <QFile>
+#include <QLayoutItem>
+#include <QPixmap>
+#include <QTextCursor>
+
 #include "uploadvideopage.h"
 #include "ui_uploadvideopage.h"
+
 #include "bilivideoplayer.h"
 #include "model/datacenter.h"
-#include "util.h"
 #include "toast.h"
-
-#include <QFileDialog>
+#include "util.h"
 
 UploadVideoPage::UploadVideoPage(QWidget *parent)
     : QWidget(parent)
@@ -48,6 +53,7 @@ UploadVideoPage::~UploadVideoPage()
 
 void UploadVideoPage::setVideoTitle(const QString &videoFilePath)
 {
+    resetPage();
     this->videoFilePath = videoFilePath;
 
     // 截图文件名设置到界面
@@ -236,9 +242,10 @@ void UploadVideoPage::onUploadVideoDone(const QString &videoId)
 
     // 获取视频总时长
     mpvPlayer = new MpvPlayer();
+    // 先绑定信号，再加载视频，保证只绑定一次
+    connect(mpvPlayer, &MpvPlayer::durationChanged, this, &UploadVideoPage::getDurationDone, Qt::UniqueConnection);
     mpvPlayer->startPlay(videoFilePath);
     mpvPlayer->pause();
-    connect(mpvPlayer, &MpvPlayer::durationChanged, this, &UploadVideoPage::getDurationDone);
 }
 
 void UploadVideoPage::uploadPhoto(const QString &photoPath)
@@ -278,6 +285,8 @@ void UploadVideoPage::getDurationDone(int64_t duration)
     this->duration = duration;
     LOG() << "要上传的视频总时长为：" << duration;
     this->isDurationOk = true;
+    // 断开信号槽，否则释放对象后不会立马断开，下次还会出发，然后程序就崩溃了
+    disconnect(mpvPlayer, &MpvPlayer::durationChanged, nullptr, nullptr);
     delete mpvPlayer;
     mpvPlayer = nullptr;
 }

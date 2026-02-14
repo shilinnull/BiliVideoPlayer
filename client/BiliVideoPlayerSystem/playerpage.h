@@ -1,17 +1,18 @@
 #ifndef PLAYERPAGE_H
 #define PLAYERPAGE_H
 
-#include <QWidget>
-#include <QMouseEvent>
 #include <QDialog>
 #include <QFrame>
+#include <QHash>
+#include <QMouseEvent>
+#include <QPixmap>
+#include <QWidget>
 
-#include "volume.h"
-#include "playspeed.h"
-#include "mpv/mpvplayer.h"
-#include "model/datacenter.h"
-#include "model/data.h"
 #include "login.h"
+#include "model/data.h"
+#include "mpv/mpvplayer.h"
+#include "playspeed.h"
+#include "volume.h"
 
 namespace Ui {
 class PlayerPage;
@@ -29,7 +30,7 @@ public:
     void startPlaying();
     void buildBulletScreenData();                   // 加载弹幕数据
     void showBulletScreen();						// 显示弹幕
-    void setUserIcon(QPixmap& userPixmap);          // 设置用户头像
+    void setUserIcon(const QPixmap& userPixmap);          // 设置用户头像
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;
@@ -49,8 +50,9 @@ private slots:
     void onSendBulletScreenBtnClicked(const QString& text);// 发送弹幕
 
 private:
-    QString secondToTime(int64_t second);           // 转换时间
+    QString secondToTime(int64_t second) const;           // 转换时间
     void initBarrageArea();							// 弹幕区域布局
+    void syncLoginUserAvatar();                    // 同步当前登录用户头像
     void updateVideoInfoUI();                       // 设置视频信息
     void updataPlayCount();                         // 更新播放数
     void onQuitBtnClicked();                        // 退出
@@ -74,7 +76,8 @@ private:
     QFrame* middle;
     QFrame* bottom;
     bool isStartBS = true;
-    QHash<int64_t, QList<model::BarrageInfo>> bulletScreens;    // 获取当前播放下的所有数据
+    QHash<int64_t, QList<model::BarrageInfo>> barrages;    // 获取当前播放下的所有弹幕
+    QByteArray loginUserAvatar;
 signals:
     void increasePlayCount(const QString& videoId);
     void updateLikeNum(int64_t likeCount);

@@ -1,5 +1,6 @@
-#include "data.h"
 #include <QJsonArray>
+
+#include "data.h"
 
 namespace model{
 
@@ -156,7 +157,22 @@ void VideoList::updateLikeNum(const QString &videoId, int64_t likeCount)
     }
 }
 
-void BarrageInfo::loadBarrageInfo(QJsonObject &barrageJson)
+void VideoList::updateVideoCheckInfo(const QString &videoId, VideoStatus videoStatus,
+                                     const QString &nickname, const QString &checkerId,
+                                     const QString &checkerAvatarId)
+{
+    for(auto& videoInfo : videoInfos){
+        if(videoInfo.videoId == videoId){
+            videoInfo.videoStatus = videoStatus;
+            videoInfo.checkerId = checkerId;
+            videoInfo.checkerName = nickname;
+            videoInfo.checkerAvatar = checkerAvatarId;
+            return;
+        }
+    }
+}
+
+void BarrageInfo::loadBarrageInfo(const QJsonObject &barrageJson)
 {
     barrageId = barrageJson["barrageId"].toString();
     userId = barrageJson["userId"].toString();
@@ -167,7 +183,7 @@ void BarrageInfo::loadBarrageInfo(QJsonObject &barrageJson)
 void UserInfo::loadUserInfo(const QJsonObject &jsonObj)
 {
     userId = jsonObj["userId"].toString();
-    phoneNum = jsonObj["phoneNum"].toString();
+    email = jsonObj["email"].toString();
     nickname = jsonObj["nickname"].toString();
     roleType.clear();
     identityType.clear();
@@ -187,7 +203,7 @@ void UserInfo::loadUserInfo(const QJsonObject &jsonObj)
     followedCount = jsonObj["followedCount"].toInt();
     followerCount = jsonObj["followerCount"].toInt();
     userStatus = jsonObj["userStatus"].toInt();
-    isFollowing = jsonObj["isFollowing"].toInt();
+    isFollowing = jsonObj["isFollowing"].toBool();
     userMemo = jsonObj["userMemo"].toString();
     userCTime = jsonObj["userCTime"].toString();
     avatarFileId = jsonObj["avatarFileId"].toString();
@@ -217,8 +233,10 @@ bool UserInfo::isTempUser() const
 void UserInfo::buildTempUser()
 {
     userId = "";
-    phoneNum = "";
+    email = "";
     nickname = "临时用户";
+    roleType.clear();
+    identityType.clear();
     roleType.append(TempUser);
     identityType.append(CUser);
     likeCount = 0;
@@ -226,10 +244,40 @@ void UserInfo::buildTempUser()
     followedCount = 0;
     followerCount = 0;
     userStatus = 0;
-    isFollowing = 0;
+    isFollowing = false;
     userMemo = "";
     userCTime = "";
     avatarFileId = "";
+}
+
+bool UserInfo::isAdminDisable() const
+{
+    return AdminStatus::Disable == userStatus;
+}
+
+void AdminInfo::loadAdminInfo(const QJsonObject &jsonObj)
+{
+    userId = jsonObj["userId"].toString();
+    nickName = jsonObj["nickname"].toString();
+    roleType = static_cast<RoleType>(jsonObj["roleType"].toInt());
+    email = jsonObj["email"].toString();
+    userStatu = static_cast<AdminStatus>(jsonObj["userStatus"].toInt());
+    remark = jsonObj["userMemo"].toString();
+}
+
+void AdminList::addAdminInfo(const AdminInfo &adminInfo)
+{
+    adminList.append(adminInfo);
+}
+
+void AdminList::setAdminStatus(const QString &userId, AdminStatus adminStatus)
+{
+    for(auto& adminInfo : adminList){
+        if(adminInfo.userId == userId){
+            adminInfo.userStatu = adminStatus;
+            return;
+        }
+    }
 }
 
 }

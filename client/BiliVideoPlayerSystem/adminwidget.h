@@ -2,6 +2,7 @@
 #define ADMINWIDGET_H
 
 #include <QWidget>
+#include <QString>
 
 namespace Ui {
 class AdminWidget;

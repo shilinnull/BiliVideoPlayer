@@ -44,7 +44,6 @@ void PlaySlider::mouseMoveEvent(QMouseEvent *event)
 {
     QRect playSliderRect = QRect(0, 0, this->width(), this->height());
     if(!playSliderRect.contains(event->pos())) {
-        LOG() << playSliderRect << "<-->" << event->pos();
         return ;
     }
     if(event->buttons() == Qt::LeftButton) {

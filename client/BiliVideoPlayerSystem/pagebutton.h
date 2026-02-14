@@ -1,7 +1,6 @@
 #ifndef PAGEBUTTON_H
 #define PAGEBUTTON_H
 
-#include <QWidget>
 #include <QPushButton>
 
 class PageButton : public QPushButton

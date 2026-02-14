@@ -1,8 +1,12 @@
 #ifndef NETCLIENT_H
 #define NETCLIENT_H
 
-#include <QObject>
+#include <QJsonObject>
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QObject>
+#include <QWidget>
+
 #include "model/data.h"
 
 namespace network {
@@ -11,7 +15,7 @@ class NetClient : public QObject
     Q_OBJECT
 public:
     NetClient(QObject *parent = nullptr);
-    void setServerUrl(const QString& url);         // 设置服务器地址
+    void setServerUrl(const QString& url);  // 设置服务器地址
     void tempLogin();						// 临时用户登录请求
     void getAllVideoList();					// 获取所有视频
     void getAllVideosInKind(int kindId);	// 获取分类下的所有视频
@@ -24,6 +28,9 @@ public:
     void uploadVideo(const QString& videoPath);             // 上传视频
     void uploadVideoDesc(const model::VideoDesc& videoDesc);// 上传视频描述信息
     void deleteVideo(const QString& videoId);               // 删除视频
+    void checkVideo(const QString& videoId, bool result);   // 视频审核
+    void putawayVideo(const QString& videoId);              // 视频上架
+    void discardVideo(const QString& videoId);              // 视频下架
     void newAttention(const QString& userId);               // 新增关注
     void delAttention(const QString& userId);               // 取消关注
     void getVideoBarrage(const QString& videoId);           // 获取弹幕
@@ -35,17 +42,27 @@ public:
     void getUserInfo(const QString& userId);                // 获取用户信息
     void setAvatar(const QString& fileId);                  // 设置用户头像
     void getUserVideoList(const QString& userId,
-                          int pageIndex);                   // 获取指定用户视频列表
-    void getAuthcode(const QString& phoneNum);              // 获取验证码
-    void loginWithMessage(const QString& phoneNum,
+                          int pageIndex,
+                          model::VideoStatus videoStatus,
+                          const QString& whichPage);        // 获取指定用户视频列表
+    void getStatusVideoList(int videoStatus, int pageIndex);// 获取状态视频列表
+    void getAuthcode(const QString& email);                 // 获取验证码
+    void loginWithEmail(const QString& email,
                           const QString& authcode,
                           const QString& authcodeId);       // 验证码登录
-    void loginWithPassword(const QString& phoneNum,
+    void loginWithPassword(const QString& userName,
                            const QString& password);        // 账号密码登录
     void loginSession();                                    // 会话登录
     void logout();                                          // 退出登录
     void setPassword(const QString& newPassword);           // 设置密码
     void setNickName(const QString& nickName);              // 修改昵称
+    void getAdminByEmail(const QString &email);       // 通过邮箱获取管理员信息
+    void getAdminListByStatus(int pageIndex, model::AdminStatus adminStatus);    // 通过状态获取管理员列表
+    void newAdmin(const model::AdminInfo& adminInfo);       // 新增管理员
+    void editAdmin(const model::AdminInfo& adminInfo);      // 编辑管理员
+    void setAdminStatus(const model::AdminInfo& userInfo);  // 设置管理员状态
+    void delAdmin(const QString& adminId);                  // 删除管理员
+
 private:
     static QString makeRequeId();
     QNetworkReply* sendHttpRequest(const QString& resourcePath, QJsonObject& jsonBody);

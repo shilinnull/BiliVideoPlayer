@@ -1,8 +1,6 @@
 #include "playspeed.h"
 #include "ui_playspeed.h"
 
-#include "util.h"
-
 PlaySpeed::PlaySpeed(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::PlaySpeed)

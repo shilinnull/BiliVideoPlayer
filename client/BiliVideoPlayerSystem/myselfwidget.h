@@ -1,10 +1,12 @@
 #ifndef MYSELFWIDGET_H
 #define MYSELFWIDGET_H
 
-#include <QWidget>
-#include "util.h"
-#include "login.h"
 #include <QPushButton>
+#include <QByteArray>
+#include <QString>
+#include <QWidget>
+
+#include "login.h"
 
 namespace Ui {
 class MyselfWidget;

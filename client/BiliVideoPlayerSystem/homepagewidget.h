@@ -1,8 +1,10 @@
 #ifndef HomePageWidget_H
 #define HomePageWidget_H
 
-#include <QWidget>
 #include <QPushButton>
+#include <QList>
+#include <QString>
+#include <QWidget>
 
 namespace Ui {
 class HomePageWidget;
@@ -41,6 +43,8 @@ private slots:
     void onRefreshBtnClicked();                         // 刷新按钮点击
     void onTopBtnClicked();                             // 置顶按钮点击
     void updateVideoList();								// 更新视频列表
+    void onKindsBtnClicked();                           // 文本为分类按钮点击
+    void onTagsBtnClicked();                            // 文本为标签按钮点击
 
 private:
     Ui::HomePageWidget *ui;

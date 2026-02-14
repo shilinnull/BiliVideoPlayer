@@ -1,14 +1,17 @@
-#include "netclient.h"
-
-#include <QtNetwork/QNetworkRequest>
-#include <QtNetwork/QNetworkReply>
-#include <QJsonObject>
+#include <QFile>
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QJsonObject>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QStandardPaths>
+#include <QUrl>
+#include <QUrlQuery>
+
+#include "netclient.h"
 #include "../util.h"
 #include "model/datacenter.h"
-#include <QUrlQuery>
 
 namespace network {
 
@@ -406,6 +409,78 @@ void NetClient::deleteVideo(const QString &videoId)
     });
 }
 
+void NetClient::checkVideo(const QString &videoId, bool result)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["videoId"] = videoId;
+    reqBody["checkResult"] = result;
+
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/checkVideo", reqBody);
+
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject resultObject = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"checkVideo 请求出错，reason = "<<reason;
+            return;
+        }
+
+        emit dataCenter->checkVideoDone();
+        LOG()<<"checkVideo 成功, resquestId = "<<resultObject["requestId"].toString();
+    });
+}
+
+void NetClient::putawayVideo(const QString &videoId)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["videoId"] = videoId;
+
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/saleVideo", reqBody);
+
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject resultObject = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"putawayVideo 请求出错，reason = "<<reason;
+            return;
+        }
+
+        emit dataCenter->putawayVideoDone();
+        LOG()<<"putawayVideo 成功, resquestId = "<<resultObject["requestId"].toString();
+    });
+}
+
+void NetClient::discardVideo(const QString &videoId)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["videoId"] = videoId;
+
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/haltVideo", reqBody);
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject resultObject = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"haltVideo 请求出错，reason = "<<reason;
+            return;
+        }
+
+        emit dataCenter->discardVideoDone();
+        LOG()<<"haltVideo 成功, resquestId = "<<resultObject["requestId"].toString();
+    });
+}
+
 void NetClient::newAttention(const QString &userId)
 {
     auto dataCenter = model::DataCenter::getInstance();
@@ -656,7 +731,7 @@ void NetClient::setAvatar(const QString &fileId)
     });
 }
 
-void NetClient::getUserVideoList(const QString &userId, int pageIndex)
+void NetClient::getUserVideoList(const QString &userId, int pageIndex, model::VideoStatus videoStatus, const QString& whichPage)
 {
     auto dataCenter = model::DataCenter::getInstance();
     QJsonObject reqBody;
@@ -666,6 +741,7 @@ void NetClient::getUserVideoList(const QString &userId, int pageIndex)
     }
     reqBody["pageIndex"] = pageIndex;
     reqBody["pageCount"] = model::VideoList::PAGE_COUNT;
+    reqBody["videoStatus"] = videoStatus;
 
     QNetworkReply* httpReply = sendHttpRequest("/HttpService/userVideoList", reqBody);
 
@@ -681,19 +757,53 @@ void NetClient::getUserVideoList(const QString &userId, int pageIndex)
 
         // 将信息保存到dataCenter中
         QJsonObject resultObj = replyObj["result"].toObject();
-        dataCenter->setUserVideoList(resultObj);
-        emit dataCenter->getUserVideoListDone(userId);
+        if(whichPage == "myPage"){
+            dataCenter->setUserVideoList(resultObj);
+            emit dataCenter->getUserVideoListDone(userId, whichPage);
+        } else if(whichPage == "checkPage"){
+            dataCenter->setStatusVideoList(resultObj);
+            emit dataCenter->getUserVideoListDone(userId, whichPage);
+        }
 
         LOG()<<"userVideoList 成功, resquestId = "<<replyObj["requestId"].toString() << "userId: " << userId;
     });
 }
 
-void NetClient::getAuthcode(const QString &phoneNum)
+void NetClient::getStatusVideoList(int videoStatus, int pageIndex)
 {
     auto dataCenter = model::DataCenter::getInstance();
     QJsonObject reqBody;
     reqBody["sessionId"] = dataCenter->getLoginSessionId();
-    reqBody["phoneNumber"] = phoneNum;
+    reqBody["status"] = videoStatus;
+    reqBody["pageIndex"] = pageIndex;
+    reqBody["pageCount"] = model::VideoList::PAGE_COUNT;
+
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/statusVideoList", reqBody);
+
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"statusVideoList 请求出错，reason = "<<reason;
+            return;
+        }
+        // 通知界面进行更新
+        QJsonObject resultObject = replyObj["result"].toObject();
+        dataCenter->setStatusVideoList(resultObject);
+        emit dataCenter->getStatusVideoListDone();
+
+        LOG()<<"statusVideoList 成功, resquestId = "<<replyObj["requestId"].toString();
+    });
+}
+
+void NetClient::getAuthcode(const QString &email)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["email"] = email;
 
     QNetworkReply* httpReply = sendHttpRequest("/HttpService/getCode", reqBody);
 
@@ -716,12 +826,12 @@ void NetClient::getAuthcode(const QString &phoneNum)
     });
 }
 
-void NetClient::loginWithMessage(const QString &phoneNum, const QString &authcode, const QString &authcodeId)
+void NetClient::loginWithEmail(const QString &email, const QString &authcode, const QString &authcodeId)
 {
     auto dataCenter = model::DataCenter::getInstance();
     QJsonObject reqBody;
     reqBody["sessionId"] = dataCenter->getLoginSessionId();
-    reqBody["phoneNumber"] = phoneNum;
+    reqBody["email"] = email;
     reqBody["verifyCode"] = authcode;
     reqBody["codeId"] = authcodeId;
 
@@ -735,21 +845,21 @@ void NetClient::loginWithMessage(const QString &phoneNum, const QString &authcod
 
         if(!ok){
             LOG()<<"vcodeLogin 请求出错，reason = "<<reason;
-            emit dataCenter->loginWithMessageFailed(reason);
+            emit dataCenter->loginWithEmailFailed(reason);
             return;
         }
 
-        emit dataCenter->loginWithMessageDone();
+        emit dataCenter->loginWithEmailDone();
         LOG()<<"vcodeLogin 成功, resquestId = "<<replyObj["requestId"].toString();
     });
 }
 
-void NetClient::loginWithPassword(const QString &phoneNum, const QString &password)
+void NetClient::loginWithPassword(const QString &userName, const QString &password)
 {
     auto dataCenter = model::DataCenter::getInstance();
     QJsonObject reqBody;
     reqBody["sessionId"] = dataCenter->getLoginSessionId();
-    reqBody["phoneNumber"] = phoneNum;
+    reqBody["username"] = userName;
     reqBody["password"] = password;
 
 
@@ -861,6 +971,161 @@ void NetClient::setNickName(const QString &nickName)
 
         emit dataCenter->setNickNameDone(nickName);
         LOG()<<"setNickName 成功, resquestId = "<<replyObj["requestId"].toString();
+    });
+}
+
+void NetClient::getAdminByEmail(const QString &email)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["email"] = email;
+
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/getAdminByEmail", reqBody);
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"getAdminByEmail 请求出错，reason = "<<reason;
+            return;
+        }
+        dataCenter->setAdminsList(replyObj["result"].toObject(), false);
+
+        emit dataCenter->getAdminByEmailDone();
+        LOG()<<"getAdminByEmail 成功, resquestId = "<<replyObj["requestId"].toString();
+    });
+}
+
+void NetClient::getAdminListByStatus(int pageIndex, model::AdminStatus adminStatus)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqBody;
+    reqBody["sessionId"] = dataCenter->getLoginSessionId();
+    reqBody["pageIndex"] = pageIndex;
+    reqBody["pageCount"] = model::AdminList::PAGE_COUNT;
+    reqBody["userStatus"] = static_cast<int>(adminStatus);
+
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/getAdminListByStatus", reqBody);
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"getAdminListByStatus 请求出错，reason = "<<reason;
+            return;
+        }
+        dataCenter->setAdminsList(replyObj["result"].toObject(), true);
+
+        emit dataCenter->getAdminListByStatusDone();
+        LOG()<<"getAdminListByStatus 成功, resquestId = "<<replyObj["requestId"].toString();
+    });
+}
+
+void NetClient::newAdmin(const model::AdminInfo &adminInfo)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqJsonObj;
+    reqJsonObj["sessionId"] = dataCenter->getLoginSessionId();
+    QJsonObject adminJson;
+    adminJson["nickname"] = adminInfo.nickName;
+    adminJson["roleType"] = static_cast<int>(adminInfo.roleType);
+    adminJson["userStatus"] = static_cast<int>(adminInfo.userStatu);
+    adminJson["userMemo"] = adminInfo.remark;
+    adminJson["email"] = adminInfo.email;
+    reqJsonObj["userInfo"] = adminJson;
+
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/newAdministrator", reqJsonObj);
+
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"newAdministrator 请求出错，reason = "<<reason;
+            return;
+        }
+
+        emit dataCenter->newAdminDone();
+        LOG()<<"newAdministrator 成功, resquestId = "<<replyObj["requestId"].toString();
+    });
+}
+
+void NetClient::editAdmin(const model::AdminInfo &adminInfo)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqJsonObj;
+    reqJsonObj["sessionId"] = dataCenter->getLoginSessionId();
+    QJsonObject adminJson;
+    adminJson["userId"] = adminInfo.userId;
+    adminJson["nickname"] = adminInfo.nickName;
+    adminJson["userStatus"] = static_cast<int>(adminInfo.userStatu);
+    adminJson["userMemo"] = adminInfo.remark;
+    reqJsonObj["userInfo"] = adminJson;
+
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/setAdministrator", reqJsonObj);
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"setAdministrator 请求出错，reason = "<<reason;
+            return;
+        }
+
+        emit dataCenter->editAdminDone(adminInfo.userId);
+        LOG()<<"setAdministrator 成功, resquestId = "<<replyObj["requestId"].toString();
+    });
+}
+
+void NetClient::setAdminStatus(const model::AdminInfo &userInfo)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqJsonObj;
+    reqJsonObj["sessionId"] = dataCenter->getLoginSessionId();
+    reqJsonObj["userId"] = userInfo.userId;
+    reqJsonObj["userStatus"] = static_cast<int>(userInfo.userStatu);
+
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/setStatus", reqJsonObj);
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"setStatus 请求出错，reason = "<<reason;
+            return;
+        }
+
+        emit dataCenter->setAdminStatusDone();
+        LOG()<<"setStatus 成功, resquestId = "<<replyObj["requestId"].toString();
+    });
+}
+
+void NetClient::delAdmin(const QString &adminId)
+{
+    auto dataCenter = model::DataCenter::getInstance();
+    QJsonObject reqJsonObj;
+    reqJsonObj["sessionId"] = dataCenter->getLoginSessionId();
+    reqJsonObj["userId"] = adminId;
+
+    QNetworkReply* httpReply = sendHttpRequest("/HttpService/delAdministrator", reqJsonObj);
+    connect(httpReply, &QNetworkReply::finished, this, [=](){
+        bool ok = false;
+        QString reason;
+        QJsonObject replyObj = handleHttpResponse(httpReply, &ok, &reason);
+
+        if(!ok){
+            LOG()<<"delAdministrator 请求出错，reason = "<<reason;
+            return;
+        }
+
+        emit dataCenter->delAdminDone();
+        LOG()<<"delAdministrator 成功, resquestId = "<<replyObj["requestId"].toString();
     });
 }
 

@@ -1,6 +1,12 @@
 #include "bilivideoplayer.h"
 #include "ui_bilivideoplayer.h"
 
+#include <QGraphicsDropShadowEffect>
+#include <QIcon>
+
+#include "model/datacenter.h"
+#include "util.h"
+
 BiliVideoPlayer* BiliVideoPlayer::instance = nullptr;
 
 BiliVideoPlayer *BiliVideoPlayer::getInstance()

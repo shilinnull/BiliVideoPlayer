@@ -2,8 +2,6 @@
 #define STARTUPPAGE_H
 
 #include <QDialog>
-#include <QLabel>
-#include <QTimer>
 
 class StartupPage : public QDialog
 {

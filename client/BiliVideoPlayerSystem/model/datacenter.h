@@ -1,10 +1,15 @@
 #ifndef DATACENTER_H
 #define DATACENTER_H
 
+#include <QByteArray>
+#include <QHash>
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QObject>
+#include <QString>
 
-#include "data.h"
 #include "../netclient/netclient.h"
+#include "data.h"
 
 namespace model {
 
@@ -16,7 +21,7 @@ public:
     void initDataFile();                // 初始化数据文件
     void saveDataFile();                // 保存数据文件
     void loadDataFile();                // 从文件加载数据
-    QString& getServerUrl();            // 获取服务器地址
+    const QString& getServerUrl() const;            // 获取服务器地址
     const KindAndTag* getKindAndTagsClassPtr();		// 获取所有分类
     const QString& getLoginSessionId() const ;		// 获取sessionId
     void setSessionId(const QString& sessionId);	// 设置sessionId
@@ -34,6 +39,9 @@ public:
     void uploadVideoAsync(const QString& videoPath);            // 上传视频
     void uploadVideoDescAsync(const model::VideoDesc& videoDesc);// 上传视频描述信息
     void deleteVideoAsync(const QString& videoId);              // 删除视频
+    void checkVideoAsync(const QString& videoId, bool result);  // 视频审核
+    void putawayVideoAsync(const QString& videoId);             // 上架视频
+    void discardVideoAsync(const QString& videoId);             // 下架视频
     void newAttentionAsync(const QString& userId);              // 新增关注
     void delAttentionAsync(const QString& userId);              // 取消关注
     void getVideoBarrageAsync(const QString& videoId);          // 获取弹幕
@@ -56,24 +64,38 @@ public:
     void setAvatarAsync(const QString& fileId);                 // 设置用户头像
     void setUserVideoList(const QJsonObject& videoListObj);     // 设置用户视频列表
     VideoList* getUserVideoList();                              // 获取用户视频列表
+    void setStatusVideoList(const QJsonObject& videoListObj);   // 设置状态下的视频列表
+    VideoList* getStatusVideoList();                            // 设置状态下的视频列表
     void getUserVideoListAsync(const QString& userId,
-                               int pageIndex);                  // 获取我的视频列表
-    void getAuthcodeAsync(const QString& phoneNum);             // 获取验证码
-    void loginWithMessageAsync(const QString& phoneNum,
+                               int pageIndex,
+                               VideoStatus videoStatus,
+                               const QString& whichPage);       // 获取我的视频列表
+    void getStatusVideoListAsync(int videoStatus,int pageIndex);// 获取状态视频列表
+    void getAuthcodeAsync(const QString& email);                // 获取验证码
+    void loginWithEmailAsync(const QString& email,
                                 const QString& authcode,
-                                const QString& authcodeId);     // 验证码登录
-    void loginWithPasswordAsync(const QString& phoneNum,
+                                const QString& authcodeId);     // 邮箱登录
+    void loginWithPasswordAsync(const QString& userName,
                                 const QString& password);       // 账号密码登录
     void loginSessionAsync();                                   // 会话登录
     void logoutAsync();                                         // 退出登录
     void setPasswordAsync(const QString& password);             // 设置密码
     void setNickNameAsync(const QString& nickName);             // 修改昵称
+    void setAdminsList(const QJsonObject& adminJson,            // 设置管理员列表
+                      bool isAdminStatus = true);               // 是否使用管理员状态进行获取，false: 使用邮箱
+    AdminList* getAdminsList();                                 // 获取管理员列表
+    void getAdminByEmailAsync(const QString& email);      // 通过邮箱获取管理员列表
+    void getAdminListByStatusAsync(int pageIndex, AdminStatus adminStatus);  // 通过状态获取管理员列表
+    void newAdminAsync(const AdminInfo& userInfo);              // 新增管理员信息
+    void editAdminAsync(const AdminInfo& adminId);                // 编辑管理员
+    void setAdminStatusAsync(const AdminInfo& userInfo);        // 设置管理员用户状态
+    void delAdminAsync(const QString& adminId);                 // 删除管理员
 
 private:
     explicit DataCenter(QObject *parent = nullptr);
     ~DataCenter();
     static DataCenter* instance;
-    QString serverURL = "http://127.0.0.1:8000";
+    QString serverURL;
     network::NetClient netClient;
     KindAndTag* kindsAndTags = nullptr;
     QString loginSessionId = "";					// 当前客户端登录到服务器会话的id
@@ -82,6 +104,8 @@ private:
     UserInfo* myselfInfo = nullptr;                 // 保存当前用户个人信息
     UserInfo* otherUserInfo = nullptr;              // 保存其他用户个人信息
     VideoList* userVideoList = nullptr;             // 保存指定用户视频列表：我的视频列表 或 其他用户视频列表
+    VideoList* statusVideoList = nullptr;           // 状态视频列表
+    AdminList* adminListPtr = nullptr;              // 管理员列表
 signals:
     void loginTempUserDone();						// 临时用户登录
     void getAllVideoListDone();						// 获取所有视频信息处理完毕
@@ -96,18 +120,23 @@ signals:
                          QWidget* wndPtr = nullptr);    // 上传视频处理完毕
     void uploadVideoDescDone();                         // 上传视频描述信息完毕
     void deleteVideoDone(const QString& videoId);       // 删除视频完毕
+    void checkVideoDone();                              // 视频审核完毕
+    void putawayVideoDone();                            // 上架视频完毕
+    void discardVideoDone();                            // 下架视频完毕
     void newAttentionDone(const QString& userId);       // 新增关注完毕
     void delAttentionDone(const QString& userId);       // 取消关注完毕
-    void getVideoBarrageDone(const QString& videoId);   // 过去弹幕信息完毕
+    void getVideoBarrageDone(const QString& videoId);   // 获取弹幕信息完毕
     void getIsLikeVideoDone(const QString& videoId, bool isLike);   // 检测是否点赞成功
     void getMyselfInfoDone();                                       // 获取用户个人信息完毕
     void getOtherUserInfoDone();                                    // 获取其他用户信息完毕
     void uploadPhotoDone(const QString& fileId, QWidget* wndPtr);   // 上传图片完毕
     void setAvatarDone();                                           // 修改用户头像完毕
-    void getUserVideoListDone(const QString& userId);               // 获取我的视频列表完毕
+    void getUserVideoListDone(const QString& userId,
+                              const QString& whichPage);            // 获取我的视频列表完毕
+    void getStatusVideoListDone();                                  // 获取状态视频列表完成
     void getAuthcodeDone(const QString& authcodeId);                // 获取验证码完毕
-    void loginWithMessageDone();                                    // 验证码登录完毕
-    void loginWithMessageFailed(const QString& errorInfo);          // 验证码登录失败
+    void loginWithEmailDone();                                      // 验证码登录完毕
+    void loginWithEmailFailed(const QString& errorInfo);            // 验证码登录失败
     void loginWithPasswordDone();                                   // 账号密码登录成功
     void loginWithPasswordFailed(const QString& errorInfo);         // 账号密码登录失败
     void loginSessionDone(bool isTemper);                           // 会话登录成功
@@ -115,6 +144,12 @@ signals:
     void logoutDone();                                              // 退出登录成功
     void setPasswordDone();                                         // 设置密码成功
     void setNickNameDone(const QString& nickName);                  // 修改昵称成功
+    void getAdminByEmailDone();                                     // 通过邮箱获取管理员列表完毕
+    void getAdminListByStatusDone();                                // 通过状态获取管理员列表完毕
+    void newAdminDone();                                            // 新增管理员完毕
+    void editAdminDone(const QString& adminInfo);                   // 编辑管理员完毕
+    void setAdminStatusDone();                                      // 设置用户状态完成
+    void delAdminDone();                                            // 删除管理员完毕
 
 };
 
