@@ -5,8 +5,7 @@
 #include <iomanip>
 #include <atomic>
 
-namespace biliutil {
-
+namespace Biliutil {
 std::optional<std::string> JSON::serialize(const Json::Value& val, bool styled) {
     Json::StreamWriterBuilder builder;
     if (!styled) {

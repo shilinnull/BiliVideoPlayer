@@ -1,4 +1,4 @@
-#include <bite_scaffold/log.h>
+#include "../../source/log.h"
 #include <gflags/gflags.h>
 
 //1. 通过gflags定义要捕获的参数
@@ -12,14 +12,14 @@ int main(int argc, char *argv[])
     //2. 解析命令行参数
     google::ParseCommandLineFlags(&argc, &argv, true);
     //3. 初始化日志器参数配置结构
-    bitelog::log_settings settings = {
+    Bililog::log_settings settings = {
         .async = FLAGS_log_async,
         .level = FLAGS_log_level,
         .format = FLAGS_log_format,
         .path = FLAGS_log_path
     };
     //4. 初始化日志器
-    bitelog::bitelog_init(settings);
+    Bililog::Bililog_init(settings);
     //5. 输出日志
     DBG("{}今年{}岁", "小明", 18);
     INF("{}今年{}岁", "小红", 19);

@@ -1,7 +1,7 @@
 #include "log.h"
-namespace bililog {
+namespace Bililog {
 std::shared_ptr<spdlog::logger> g_logger;
-void bililog_init(const log_settings &settings) {
+void Bililog_init(const log_settings &settings) {
     //1. 判断日志器类型 - async/sync
     //2. 判断输出目标 -- stdout, file
     //3. 创建日志器
@@ -23,4 +23,4 @@ void bililog_init(const log_settings &settings) {
     //5. 设置日志格式
     g_logger->set_pattern(settings.format);
 }
-}   // namespace bililog
+}   // namespace Bililog

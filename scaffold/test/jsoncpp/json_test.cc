@@ -7,7 +7,7 @@ void serialize_test() {
     val["score"].append(77.5);
     val["score"].append(88.5);
     val["score"].append(99.5);
-    auto ret = biliutil::JSON::serialize(val);
+    auto ret = Biliutil::JSON::serialize(val);
     if (!ret) {
         return;
     }
@@ -15,7 +15,7 @@ void serialize_test() {
 }
 void unserialize_test() {
     std::string str = R"({"age":18,"name":"zhangsan","score":[77.5,88.5,99.5]})";
-    auto ret = biliutil::JSON::unserialize(str);
+    auto ret = Biliutil::JSON::unserialize(str);
     if (!ret) {
         return;
     }
@@ -31,7 +31,8 @@ void unserialize_test() {
 
 int main()
 {
-    bililog::bililog_init();
+    // 初始化日志
+    Bililog::Bililog_init();
     serialize_test();
     unserialize_test();
     return 0;
