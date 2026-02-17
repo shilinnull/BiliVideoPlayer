@@ -1,0 +1,264 @@
+syntax = "proto3";
+package api_message;
+option cc_generic_services = true;
+import "base.proto";
+
+/*新增视频信息请求与响应消息结构*/
+message NewVideoReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional NewVideoInfo videoInfo = 3;
+};
+message NewVideoRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+};
+
+/*视频删除*/
+message RemoveVideoReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string videoId = 3;
+};
+message RemoveVideoRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+}
+
+/*点赞判断 */
+message JudgeLikeReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string videoId = 3;
+};
+message JudgeLikeResult {
+    optional bool isLike = 1;
+};
+message JudgeLikeRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+    JudgeLikeResult result = 4;
+};
+
+/*点赞操作*/
+message setLikeReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string videoId = 3;
+};
+message setLikeRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+};
+
+/* 播放操作*/
+message PlayVideoReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string videoId = 3;
+};
+message PlayVideoRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+};
+
+/*新增视频弹幕*/
+message newBarrageReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string videoId = 3;
+    optional BarrageInfo barrageInfo = 4;
+};
+message newBarrageRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+};
+
+/*获取视频弹幕列表*/
+message getBarrageListReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string videoId = 3;
+};
+message getBarrageListResult {
+    repeated BarrageInfo barrageList = 1;
+};
+message getBarrageListRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+    getBarrageListResult result = 4;
+};
+
+/*视频审核*/
+message checkVideoReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string videoId = 3;
+    optional bool checkResult = 4;
+};
+message checkVideoRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+};
+
+/*视频上架*/
+message saleVideoReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string videoId = 3;
+};
+message saleVideoRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+};
+
+/*视频下架*/
+message haltVideoReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string videoId = 3;
+};
+message haltVideoRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+};
+
+/*获取用户视频列表*/
+message userVideoListReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string userId = 3;
+    optional int32 pageIndex = 4;
+    optional int32 pageCount = 5;
+    optional int32 videoStatus = 6;
+};
+message userVideoListResult {
+    optional int32 totalCount = 1;
+    repeated VideoInfo videoList = 2;
+};
+message userVideoListRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+    userVideoListResult result = 4;
+};
+
+/*获取状态视频列表 */
+message StatusVideoListReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional int32 videoStatus = 3;
+    optional int32 pageIndex = 4;
+    optional int32 pageCount = 5;
+    optional string lastVideoId = 6;
+};
+message StatusVideoListResult {
+    optional int32 totalCount = 1;
+    repeated VideoInfo videoList = 2;
+};
+message StatusVideoListRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+    StatusVideoListResult result = 4;
+};
+
+/*获取主页视频列表*/
+message AllVideoListReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional int32 pageIndex = 3;
+    optional int32 pageCount = 4;
+};
+message AllVideoListResult {
+    repeated VideoInfo videoList = 2;
+};
+message AllVideoListRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+    AllVideoListResult result = 4;
+};
+
+/*获取分类视频列表*/
+message TypeVideoListReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional int32 videoTypeId = 3;
+    optional int32 pageIndex = 4;
+    optional int32 pageCount = 5;
+};
+message TypeVideoListResult {
+    repeated VideoInfo videoList = 2;
+};
+message TypeVideoListRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+    TypeVideoListResult result = 4;
+};
+
+/*获取标签视频列表*/
+message TagVideoListReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional int32 videoTag = 3;
+    optional int32 pageIndex = 4;
+    optional int32 pageCount = 5;
+};
+message TagVideoListResult {
+    repeated VideoInfo videoList = 2;
+};
+message TagVideoListRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+    TagVideoListResult result = 4;
+};
+
+/*获取搜索视频列表*/
+message keyVideoListReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string searchKey = 3;
+    optional int32 pageIndex = 4;
+    optional int32 pageCount = 5;
+};
+message keyVideoListResult {
+    repeated VideoInfo videoList = 2;
+};
+message keyVideoListRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+    keyVideoListResult result = 4;
+};
+
+service VideoService {
+    rpc newVideo (NewVideoReq) returns (NewVideoRsp);
+    rpc removeVideo (RemoveVideoReq) returns (RemoveVideoRsp);
+    rpc judgeLike (JudgeLikeReq) returns (JudgeLikeRsp);
+    rpc setLike (setLikeReq) returns (setLikeRsp);
+    rpc setPlay (PlayVideoReq) returns (PlayVideoRsp);
+    rpc newBarrage (newBarrageReq) returns (newBarrageRsp);
+    rpc getBarrage (getBarrageListReq) returns (getBarrageListRsp);
+    rpc checkVideo (checkVideoReq) returns (checkVideoRsp);
+    rpc saleVideo (saleVideoReq) returns (saleVideoRsp);
+    rpc haltVideo (haltVideoReq) returns (haltVideoRsp);
+    rpc userVideoList (userVideoListReq) returns (userVideoListRsp);
+    rpc statusVideoList (StatusVideoListReq) returns (StatusVideoListRsp);
+    rpc allVideoList (AllVideoListReq) returns (AllVideoListRsp);
+    rpc typeVideoList (TypeVideoListReq) returns (TypeVideoListRsp);
+    rpc tagVideoList (TagVideoListReq) returns (TagVideoListRsp);
+    rpc keyVideoList (keyVideoListReq) returns (keyVideoListRsp);
+};

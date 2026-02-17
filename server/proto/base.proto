@@ -1,0 +1,83 @@
+syntax = "proto3";
+package api_message;
+option cc_generic_services = true;
+
+/*用户详细信息结构*/
+message UserInfo {
+    optional string userId = 1;
+    optional string email = 2;
+    optional string nickname = 3;
+    repeated int32 roleType = 4;
+    repeated int32 identifyType = 5;
+    optional int32 likeCount = 6;
+    optional int32 playCount = 7;
+    optional int32 followedCount = 8;
+    optional int32 followerCount = 9;
+    optional int32 userStatus = 10;
+    optional bool isFollowing = 11;
+    optional string userMemo = 12;
+    optional string userCTime = 13;
+    optional string avatarFileId = 14;
+};
+
+/*管理员信息结构*/
+message AdminInfo {
+    optional string userId = 1;
+    optional string nickname = 2;
+    optional int32 roleType = 3;
+    optional int32 userStatus = 4;
+    optional string userMemo = 5;
+    optional string email = 6;
+};
+
+/*文件信息结构*/
+message FileInfo {
+    optional string fileId = 1;
+    int32 fileSize = 2;
+    optional string uploader = 3;
+    optional string fileMime = 4;
+    optional bytes fileData = 5;
+};
+
+/* 视频信息结构 */
+message NewVideoInfo {
+    optional string videoFileId = 1;
+    optional string photoFileId = 2;
+    optional string videoTitle = 3;
+    optional string videoDesc = 4;
+    optional int32 duration = 5;
+    // optional int32 size = 6;
+    optional int32 videoType = 7;
+    repeated int32 videoTag = 8;
+};
+
+message VideoInfo {
+    optional string videoId = 1;
+    optional string userId = 2;
+    optional string userAvatarId = 3;
+    optional string nickname = 4;
+    optional int32 videoType = 5;
+    repeated int32 videoTag = 6;
+    optional string videoFileId = 7;
+    optional string photoFileId = 8;
+    optional int32 likeCount = 9;
+    optional int32 playCount = 10;
+    optional int32 videoSize = 11;
+    optional string videoDesc = 12;
+    optional string videoTitle = 13;
+    optional int32 videoDuration = 14;
+    optional string videoUpTime = 15;
+    optional string checkerId = 16;
+    optional string checkerName = 17;
+    optional string checkerAvatar = 18;
+    optional int32 videoStatus = 19;
+};
+
+/* 弹幕信息 */
+message BarrageInfo {
+    optional string barrageId = 1;
+    optional string userId = 2;
+    optional string videoId = 3;
+    optional string barrageContent = 4;
+    optional int64 barrageTime = 5;
+};

@@ -1,0 +1,274 @@
+syntax = "proto3";
+package api_message;
+option cc_generic_services = true;
+
+import "base.proto";
+
+//临时登录请求与响应消息接口
+message TempLoginReq {
+    optional string requestId = 1;
+};
+message TempLoginResult {
+    optional string sessionId = 1;
+};
+message TempLoginRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+    TempLoginResult result = 4;
+};
+
+// 会话登录请求与响应消息结构
+message SessionLoginReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+};
+message SessionLoginResult {
+    optional bool isGuest = 1;
+};
+message SessionLoginRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+    SessionLoginResult result = 4;
+};
+
+//获取短信验证码请求与响应消息结构
+message GetCodeReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string email = 3;
+};
+message GetCodeResult {
+    optional string codeId = 1;
+};
+message GetCodeRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+    GetCodeResult result = 4;
+};
+
+//短信登录请求与响应消息结构
+message CodeLoginReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string email = 3;
+    optional string verifyCode = 4;
+    optional string codeId = 5;
+};
+message CodeLoginRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+}
+
+//密码登录请求与响应消息结构
+message PasswordLoginReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string username = 3;
+    optional string password = 4;
+};
+message PasswordLoginRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+};
+
+//退出登录请求与响应消息结构
+message LogoutReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+};
+message LogoutResult {
+    optional string sessionId = 1;
+};
+message LogoutRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+    LogoutResult result = 4;
+};
+
+//设置用户头像请求与响应消息结构
+message SetAvatarReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string fileId = 3;
+};
+message SetAvatarRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+};
+
+//设置用户昵称请求与响应消息结构
+message SetNicknameReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string nickname = 3;
+};
+message SetNicknameRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+};
+
+//设置登录密码请求与响应消息结构
+message SetPasswordReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string password = 3;
+};
+message SetPasswordRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+}
+
+//设置用户状态请求与响应消息结构
+message SetUserStatusReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string userId = 3;
+    optional int32 userStatus = 4;
+}
+message SetUserStatusRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+};
+
+/*获取用户详细信息请求与响应消息结构*/
+message GetUserInfoReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string userId = 3;
+};
+message GetUserInfoResult {
+    UserInfo userInfo = 1;
+};
+message GetUserInfoRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+    GetUserInfoResult result = 4;
+};
+
+/*新增关注请求与响应消息结构*/
+message NewFollowReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string userId = 3;
+};
+message NewFollowRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+}
+
+/*取消关注请求与响应消息结构*/
+message DelFollowReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string userId = 3;
+}
+message DelFollowRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+}
+
+/*新增管理员请求与响应结构 */
+message NewAdminReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional AdminInfo userInfo = 3;
+};
+message NewAdminRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+}
+
+/*删除管理员请求与响应结构*/
+message DelAdminReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string userId = 3;
+};
+message DelAdminRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+}
+
+/*编辑管理员请求与响应消息结构 */
+message SetAdminReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional AdminInfo userInfo = 3;
+};
+message SetAdminRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+}
+
+/*通过手机号获取管理员信息*/
+message GetAdminReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string email = 3;
+};
+message GetAdminResult {
+    AdminInfo userInfo = 1;
+};
+message GetAdminRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+    GetAdminResult result = 4;
+}
+
+/*获取管理员列表请求与响应消息结构*/
+message GetAdminListReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional int32 pageIndex = 3;
+    optional int32 pageCount = 4;
+    optional int32 userStatus = 5;
+};
+message GetAdminListResult {
+    optional int32 totalCount = 1;
+    repeated AdminInfo userList = 2;
+};
+message GetAdminListRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+    GetAdminListResult result = 4;
+};
+
+
+service UserService {
+    rpc tempLogin (TempLoginReq) returns (TempLoginRsp);
+    rpc sessionLogin (SessionLoginReq) returns (SessionLoginRsp);
+    rpc getCode (GetCodeReq) returns (GetCodeRsp);
+    rpc vcodeLogin (CodeLoginReq) returns (CodeLoginRsp);
+    rpc passwdLogin (PasswordLoginReq) returns (PasswordLoginRsp);
+    rpc logout (LogoutReq) returns (LogoutRsp);
+    rpc setAvatar (SetAvatarReq) returns (SetAvatarRsp);
+    rpc setNickname (SetNicknameReq) returns (SetNicknameRsp);
+    rpc setPassword (SetPasswordReq) returns (SetPasswordRsp);
+    rpc setStatus (SetUserStatusReq) returns (SetUserStatusRsp);
+    rpc getUserInfo (GetUserInfoReq) returns (GetUserInfoRsp);
+    rpc newAttention (NewFollowReq) returns (NewFollowRsp);
+    rpc delAttention (DelFollowReq) returns (DelFollowRsp);
+    rpc newAdministrator (NewAdminReq) returns (NewAdminRsp);
+    rpc delAdministrator (DelAdminReq) returns (DelAdminRsp);
+    rpc setAdministrator (SetAdminReq) returns (SetAdminRsp);
+    rpc getAdminByEmail (GetAdminReq) returns (GetAdminRsp);
+    rpc getAdminListByStatus (GetAdminListReq) returns (GetAdminListRsp);
+};
