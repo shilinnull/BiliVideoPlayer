@@ -1,0 +1,53 @@
+syntax = "proto3";
+package api_message;
+option cc_generic_services = true;
+import "user.proto";
+import "file.proto";
+import "video.proto";
+
+// 请求路径： /HttpService/tempLogin ...
+service HttpService {
+    /*user*/
+    rpc tempLogin (TempLoginReq) returns (TempLoginRsp);
+    rpc sessionLogin (SessionLoginReq) returns (SessionLoginRsp);
+    rpc getCode (GetCodeReq) returns (GetCodeRsp);
+    rpc vcodeLogin (CodeLoginReq) returns (CodeLoginRsp);
+    rpc passwdLogin (PasswordLoginReq) returns (PasswordLoginRsp);
+    rpc logout (LogoutReq) returns (LogoutRsp);
+    rpc setAvatar (SetAvatarReq) returns (SetAvatarRsp);
+    rpc setNickname (SetNicknameReq) returns (SetNicknameRsp);
+    rpc setPassword (SetPasswordReq) returns (SetPasswordRsp);
+    rpc setStatus (SetUserStatusReq) returns (SetUserStatusRsp);
+    rpc getUserInfo (GetUserInfoReq) returns (GetUserInfoRsp);
+    rpc newAttention (NewFollowReq) returns (NewFollowRsp);
+    rpc delAttention (DelFollowReq) returns (DelFollowRsp);
+    rpc newAdministrator (NewAdminReq) returns (NewAdminRsp);
+    rpc delAdministrator (DelAdminReq) returns (DelAdminRsp);
+    rpc setAdministrator (SetAdminReq) returns (SetAdminRsp);
+    rpc getAdminByEmail (GetAdminReq) returns (GetAdminRsp);
+    rpc getAdminListByStatus (GetAdminListReq) returns (GetAdminListRsp);
+
+    /*file*/
+    rpc uploadPhoto (HttpUploadImageReq) returns (HttpUploadImageRsp);
+    rpc downloadPhoto (HttpDownloadImageReq) returns (HttpDownloadImageRsp);
+    rpc uploadVideo (HttpUploadVideoReq) returns (HttpUploadVideoRsp);
+    rpc downloadVideo (HttpDownloadVideoReq) returns (HttpDownloadVideoRsp);
+    
+    /*video*/
+    rpc newVideo (NewVideoReq) returns (NewVideoRsp);
+    rpc removeVideo (RemoveVideoReq) returns (RemoveVideoRsp);
+    rpc judgeLike (JudgeLikeReq) returns (JudgeLikeRsp);
+    rpc setLike (setLikeReq) returns (setLikeRsp);
+    rpc setPlay (PlayVideoReq) returns (PlayVideoRsp);
+    rpc newBarrage (newBarrageReq) returns (newBarrageRsp);
+    rpc getBarrage (getBarrageListReq) returns (getBarrageListRsp);
+    rpc checkVideo (checkVideoReq) returns (checkVideoRsp);
+    rpc saleVideo (saleVideoReq) returns (saleVideoRsp);
+    rpc haltVideo (haltVideoReq) returns (haltVideoRsp);
+    rpc userVideoList (userVideoListReq) returns (userVideoListRsp);
+    rpc statusVideoList (StatusVideoListReq) returns (StatusVideoListRsp);
+    rpc allVideoList (AllVideoListReq) returns (AllVideoListRsp);
+    rpc typeVideoList (TypeVideoListReq) returns (TypeVideoListRsp);
+    rpc tagVideoList (TagVideoListReq) returns (TagVideoListRsp);
+    rpc keyVideoList (keyVideoListReq) returns (keyVideoListRsp);
+}
