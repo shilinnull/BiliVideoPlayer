@@ -80,4 +80,5 @@ CMakeLists.txt.user*
 .rcc/
 .uic/
 /build*/
-.idea/
+/.idea
+cmake-build*/
