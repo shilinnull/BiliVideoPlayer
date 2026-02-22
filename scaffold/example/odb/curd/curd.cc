@@ -10,7 +10,7 @@ using namespace std;
 const std::string HOST = "192.168.80.128";
 const std::string USER = "root";
 const std::string PASS = "123456";
-const std::string DBNAME = "test";
+const std::string DBNAME = "mytest";
 const unsigned int PORT = 3306;
 const std::string CSET = "utf8";
 
