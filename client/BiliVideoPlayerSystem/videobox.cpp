@@ -59,7 +59,7 @@ void VideoBox::updateVideoInfoUI()
     ui->likeNum->setText(intToString(videoInfo.likeCount));
     ui->playNum->setText(intToString(videoInfo.playCount));
     ui->userNikeName->setText(videoInfo.nickName);
-    ui->loadupTime->setText(videoInfo.videoUpTime);
+    ui->loadupTime->setText(" · " + formatDate(videoInfo.videoUpTime));
     setVideoDuration(videoInfo.videoDuration);
     setVideoImage(videoInfo.photoFileId);
     setUserIcon(videoInfo.userAvatarId);

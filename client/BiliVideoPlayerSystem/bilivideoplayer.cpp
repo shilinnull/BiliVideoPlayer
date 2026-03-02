@@ -149,7 +149,11 @@ void BiliVideoPlayer::onSwitchStackedWidgetPage(int pageId)
     resetSwitchBtnInfo(pageId);                     // 重新设置按钮上的背景和字体
     if(pageId == MyselfPage) {
         ui->myPage->loadMySelf();                   // 加载用户个人信息
-    }
+    } /*else if(pageId == HomePage) {
+        ui->homePage->onRefreshBtnClicked();        // 切换到我的页面需要重新添加视频
+    } else if(pageId == UploadPage) {
+        ui->uploadVideo->resetPage();
+    }*/
     repaint();                                      // 保证页面可以立即刷新出来
 }
 

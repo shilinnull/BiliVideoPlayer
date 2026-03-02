@@ -7,6 +7,8 @@
 #include <QIcon>
 #include <QPainter>
 #include <QPainterPath>
+#include <QDate>
+#include <QDateTime>
 
 static inline QString getFileName(const QString& path) {
     QFileInfo fileinfo(path);
@@ -102,6 +104,43 @@ static inline QString hidePhoneNum(const QString& phoneNum) {
 static inline QString hideEmail(const QString& email) {
     int pos = email.indexOf('@');
     return email.left(3) + QString(pos - 3, '*') + email.mid(pos);
+}
+
+static QString formatDate(const QString &dateStr) {
+    LOG() << dateStr;
+    QString outputFormat = "yyyy-MM-dd HH:mm:ss";
+    static const QStringList inputFormats = {
+        "M-d HH:mm:ss",
+        "M-dd HH:mm:ss",
+        "MM-d HH:mm:ss",
+        "MM-dd HH:mm:ss",
+        "yyyy-M-d HH:mm:ss",
+        "yyyy-M-dd HH:mm:ss",
+        "yyyy-MM-d HH:mm:ss",
+        "yyyy-MM-dd HH:mm:ss"
+    };
+
+    QDateTime dateTime;
+    for (const QString& inputFormat : inputFormats) {
+        dateTime = QDateTime::fromString(dateStr, inputFormat);
+        if (dateTime.isValid()) {
+            if (!inputFormat.contains("yyyy")) {
+                QDate d = dateTime.date();
+                d.setDate(QDate::currentDate().year(), d.month(), d.day());
+                dateTime.setDate(d);
+            }
+            break;
+        }
+    }
+
+    QString newDate;
+    if(dateTime.isValid()) {
+        newDate = dateTime.toString(outputFormat);
+        LOG() << dateStr << " - " << newDate;
+    } else {
+        qDebug() << "Invalid date format";
+    }
+    return newDate;
 }
 
 
