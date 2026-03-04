@@ -8,4 +8,4 @@ delayed_publish:delayed_publish.cc ../../source/mq.cc ../../source/log.cc
 delayed_subscribe:delayed_subscribe.cc ../../source/mq.cc ../../source/log.cc
 	g++ -std=c++17 $^ -o $@ -lamqpcpp -lev -lpthread -lfmt
 clean:
-	rm -rf simple_publish simple_subscribe delayed_subscribe
+	rm -rf simple_publish simple_subscribe delayed_subscribe delayed_publish
