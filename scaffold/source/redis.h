@@ -13,6 +13,7 @@ namespace Biliredis {
         std::string passwd;
         size_t connection_pool_size = 3;
     };
+
     class RedisFactory {
     public:
         static std::shared_ptr<sw::redis::Redis> create(const redis_settings& settings);
