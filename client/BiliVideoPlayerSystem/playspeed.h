@@ -22,6 +22,8 @@ private slots:
     void onPlay20Speed();
 signals:
     void setPlaySpeed(double speed);
+private:
+    void resetStyle(int speed);
 
 private:
     Ui::PlaySpeed *ui;

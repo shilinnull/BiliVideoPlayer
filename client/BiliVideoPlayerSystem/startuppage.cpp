@@ -63,19 +63,21 @@ StartupPage::StartupPage(QDialog *parent)
 
 void StartupPage::startTimer()
 {
-    QTimer* timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, [=]{
-        if(loginSuccess && mySelfInfoSuccess) {
-            timer->stop();
-            delete timer;
-            close();
+    auto dataCenter = model::DataCenter::getInstance();
+    // 启动页固定展示2秒，到点后若登录流程仍未完成则走离线临时用户兜底。
+    QTimer::singleShot(2000, this, [=]{
+        if(!(loginSuccess && mySelfInfoSuccess)) {
+            LOG() << "启动阶段2秒内未完成登录，使用本地临时用户进入主界面";
+            dataCenter->setSessionId("");
+            dataCenter->buildTempUserInfo();
+            loginSuccess = true;
+            mySelfInfoSuccess = true;
         }
+        close();
     });
-    timer->start(2000); // 两秒钟后触发
 
     // 如果sessionId为空，说明没有登录过
     // 如果sessionId为空，但用户角色为临时用户，仍然使用临时身份登录
-    auto dataCenter = model::DataCenter::getInstance();
     QString sessionId = dataCenter->getLoginSessionId();
     if(sessionId.isEmpty() || dataCenter->getMyselfInfo()->isTempUser()) {
         dataCenter->loginTempUserAsync();       // 临时登录，从服务器获取sessionId

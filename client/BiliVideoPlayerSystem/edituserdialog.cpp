@@ -32,6 +32,7 @@ EditUserDialog::EditUserDialog(QWidget *parent, const QString& text, model::Admi
     // 设置管理员角色
     ui->roleComboBox->addItem("平台管理员");
     ui->roleComboBox->setCurrentIndex(0);
+    ui->nameEdit->setMaxLength(16); // 用户昵称最多16个字
     // 如果id不空，说明是编辑用户，否则是新增用户
     if(!adminInfo.userId.isEmpty()){
         ui->emailEdit->setText(adminInfo.email);

@@ -146,6 +146,15 @@ void RoleTableItem::onEditBtnClicked()
     if(editAdminDlg->getCommitResult()){
         auto dataCenter = model::DataCenter::getInstance();
         dataCenter->editAdminAsync(adminInfo);
+
+        // 管理员列表中也需要同步
+        auto adminLists = dataCenter->getAdminsList()->adminList;
+        for(auto& admin : adminLists) {
+            if(admin.userId == adminInfo.userId) {
+                admin.nickName = adminInfo.nickName;
+                break;
+            }
+        }
     }
     delete editAdminDlg;
 }

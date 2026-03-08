@@ -37,10 +37,10 @@ public:
     QPushButton* buildSelectBtn(QWidget *parent, const QString &color, const QString &text);
     // 点击分类后需要显示的标签
     void resetTags(const QList<QString> &tags);
+    void onRefreshBtnClicked();                         // 刷新按钮点击
 private slots:
     void onKindBtnClicked(QPushButton* clickKindBtn);   // 分类按钮点击
     void onTagBtnClicked(QPushButton* clickLabelBtn);   // 标签按钮点击
-    void onRefreshBtnClicked();                         // 刷新按钮点击
     void onTopBtnClicked();                             // 置顶按钮点击
     void updateVideoList();								// 更新视频列表
     void onKindsBtnClicked();                           // 文本为分类按钮点击

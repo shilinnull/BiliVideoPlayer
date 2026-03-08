@@ -126,10 +126,12 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="nicknameBtn">
+          <widget class="MyPushButton" name="nicknameBtn">
            <property name="styleSheet">
-            <string notr="true">#nicknameBtn {
+            <string notr="true">#nicknameBtn{ 
 	border : none;
+	font-size : 18px; 
+	font-family : 微软雅⿊; 
 }</string>
            </property>
            <property name="text">
@@ -560,6 +562,11 @@ QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical { border:none; wi
    <class>AttentionButton</class>
    <extends>QPushButton</extends>
    <header location="global">myselfwidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MyPushButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">avatarbutton.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
