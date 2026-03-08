@@ -98,6 +98,7 @@ void MpvPlayer::handleMpvEvent(mpv_event *event)
             // 获取当前分片的起始播放时间
             double segmentStartTime = 0;
             mpv_get_property(mpv, "demuxer-start-time", MPV_FORMAT_DOUBLE, &segmentStartTime);
+            segmentStartTime--;
 
             // 获取当前分片内的播放时间
             double segmentCurrentTime = 0;

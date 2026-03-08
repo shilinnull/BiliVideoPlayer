@@ -53,6 +53,13 @@ RoleTable::RoleTable(QWidget *parent)
         getAdminList(1);
     });
 
+    // 通过邮箱获取管理员信息失败
+    connect(dataCenter, &model::DataCenter::getAdminInfoByEmailFailed, this, [=]{
+        auto adminList = dataCenter->getAdminsList();
+        adminList->clearAdminList();
+        updateAdminListUI();
+    });
+
     initStyleSheet();
 }
 

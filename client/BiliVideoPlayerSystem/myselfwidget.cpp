@@ -122,7 +122,7 @@ void MyselfWidget::loadOtherUser(const QString &userId)
 
     // 切换到其他用户模式
     ui->avatarBtn->changeMod(false);
-    ui->avatarBtn->setEnabled(false);
+    ui->avatarBtn->setClickedStatus(false);
 }
 
 void MyselfWidget::initUI()
@@ -156,6 +156,7 @@ void MyselfWidget::connectSignalAndSlots()
     });
     connect(dataCenter, &model::DataCenter::logoutDone, this, &MyselfWidget::logoutDone);   //退出登录
     connect(dataCenter, &model::DataCenter::setPasswordDone, this, [=]{
+        isModifyPassword = true;
         LOG() << "修改密码成功";
     });
     // 修改昵称成功
@@ -176,6 +177,13 @@ void MyselfWidget::onUploadAvatarBtnClicked()
         LOG() << "取消选择头像";
         return ;
     }
+
+    QFileInfo fileInfo(filename);
+    if(fileInfo.size() >= 1024 * 1024 * 5) {
+        Toast::showMessage("头像大小不能超贵5M！");
+        return ;
+    }
+
     QByteArray fileDate = std::move(loadFileToByteArray(filename));
     if(fileDate.isEmpty()) {
         LOG() << "头像文件读取失败";
@@ -207,6 +215,17 @@ void MyselfWidget::onSetNickNameDone(const QString& nickName)
     auto myself = dataCenter->getMyselfInfo();
     myself->nickname = nickName;
     LOG() << "修改用户昵称成功! nickName=" << nickName;
+
+    QList<VideoBox*> videoList = ui->container->findChildren<VideoBox*>();
+    for(auto& videoBox : videoList) {
+        videoBox->setNicknameOfVideoUser(nickName);
+    }
+    auto userVideoList = dataCenter->getVideoListPtr()->getVideoList();
+    for(auto& videoList : userVideoList) {
+        if(videoList.userId == myself->userId) {
+            videoList.nickName = nickName;
+        }
+    }
 }
 
 void MyselfWidget::onQuitBtnClicked()
@@ -217,12 +236,13 @@ void MyselfWidget::onQuitBtnClicked()
     if(confirmDlg.isConfirmPress()) {
         auto dataCenter = model::DataCenter::getInstance();
         dataCenter->logoutAsync();      // 发送退出请求
+        isModifyPassword = false;       // 用户不退出播放系统，重新登录其他账号时，则显示修改密码按钮
     }
 }
 
 void MyselfWidget::settingBtnClicked()
 {
-    ModifyMyselfDialog* dialog = new ModifyMyselfDialog();
+    ModifyMyselfDialog* dialog = new ModifyMyselfDialog(isModifyPassword);
     dialog->exec();
     delete dialog;
 }
@@ -239,9 +259,9 @@ void MyselfWidget::getMyselfInfoDone()
         BiliVideoPlayer* biliPlayer = BiliVideoPlayer::getInstance();
         biliPlayer->showSystemPageBtn(false);
         ui->avatarBtn->setIcon(QIcon(":/image/myself/defaultAvatar.png"));
-        ui->avatarBtn->setEnabled(true);
+        ui->avatarBtn->setClickedStatus(false);
         ui->avatarBtn->changeMod(true);
-        ui->nicknameBtn->setText("点击登录");
+        ui->nicknameBtn->setText("未登录");
 
         ui->nicknameBtn->adjustSize();
         ui->nicknameBtn->setEnabled(true); // 允许点击昵称
@@ -280,7 +300,7 @@ void MyselfWidget::getMyselfInfoDone()
 
     // 4. 其他：隐藏关注按钮、不能点击登录、允许修改头像
     ui->attentionBtn->hide();
-    ui->avatarBtn->setEnabled(true);
+    ui->avatarBtn->setClickedStatus(false);
     ui->avatarBtn->changeMod(true);
     ui->myVideoLabel->setText("我的视频");
 }
@@ -293,7 +313,7 @@ void MyselfWidget::getOtherUserInfoDone()
     ui->settingBtn->hide();
     ui->quitBtn->hide();
     ui->uploadVideoBtn->hide();
-    ui->avatarBtn->setEnabled(false);
+    ui->avatarBtn->setClickedStatus(false);
     ui->nicknameBtn->setEnabled(false);
 
     // 2. 获取其他用户的个人信息

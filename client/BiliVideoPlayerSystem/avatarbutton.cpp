@@ -1,7 +1,23 @@
 #include "avatarbutton.h"
 
+MyPushButton::MyPushButton(QWidget *parent)
+    :QPushButton(parent)
+{}
+
+void MyPushButton::setClickedStatus(bool enable)
+{
+    this->clickedStatus = enable;
+}
+
+void MyPushButton::mousePressEvent(QMouseEvent *event)
+{
+    if(clickedStatus) {
+        QPushButton::mousePressEvent(event);
+    }
+}
+
 AvatarButton::AvatarButton(QWidget *parent)
-    : QPushButton{parent}
+    : MyPushButton{parent}
     , mask(nullptr)
     , showMask(true)
 {

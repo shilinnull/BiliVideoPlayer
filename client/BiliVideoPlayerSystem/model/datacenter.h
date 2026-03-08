@@ -150,6 +150,8 @@ signals:
     void editAdminDone(const QString& adminInfo);                   // 编辑管理员完毕
     void setAdminStatusDone();                                      // 设置用户状态完成
     void delAdminDone();                                            // 删除管理员完毕
+    void setNicknameFailed(const QString& reason);                  // 设置昵称失败
+    void getAdminInfoByEmailFailed();                               // 通过邮箱获取管理员信息失败
 
 };
 

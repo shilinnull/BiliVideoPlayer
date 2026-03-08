@@ -6,7 +6,17 @@
 #include <QEnterEvent>
 #include <QEvent>
 
-class AvatarButton : public QPushButton
+class MyPushButton : public QPushButton {
+    Q_OBJECT
+public:
+    explicit MyPushButton(QWidget* parent = nullptr);
+    void setClickedStatus(bool enable);
+protected:
+    void mousePressEvent(QMouseEvent* event) override;
+    bool clickedStatus;     // 标记按钮是否可以被点击
+};
+
+class AvatarButton : public MyPushButton
 {
     Q_OBJECT
 public:

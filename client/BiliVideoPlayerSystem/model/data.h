@@ -168,6 +168,7 @@ public:
     // 添加管理员
     void addAdminInfo(const AdminInfo& adminInfo);
     void setAdminStatus(const QString &userId, AdminStatus adminStatus);
+    void clearAdminList();
 };
 
 class UserInfo{

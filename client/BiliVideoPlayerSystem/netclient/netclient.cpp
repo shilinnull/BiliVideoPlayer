@@ -966,6 +966,7 @@ void NetClient::setNickName(const QString &nickName)
 
         if(!ok){
             LOG()<<"setNickName 请求出错，reason = "<<reason;
+            emit dataCenter->setNicknameFailed(reason);
             return;
         }
 
@@ -989,6 +990,7 @@ void NetClient::getAdminByEmail(const QString &email)
 
         if(!ok){
             LOG()<<"getAdminByEmail 请求出错，reason = "<<reason;
+            emit dataCenter->getAdminInfoByEmailFailed();
             return;
         }
         dataCenter->setAdminsList(replyObj["result"].toObject(), false);
@@ -1153,7 +1155,8 @@ QJsonObject NetClient::handleHttpResponse(QNetworkReply *httpResp, bool *ok, QSt
     // 1. 判断是否会出错
     if(httpResp->error() != QNetworkReply::NoError) {
         *ok = false;
-        *reason = httpResp->errorString();
+        *reason = "服务器错误！";
+        LOG() << "http请求失败:" << httpResp->errorString();
         httpResp->deleteLater();
         return QJsonObject();
     }

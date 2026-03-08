@@ -26,6 +26,7 @@ public:
 
     void updateVideoInfoUI();
     void showMoreBtn(bool isShow);      // 是否显示...按钮
+    void setNicknameOfVideoUser(const QString& nickName);// 设置用户昵称后，videoBox中显示的昵称需要同步更改
 private:
     void onPlayBtnClicked();
     void setVideoDuration(int64_t duration);            // 设置视频时长

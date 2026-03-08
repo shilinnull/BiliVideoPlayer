@@ -111,6 +111,12 @@ void VideoBox::setUserIcon(const QString &userAvatarId)
     }
 }
 
+void VideoBox::setNicknameOfVideoUser(const QString &nickName)
+{
+    videoInfo.nickName = nickName;
+    ui->userNikeName->setText(nickName);
+}
+
 void VideoBox::paintEvent(QPaintEvent *event)
 {
     // 防止图片还没下载好就对QPixmap进行绘制

@@ -280,4 +280,10 @@ void AdminList::setAdminStatus(const QString &userId, AdminStatus adminStatus)
     }
 }
 
+void AdminList::clearAdminList()
+{
+    adminList.clear();
+    totalCount = 0;
+}
+
 }

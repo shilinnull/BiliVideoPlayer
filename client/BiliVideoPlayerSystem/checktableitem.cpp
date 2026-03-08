@@ -152,20 +152,15 @@ void CheckTableItem::onVideoBtnClicked()
         // 加载默认头像
         userAvatar.loadFromData(loadFileToByteArray(":/images/myself/defaultAvatar.png"));
         playerPage->setUserIcon(userAvatar);
+        LOG() << "设置默认头像";
     } else {
         // 获取用户头像
         auto dataCenter = model::DataCenter::getInstance();
-        connect(dataCenter, &model::DataCenter::downloadPhotoDone, this, [=](const QString& imageId, QByteArray imageData){
-            if(videoInfo.userAvatarId != imageId) {
-                return ;
-            }
-            userAvatar.loadFromData(imageData);
-            playerPage->setUserIcon(userAvatar);
-        });
-        dataCenter->downloadPhotoAsync(videoInfo.userAvatarId);
+        connect(dataCenter, &model::DataCenter::downloadPhotoDone, this, &CheckTableItem::downloadUserAvatarSuccess);
     }
     playerPage->show();
     playerPage->startPlaying();
+    LOG() << "管理员审核视频";
 }
 
 void CheckTableItem::onOperatorBtnClicked()
@@ -263,4 +258,16 @@ void CheckTableItem::onOperatorBtn2Clicked()
         dataCenter->checkVideoAsync(videoInfo.videoId, false);
     }
     delete confirmDlg;
+}
+
+void CheckTableItem::downloadUserAvatarSuccess(const QString& userId, QByteArray avatarData)
+{
+    if(videoInfo.userAvatarId != userId) {
+        return ;
+    }
+    userAvatar = makeCircleIcon(avatarData, 13).pixmap(26, 26);
+    playerPage->setUserIcon(userAvatar);
+    auto dataCenter = model::DataCenter::getInstance();
+    disconnect(dataCenter, &model::DataCenter::downloadPhotoDone, this, &CheckTableItem::downloadUserAvatarSuccess);
+
 }
