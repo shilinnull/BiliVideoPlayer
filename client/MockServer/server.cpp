@@ -292,10 +292,20 @@ QHttpServerResponse MockServer::allVideoList(const QHttpServerRequest &request)
                                     "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
                                     "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
                                     "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
+                                    "一条视频告诉你去了北京该怎么玩一条视频告诉你去了北京该怎么玩"
                                     "一条视频告诉你去了北京该怎么玩~";
         videoJsonObj["videoTitle"] = "【北京旅游攻略】一条视频告诉你去了北京该怎么玩";
         videoJsonObj["videoDuration"] = 10;
-        videoJsonObj["videoUpTime"] = "9-16 12:28:58";
+        videoJsonObj["videoUpTime"] = "2000-9-16 12:28:58";
 
         videoLists.append(videoJsonObj);
     }
@@ -1061,7 +1071,7 @@ QHttpServerResponse MockServer::getUserInfo(const QHttpServerRequest &req)
     if(userId.isEmpty()) {
         // 获取个人信息
         userInfoObj["userId"] = "1000001";    // 用户id
-        userInfoObj["email"] = "zhangsan@example.com"; // 邮箱
+        userInfoObj["email"] = "zhangsan@qq.com"; // 邮箱
         userInfoObj["nickname"] = "张三";    // 用户昵称
 
         // 角色类型：0-未知，1-超级管理员，2-普通管理员，3-普通用户，4-临时用户
@@ -1280,11 +1290,11 @@ QHttpServerResponse MockServer::passwdLogin(const QHttpServerRequest &req)
 
     int errorCode = 0;
     QString errorMsg;
-    if(userName != "256652753@qq.com") {
+    if(userName != "zhangsan@qq.com") {
         errorCode = 603;
         errorMsg = "账号输入有误！";
     }
-    if(password != "hello123"){
+    if(password != "123456"){
         errorCode = 604;
         errorMsg = "密码输入有误！";
     }

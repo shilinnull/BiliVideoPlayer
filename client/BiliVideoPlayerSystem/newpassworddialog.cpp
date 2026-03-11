@@ -4,12 +4,21 @@
 #include <QLineEdit>
 #include <QMap>
 
+#include "bilivideoplayer.h"
+
 NewPasswordDialog::NewPasswordDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::NewPasswordDialog)
 {
     ui->setupUi(this);
     setWindowFlag(Qt::FramelessWindowHint);
+
+    // 显示到主窗口界面
+    BiliVideoPlayer* biliplayer = BiliVideoPlayer::getInstance();
+    QPoint point = biliplayer->mapToGlobal(QPoint(0, 0));
+    point.setX(point.x() + (biliplayer->width() - width()) / 2);
+    point.setY(point.y() + (biliplayer->height() - height()) / 2);
+    this->move(point);
 
     connect(ui->cancelBtn, &QPushButton::clicked, this, &NewPasswordDialog::close);
     connect(ui->submitBtn, &QPushButton::clicked, this, &NewPasswordDialog::onSubmitBtnClicked);

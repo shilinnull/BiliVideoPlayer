@@ -30,8 +30,7 @@ public:
     void startPlaying();
     void buildBulletScreenData();                   // 加载弹幕数据
     void showBulletScreen();						// 显示弹幕
-    void setUserIcon(const QPixmap& userPixmap);          // 设置用户头像
-
+    void setUserIcon(const QPixmap& userPixmap);    // 设置用户头像
 protected:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;

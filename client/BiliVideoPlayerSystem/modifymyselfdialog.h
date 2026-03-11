@@ -13,7 +13,7 @@ class ModifyMyselfDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit ModifyMyselfDialog(QWidget *parent = nullptr);
+    explicit ModifyMyselfDialog(bool isModifyPassword, QWidget *parent = nullptr);
     ~ModifyMyselfDialog();
 
 private slots:

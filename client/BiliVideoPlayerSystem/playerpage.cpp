@@ -82,7 +82,6 @@ PlayerPage::PlayerPage(const model::VideoInfo& videoInfo, QWidget *parent)
         loginUserAvatar = imageData;
     });
     dataCenter->getIsLikeVideoAsync(videoInfo.videoId);
-
 }
 
 PlayerPage::~PlayerPage()
@@ -461,13 +460,21 @@ void PlayerPage::updateVideoInfoUI()
 {
     ui->videoTittle->setText(videoInfo.videoTitle);
     ui->userNikeName->setText(videoInfo.nickName);
-    ui->loadupTime->setText(videoInfo.videoUpTime);
+    ui->loadupTime->setText(formatDate(videoInfo.videoUpTime));
     ui->likeNum->setText(intToString(videoInfo.likeCount));
     ui->playNum->setText(intToString(videoInfo.playCount));
     QString curPlayTime = secondToTime(0);
     QString totalTime = secondToTime(videoInfo.videoDuration);
     ui->videoDuration->setText(curPlayTime + "/" + totalTime);
-    ui->videoDesc->setText(videoInfo.videoDesc);
+
+    if(videoInfo.videoDesc.size() < 200)
+        ui->videoDesc->setText(videoInfo.videoDesc);
+    else {
+        ui->videoDesc->setText(videoInfo.videoDesc.left(200) + "...");
+        ui->videoDesc->setStyleSheet("#videoDesc{font-size: 14px;}"
+                                "QToolTip{background-color: #FFFFFF; color: #000000;}");
+        ui->videoDesc->setToolTip(videoInfo.videoDesc);
+    }
 }
 
 void PlayerPage::updataPlayCount()

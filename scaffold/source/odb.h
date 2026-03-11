@@ -18,7 +18,7 @@ namespace Biliodb {
 
     class DBFactory {
     public:
-        static std::shared_ptr<odb::database> mysql(const mysql_settings &settings);
+        static std::shared_ptr<odb::database> mysql(const mysql_settings& settings);
     };
 }
 

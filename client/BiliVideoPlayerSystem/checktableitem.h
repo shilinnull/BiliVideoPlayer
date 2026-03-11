@@ -28,6 +28,8 @@ private slots:
     void onOperatorBtnClicked();
     // 驳回按钮点击
     void onOperatorBtn2Clicked();
+    // 获取用户头像成功
+    void downloadUserAvatarSuccess(const QString& userId, QByteArray avatarData);
 
 private:
     Ui::CheckTableItem *ui;

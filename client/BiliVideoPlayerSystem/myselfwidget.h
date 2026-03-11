@@ -67,6 +67,7 @@ private:
     Ui::MyselfWidget *ui;
     Login* login;
     QString userId;     // 标记我的页面是当前用户还是其他用户
+    bool isModifyPassword = false;
 };
 
 #endif // MYSELFWIDGET_H

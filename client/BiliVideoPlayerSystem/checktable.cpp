@@ -22,7 +22,7 @@ CheckTable::CheckTable(QWidget *parent)
     ui->videoStatus->addItem("已下架");
     ui->videoStatus->setCurrentIndex(0);
 
-    QRegularExpression regExp("^[0-9a-zA-Z]{1,20}$");
+    QRegularExpression regExp("^[0-9a-zA-Z]{20}$");
     QValidator* validator = new QRegularExpressionValidator(regExp, this);
     // 创建验证器，验证是否符合
     ui->userIdEdit->setValidator(validator);

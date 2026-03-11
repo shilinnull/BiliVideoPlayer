@@ -426,7 +426,7 @@ QScrollBar::up-arrow:vertical, QScrollBar::down- arrow:vertical {
                  </rect>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">#changeButton { border : none; color : #FFFFFF; background-color : rgba(0, 0, 0, 0.0); }</string>
+                 <string notr="true">#changeButton { border : none; color : #FFFFFF; background-color : rgba(0, 0, 0, 0.3); }</string>
                 </property>
                 <property name="text">
                  <string>更改封面图</string>
@@ -690,7 +690,7 @@ QScrollBar::up-arrow:vertical, QScrollBar::down- arrow:vertical {
                  <string notr="true">#briefLeftWord{ color : #999999; }</string>
                 </property>
                 <property name="text">
-                 <string>0/1000</string>
+                 <string>0/500</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignmentFlag::AlignCenter</set>

@@ -59,7 +59,7 @@ void VideoBox::updateVideoInfoUI()
     ui->likeNum->setText(intToString(videoInfo.likeCount));
     ui->playNum->setText(intToString(videoInfo.playCount));
     ui->userNikeName->setText(videoInfo.nickName);
-    ui->loadupTime->setText(videoInfo.videoUpTime);
+    ui->loadupTime->setText(" · " + formatDate(videoInfo.videoUpTime));
     setVideoDuration(videoInfo.videoDuration);
     setVideoImage(videoInfo.photoFileId);
     setUserIcon(videoInfo.userAvatarId);
@@ -109,6 +109,12 @@ void VideoBox::setUserIcon(const QString &userAvatarId)
         auto dataCenter = model::DataCenter::getInstance();
         dataCenter->downloadPhotoAsync(userAvatarId);
     }
+}
+
+void VideoBox::setNicknameOfVideoUser(const QString &nickName)
+{
+    videoInfo.nickName = nickName;
+    ui->userNikeName->setText(nickName);
 }
 
 void VideoBox::paintEvent(QPaintEvent *event)
