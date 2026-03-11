@@ -1,0 +1,13 @@
+@PACKAGE_INIT@  # CMake 提供的初始化宏
+
+# 添加自定义Find模块路径
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/modules)
+
+# 声明所有传递依赖（自动触发find_package）
+include("${CMAKE_CURRENT_LIST_DIR}/modules/Finddepends.cmake")
+find_my_depends()
+
+# 包含目标导出文件
+include(${CMAKE_CURRENT_LIST_DIR}/Bili_scaffoldTargets.cmake)
+# 可选：验证组件或其他配置
+check_required_components(Bili_scaffold)
