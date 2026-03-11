@@ -39,9 +39,9 @@ class CalServiceImpl : public cal::CalService {
 int main()
 {
     Bililog::Bililog_init();
-    std::string reg_center_addr = "htttp://192.168.65.128:2379";
+    std::string reg_center_addr = "htttp://192.168.80.128:2379";
     std::string reg_svc_name = "cal";
-    std::string reg_svc_addr = "192.168.65.128:9000";
+    std::string reg_svc_addr = "192.168.80.128:9000";
     CalServiceImpl *cal_service = new CalServiceImpl;
     auto server = Bilirpc::RpcServerFactory::create(9000, cal_service);
 

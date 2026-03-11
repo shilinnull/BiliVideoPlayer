@@ -6,11 +6,11 @@
 int main()
 {
     Bililog::Bililog_init();
-    std::string reg_center_addr = "htttp://192.168.65.128:2379";
+    std::string reg_center_addr = "htttp://192.168.80.128:2379";
     std::string reg_svc_name = "cal";
     // 0. 实例化服务节点管理对象
     Bilirpc::SvcChannels scs;
-    // 1. 添加服务端节点管理： 192.168.65.130:9000
+    // 1. 添加服务端节点管理： 192.168.80.128:9000
     scs.setWatch(reg_svc_name);
     auto online_cb = std::bind(&Bilirpc::SvcChannels::addNode, &scs, std::placeholders::_1, std::placeholders::_2);
     auto offline_cb = std::bind(&Bilirpc::SvcChannels::delNode, &scs, std::placeholders::_1, std::placeholders::_2);
