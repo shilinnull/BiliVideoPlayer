@@ -1,0 +1,19 @@
+syntax = "proto3";
+package api_message;
+option cc_generic_services = true;
+
+message DeleteCacheMsg {
+    repeated string key = 1;
+}
+
+message CacheToDBMsg {
+    repeated string video_id = 1;
+}
+
+message DeleteFileMsg {
+    repeated string file_id = 1;
+}
+
+message HLSTranscodeMsg {
+    repeated string video_id = 1;
+}

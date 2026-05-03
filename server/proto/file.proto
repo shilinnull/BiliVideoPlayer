@@ -1,0 +1,87 @@
+syntax = "proto3";
+package api_message;
+option cc_generic_services = true;
+import "base.proto";
+
+/*图片文件上传*/
+//这是一个Http的图片上传请求结构
+message HttpUploadImageReq {
+};
+message HttpUploadImageRsp {
+};
+//这是一个Rpc的图片上传请求结构
+message UploadImageReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    FileInfo fileInfo = 3;
+};
+message UploadImageResult {
+    optional string fileId = 1;
+};
+message UploadImageRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+    UploadImageResult result = 4;
+};
+
+/* 图片文件下载 */
+message HttpDownloadImageReq {
+};
+message HttpDownloadImageRsp {
+};
+message DownloadImageReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string fileId = 3;
+};
+message DownloadImageRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+    FileInfo result = 4;
+};
+
+/* 视频上传 */
+message HttpUploadVideoReq {
+};
+message HttpUploadVideoRsp {
+};
+message UploadVideoReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    FileInfo fileInfo = 3;
+};
+message UploadVideoResult {
+    optional string fileId = 1;
+};
+message UploadVideoRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+    UploadVideoResult result = 4;
+};
+
+/* 视频下载 */
+message HttpDownloadVideoReq {
+};
+message HttpDownloadVideoRsp {
+};
+message DownloadVideoReq {
+    optional string requestId = 1;
+    optional string sessionId = 2;
+    optional string fileId = 3;
+};
+message DownloadVideoRsp {
+    optional string requestId = 1;
+    optional int32 errorCode = 2;
+    optional string errorMsg = 3;
+    FileInfo result = 4;
+};
+
+service FileService {
+    rpc uploadPhoto (UploadImageReq) returns (UploadImageRsp);
+    rpc downloadPhoto (DownloadImageReq) returns (DownloadImageRsp);
+    rpc uploadVideo (HttpUploadVideoReq) returns (HttpUploadVideoRsp);
+    rpc downloadVideo (DownloadVideoReq) returns (DownloadVideoRsp);
+}
