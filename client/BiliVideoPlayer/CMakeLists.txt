@@ -7,12 +7,11 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets Network)
 
 set(MPV_DLL "${CMAKE_CURRENT_SOURCE_DIR}/mpv/dll/libmpv-2.dll")
 
+set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} --use-temp-file")
+
 set(APP_WIN_RC "")
 if(WIN32)
-    set(APP_WIN_RC "${CMAKE_CURRENT_SOURCE_DIR}/biliPlayer.rc")
-    if(NOT EXISTS "${APP_WIN_RC}")
-        set(APP_WIN_RC "")
-    endif()
+    set(APP_WIN_RC ${CMAKE_CURRENT_SOURCE_DIR}/biliPlayer.rc)
 endif()
 
 set(APP_SOURCES
