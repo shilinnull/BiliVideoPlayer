@@ -42,13 +42,6 @@ static inline void writeByteArrayToFile(const QString& path, const QByteArray& c
     file.close();
 }
 
-static inline QIcon makeIcon(const QByteArray& byteArray) {
-    QPixmap pixmap;
-    pixmap.loadFromData(byteArray);
-    QIcon icon(pixmap);
-    return icon;
-}
-
 static inline QIcon makeCircleIcon(const QByteArray& byteArray, int radius) {
     QPixmap pixmap;
     pixmap.loadFromData(byteArray);
@@ -90,14 +83,6 @@ static QString intToString2(int value) {
     }else {
         return QString::asprintf("%.2lfw", value / 10000.0);
     }
-}
-
-// 隐藏手机号后四位
-static inline QString hidePhoneNum(const QString& phoneNum) {
-    if(phoneNum.size() < 11) {
-        return phoneNum;
-    }
-    return phoneNum.left(3) +"****" + phoneNum.right(4);
 }
 
 // 隐藏邮箱

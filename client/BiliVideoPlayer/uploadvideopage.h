@@ -5,7 +5,7 @@
 #include <QWidget>
 #include <QScopedPointer>
 
-#include "./mpv/mpvplayer.h"
+#include "player/player.h"
 
 #include <cstdint>
 
@@ -50,7 +50,7 @@ private:
     bool isDurationOk = false;      // 视频总时长获取成功
     QString coverImageId;           // 频封面上传成功后返回视频封⾯id，上传视频信息时需用到
     QString videoId;                // 视频ID
-    QScopedPointer<MpvPlayer> mpvPlayer; // 这个实例是要获取视频总时长
+    QScopedPointer<FFmpegPlayer> mpvPlayer; // 这个实例是要获取视频总时长
     int64_t duration;               // 视频总时长
 };
 

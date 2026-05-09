@@ -2,8 +2,10 @@
 #define PLAYERPAGE_H
 
 #include <QDialog>
+#include <QEvent>
 #include <QFrame>
 #include <QHash>
+#include <QImage>
 #include <QMouseEvent>
 #include <QPointer>
 #include <QPixmap>
@@ -11,7 +13,7 @@
 
 #include "login.h"
 #include "model/data.h"
-#include "mpv/mpvplayer.h"
+#include "player/player.h"
 #include "playspeed.h"
 #include "volume.h"
 
@@ -35,6 +37,7 @@ public:
 protected:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
+    bool eventFilter(QObject* obj, QEvent* event) override;
 
 private slots:
     void onVolumeBtnClicked();                      // 音量
@@ -48,6 +51,7 @@ private slots:
     void onSetPlayProgress(double playRatio);		// 设置播放进度
     void onBulletScreenClicked();					// 弹幕开关控制
     void onSendBulletScreenBtnClicked(const QString& text);// 发送弹幕
+    void onFrameReady(QImage image);                // 视频帧就绪
 
 private:
     QString secondToTime(int64_t second) const;           // 转换时间
@@ -63,8 +67,9 @@ private:
     Volume* volume;                 // 音量调节
     PlaySpeed* playSpeed;           // 播放速度
     QPointer<Login> login;          // 登录窗口
-    MpvPlayer* mpvPlayer = nullptr; // 封装mpv库，控制播放视频
+    FFmpegPlayer* Player = nullptr; // 封装FFmpeg库，控制播放视频
     bool isPlay = false;            // 默认情况下暂停
+    bool videoEnded = false;        // 视频是否已播放结束
     model::VideoInfo videoInfo;     // 保存视频信息
     bool isUpdatePlayNum = false;   // 是否更新播放次数
     bool isLike = false;            // 检测是否被点赞过，默认没有
@@ -78,6 +83,8 @@ private:
     bool isStartBS = true;
     QHash<int64_t, QList<model::BarrageInfo>> barrages;    // 获取当前播放下的所有弹幕
     QByteArray loginUserAvatar;
+    QImage currentFrame;                            // 当前视频帧
+    QImage firstFrame;                              // 第一帧（用于播放结束后显示）
 signals:
     void increasePlayCount(const QString& videoId);
     void updateLikeNum(int64_t likeCount);

@@ -1,6 +1,7 @@
 #include <QShortcut>
 #include <QKeySequence>
 #include <QJsonArray>
+#include <QPainter>
 
 #include "playerpage.h"
 #include "ui_playerpage.h"
@@ -26,7 +27,7 @@ PlayerPage::PlayerPage(const model::VideoInfo& videoInfo, QWidget *parent)
 
     volume = new Volume(this);						// 音量
     playSpeed = new PlaySpeed(this);				// 倍速
-    mpvPlayer = new MpvPlayer(ui->screen, this);	// 视频
+    Player = new FFmpegPlayer(ui->screen, this);	// 视频
     login = new Login(this);                        // 登录窗口
 
     initBarrageArea();								// 初始化弹幕布局
@@ -49,11 +50,14 @@ PlayerPage::PlayerPage(const model::VideoInfo& videoInfo, QWidget *parent)
     connect(playSpeed, &PlaySpeed::setPlaySpeed, this, &PlayerPage::onPlaySpeedChanged);
     connect(volume, &Volume::setVolume, this, &PlayerPage::setVolume);
     connect(ui->videoSlider, &PlaySlider::setPlayProgress, this, &PlayerPage::onSetPlayProgress);
-    connect(mpvPlayer, &MpvPlayer::playPositionChanged, this, &PlayerPage::onPlayPositionChanged);
-    connect(mpvPlayer, &MpvPlayer::endOfPlaylist, this, &PlayerPage::onEndOfPlayList);
+    connect(Player, &FFmpegPlayer::playPositionChanged, this, &PlayerPage::onPlayPositionChanged);
+    connect(Player, &FFmpegPlayer::endOfPlaylist, this, &PlayerPage::onEndOfPlayList);
     connect(ui->bulletScreenBtn, &QPushButton::clicked, this, &PlayerPage::onBulletScreenClicked);
     connect(ui->bulletScreenText, &BarrageEdit::onSendScreenBtn, this, &PlayerPage::onSendBulletScreenBtnClicked);
     connect(ui->userAvatar, &QPushButton::clicked, this, &PlayerPage::onUserAvatarClicked);
+
+    ui->screen->installEventFilter(this);
+    connect(Player, &FFmpegPlayer::frameReady, this, &PlayerPage::onFrameReady);
 
     likeCount = videoInfo.likeCount;        // 更新播放数
     auto dataCenter = model::DataCenter::getInstance();
@@ -106,13 +110,16 @@ void PlayerPage::startPlaying()
     QString m3u8FileUrl = dataCenter->getServerUrl();
     m3u8FileUrl += "/HttpService/downloadVideo?fileId=";
     m3u8FileUrl += videoInfo.videoFileId;
-    mpvPlayer->startPlay(m3u8FileUrl);
+    Player->startPlay(m3u8FileUrl);
 
     isUpdatePlayNum = false;
+    videoEnded = false;
+    isPlay = false;
+    firstFrame = QImage();
+    ui->playBtn->setStyleSheet("border-image: url(:/images/PlayPage/zanting.png)");
     ui->videoSlider->setPlayStep(0);// 设置进度条
+    ui->videoDuration->setText("00:00/" + secondToTime(videoInfo.videoDuration));
     setVolume(volume->getVolume()); // 设置音量
-    // 视频加载成功之后会立马播放，初始时先将其设置为暂停状态，当用户点击播放按钮之后再让视频播放起来
-    mpvPlayer->pause();
 }
 
 void PlayerPage::buildBulletScreenData()
@@ -142,6 +149,31 @@ void PlayerPage::syncLoginUserAvatar()
     dataCenter->downloadPhotoAsync(myselfInfo->avatarFileId);
 }
 
+void PlayerPage::onFrameReady(QImage image)
+{
+    if(firstFrame.isNull()) {
+        firstFrame = image;
+    }
+    currentFrame = image;
+    ui->screen->update();
+}
+
+bool PlayerPage::eventFilter(QObject* obj, QEvent* event)
+{
+    if(obj == ui->screen && event->type() == QEvent::Paint) {
+        QPainter painter(ui->screen);
+        painter.fillRect(ui->screen->rect(), Qt::black);
+        if(!currentFrame.isNull()) {
+            QImage scaled = currentFrame.scaled(ui->screen->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            int x = (ui->screen->width() - scaled.width()) / 2;
+            int y = (ui->screen->height() - scaled.height()) / 2;
+            painter.drawImage(x, y, scaled);
+        }
+        return true;
+    }
+    return QWidget::eventFilter(obj, event);
+}
+
 void PlayerPage::showBulletScreen()
 {
     // 视频进入播放时再开始加载弹幕
@@ -155,7 +187,7 @@ void PlayerPage::showBulletScreen()
     }
 
     // 1. 获取当前playTime点的所有弹幕
-    QList<model::BarrageInfo> bulletScrrenList = barrages.value(mpvPlayer->getPlayTime());
+    QList<model::BarrageInfo> bulletScrrenList = barrages.value(Player->getPlayTime());
     BulletScreenItem* bsItem = nullptr;
 
     if(loginUserAvatar.isEmpty()) {
@@ -287,16 +319,29 @@ void PlayerPage::onLikeImageBtnClicked()
 
 void PlayerPage::onplayBtnClicked()
 {
+    // If video has ended, restart from beginning and start playing
+    if(videoEnded) {
+        videoEnded = false;
+        startPlaying();
+        isPlay = true;
+        ui->playBtn->setStyleSheet("border-image: url(:/images/PlayPage/bofang.png)");
+        if(Player) Player->play();
+        barrageArea->show();
+        if(!isUpdatePlayNum)
+            updataPlayCount();
+        return;
+    }
+
     isPlay = !isPlay;
     if(isPlay) {
         // 播放
         ui->playBtn->setStyleSheet("border-image: url(:/images/PlayPage/bofang.png)");
-        if(mpvPlayer) mpvPlayer->play();
+        if(Player) Player->play();
         barrageArea->show();	// 弹幕显示
     } else {
         // 暂停
         ui->playBtn->setStyleSheet("border-image: url(:/images/PlayPage/zanting.png)");
-        if(mpvPlayer) mpvPlayer->pause();
+        if(Player) Player->pause();
         barrageArea->hide();	// 弹幕隐藏
     }
     // 在本次播放中，视频的播放数未更新时再更新播放数
@@ -306,16 +351,19 @@ void PlayerPage::onplayBtnClicked()
 
 void PlayerPage::onPlaySpeedChanged(double speed)
 {
-    if(mpvPlayer) mpvPlayer->setPlaySpeed(speed);
+    if(Player) Player->setPlaySpeed(speed);
 }
 
 void PlayerPage::setVolume(int volumeRatio)
 {
-    if(mpvPlayer) mpvPlayer->setVolume(volumeRatio);
+    if(Player) Player->setVolume(volumeRatio);
 }
 
 void PlayerPage::onPlayPositionChanged(int64_t playTime)
 {
+    if(playTime > videoInfo.videoDuration) {
+        playTime = videoInfo.videoDuration;
+    }
     QString curPlayTime = secondToTime(playTime);
     QString totalTime = secondToTime(videoInfo.videoDuration);
     ui->videoDuration->setText(curPlayTime + "/" + totalTime);
@@ -329,17 +377,37 @@ void PlayerPage::onPlayPositionChanged(int64_t playTime)
 
 void PlayerPage::onEndOfPlayList()
 {
+    // Only mark as ended if the user was actually playing.
+    // If the decode finished while paused (e.g. during initial load),
+    // don't set videoEnded so the user can click play normally.
+    if(Player && Player->isPlaying()) {
+        videoEnded = true;
+        Player->pause();
+    }
     isPlay = false;
-    ui->playBtn->setStyleSheet("border-image: url(:/images/PlayPage/zanting.png);");
-    // 重新点击播放按钮进行播放视频
-    startPlaying();
+    ui->playBtn->setStyleSheet("border-image: url(:/images/PlayPage/zanting.png)");
+    ui->videoSlider->setPlayStep(0);
+    ui->videoDuration->setText("00:00/" + secondToTime(videoInfo.videoDuration));
+
+    // Show the first frame instead of the last frame
+    if(!firstFrame.isNull()) {
+        currentFrame = firstFrame;
+        ui->screen->update();
+    }
 }
 
 void PlayerPage::onSetPlayProgress(double playRatio)
 {
-    // 更新播放时间
     int playTime = playRatio * videoInfo.videoDuration;
-    mpvPlayer->setCurrentPlayPositon(playTime);
+    Player->setCurrentPlayPositon(playTime);
+    // If the video had ended, resume playback from the seeked position.
+    // Without this, the video thread stays paused and the user sees nothing.
+    if(videoEnded) {
+        videoEnded = false;
+        isPlay = true;
+        Player->play();
+        ui->playBtn->setStyleSheet("border-image: url(:/images/PlayPage/bofang.png)");
+    }
 }
 
 void PlayerPage::onBulletScreenClicked()
@@ -395,7 +463,7 @@ void PlayerPage::onSendBulletScreenBtnClicked(const QString &text)
     bs->startAnimal();
 
     model::BarrageInfo barrageInfo;
-    barrageInfo.playTime = mpvPlayer->getPlayTime();
+    barrageInfo.playTime = Player->getPlayTime();
     barrageInfo.text = text;
     barrageInfo.userId = myself->userId;
     dataCenter->loadupBarragesAsync(videoInfo.videoId, barrageInfo);
@@ -516,6 +584,11 @@ void PlayerPage::updataPlayCount()
 
 void PlayerPage::onQuitBtnClicked()
 {
+    // Stop playback immediately (join threads now, not during deferred delete).
+    // Without this, the FFmpegPlayer destructor blocks the main thread when Qt
+    // processes deleteLater(), causing a visible UI freeze.
+    Player->stopPlayback();
+
     if(likeCount != videoInfo.likeCount){
         // 视频的点赞信息发生改变，给服务器同步
         auto dataCenter = model::DataCenter::getInstance();

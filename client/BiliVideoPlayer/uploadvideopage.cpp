@@ -231,7 +231,7 @@ void UploadVideoPage::onUploadVideoDone(const QString &videoId)
     this->videoId = videoId;
     isUploadVideoOk = true;
     // 设置视频首帧
-    QString firstFrame= MpvPlayer::getVideoFirstFrame(videoFilePath);
+    QString firstFrame= FFmpegPlayer::getVideoFirstFrame(videoFilePath);
     QPixmap pixmap(firstFrame);
     pixmap = pixmap.scaled(ui->imageLabel->size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
     ui->imageLabel->setPixmap(pixmap);
@@ -241,9 +241,9 @@ void UploadVideoPage::onUploadVideoDone(const QString &videoId)
     QFile::remove(firstFrame);
 
     // 获取视频总时长
-    mpvPlayer.reset(new MpvPlayer());
+    mpvPlayer.reset(new FFmpegPlayer());
     // 先绑定信号，再加载视频，保证只绑定一次
-    connect(mpvPlayer.data(), &MpvPlayer::durationChanged, this, &UploadVideoPage::getDurationDone, Qt::UniqueConnection);
+    connect(mpvPlayer.data(), &FFmpegPlayer::durationChanged, this, &UploadVideoPage::getDurationDone, Qt::UniqueConnection);
     mpvPlayer->startPlay(videoFilePath);
     mpvPlayer->pause();
 }
@@ -287,7 +287,7 @@ void UploadVideoPage::getDurationDone(int64_t duration)
     this->isDurationOk = true;
     // 断开信号槽，否则释放对象后不会立马断开，下次还会出发，然后程序就崩溃了
     if(mpvPlayer.data() != nullptr) {
-        disconnect(mpvPlayer.data(), &MpvPlayer::durationChanged, nullptr, nullptr);
+        disconnect(mpvPlayer.data(), &FFmpegPlayer::durationChanged, nullptr, nullptr);
     }
     mpvPlayer.reset(nullptr);
 }

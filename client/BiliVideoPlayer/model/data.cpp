@@ -59,11 +59,6 @@ int KindAndTag::getTagId(QString kind, QString tag) const
     return tagIds[kind][tag];
 }
 
-const KindAndTag *KindAndTag::getKindAndTagsClassPtr()
-{
-    return this;
-}
-
 void VideoInfo::loadVideoInfo(const QJsonObject &jsonObj)
 {
     videoId = jsonObj.value("videoId").toString();

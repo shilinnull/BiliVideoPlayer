@@ -607,7 +607,7 @@ QHttpServerResponse MockServer::downloadVideo(const QHttpServerRequest &req)
     QByteArray imageData = loadFileToByteArray(imagePath);
 
     QHttpServerResponse  httpResp(imageData, QHttpServerResponse::StatusCode::Ok);
-    httpResp.setHeader("Content-Type", "text/plain");
+    httpResp.setHeader("Content-Type", "application/vnd.apple.mpegurl");
     return httpResp;
 }
 

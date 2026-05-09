@@ -5,8 +5,6 @@ set(APP_NAME BiliVideoPlayer)
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets Network)
 
-set(MPV_DLL "${CMAKE_CURRENT_SOURCE_DIR}/mpv/dll/libmpv-2.dll")
-
 set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} --use-temp-file")
 
 set(APP_WIN_RC "")
@@ -42,15 +40,14 @@ set(APP_SOURCES
     paginator.h paginator.cpp
     login.h login.cpp login.ui
     toast.h toast.cpp
-    mpv/client.h mpv/render.h mpv/render_gl.h mpv/stream_cb.h
-    mpv/mpvplayer.cpp mpv/mpvplayer.h
+    player/player.cpp player/player.h
+    player/audiodecoder.cpp player/audiodecoder.h
+    player/avpacketqueue.cpp player/avpacketqueue.h
     bulletscreenitem.h bulletscreenitem.cpp
     barrageedit.h barrageedit.cpp
     model/datacenter.h model/datacenter.cpp
     model/data.h model/data.cpp
-    test/TestJson.h
     netclient/netclient.h netclient/netclient.cpp
-    test/TestHttp.h
     confirmdialog.h confirmdialog.cpp
     ${APP_WIN_RC}
 )
@@ -128,6 +125,8 @@ qt_add_executable(${APP_NAME}
 target_include_directories(${APP_NAME}
     PRIVATE
         ${PROJECT_SOURCE_DIR}
+    ${PROJECT_SOURCE_DIR}/ffmpeg/include
+    ${PROJECT_SOURCE_DIR}/sdl/include
 )
 
 qt_add_resources(
@@ -142,15 +141,51 @@ target_link_libraries(${APP_NAME}
         Qt6::Core
         Qt6::Widgets
         Qt6::Network
-        ${MPV_DLL}
+        avcodec
+        avformat
+        avfilter
+        avutil
+        swresample
+        swscale
+        SDL2
 )
 
-if(WIN32 AND EXISTS "${MPV_DLL}")
-    add_custom_command(TARGET ${APP_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${MPV_DLL}"
-            "$<TARGET_FILE_DIR:${APP_NAME}>"
-    )
+target_link_directories(${APP_NAME}
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/ffmpeg/lib
+        ${PROJECT_SOURCE_DIR}/sdl/lib
+)
+
+set(FFMPEG_DLL_DIR "${PROJECT_SOURCE_DIR}/dll")
+set(FFMPEG_DLLS
+    "${FFMPEG_DLL_DIR}/avcodec-58.dll"
+    "${FFMPEG_DLL_DIR}/avdevice-58.dll"
+    "${FFMPEG_DLL_DIR}/avfilter-7.dll"
+    "${FFMPEG_DLL_DIR}/avformat-58.dll"
+    "${FFMPEG_DLL_DIR}/avutil-56.dll"
+    "${FFMPEG_DLL_DIR}/postproc-55.dll"
+    "${FFMPEG_DLL_DIR}/swresample-3.dll"
+    "${FFMPEG_DLL_DIR}/swscale-5.dll"
+)
+set(SDL_DLL "${FFMPEG_DLL_DIR}/SDL2.dll")
+
+if(WIN32)
+    foreach(DLL_FILE IN LISTS FFMPEG_DLLS)
+        if(EXISTS "${DLL_FILE}")
+            add_custom_command(TARGET ${APP_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${DLL_FILE}"
+                    "$<TARGET_FILE_DIR:${APP_NAME}>"
+            )
+        endif()
+    endforeach()
+    if(EXISTS "${SDL_DLL}")
+        add_custom_command(TARGET ${APP_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${SDL_DLL}"
+                "$<TARGET_FILE_DIR:${APP_NAME}>"
+        )
+    endif()
 endif()
 
 include(GNUInstallDirs)
@@ -161,8 +196,15 @@ install(TARGETS ${APP_NAME}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
-if(EXISTS "${MPV_DLL}")
-    install(FILES "${MPV_DLL}" DESTINATION ${CMAKE_INSTALL_BINDIR})
+if(WIN32)
+    foreach(DLL_FILE IN LISTS FFMPEG_DLLS)
+        if(EXISTS "${DLL_FILE}")
+            install(FILES "${DLL_FILE}" DESTINATION ${CMAKE_INSTALL_BINDIR})
+        endif()
+    endforeach()
+    if(EXISTS "${SDL_DLL}")
+        install(FILES "${SDL_DLL}" DESTINATION ${CMAKE_INSTALL_BINDIR})
+    endif()
 endif()
 
 qt_generate_deploy_app_script(
