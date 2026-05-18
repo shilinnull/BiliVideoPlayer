@@ -2,14 +2,37 @@
 #include "audiodecoder.h"
 #include "util.h"
 
+#include <QCoreApplication>
 #include <QDir>
+#include <QFileInfo>
 #include <QMetaObject>
 #include <QProcess>
+#include <QStandardPaths>
 #include <QTimer>
+#include <QUuid>
 #include <QWidget>
 
 #include <chrono>
 #include <thread>
+
+namespace {
+QString findFfmpegExecutable()
+{
+    const QString appDir = QCoreApplication::applicationDirPath();
+    const QString currentDir = QDir::currentPath();
+    const QStringList candidates = {
+        QDir(appDir).filePath("ffmpeg.exe"),
+        QDir(appDir).filePath("ffmpeg/ffmpeg.exe"),
+        QDir(currentDir).filePath("ffmpeg/ffmpeg.exe")
+    };
+    for(const auto& path : candidates) {
+        if(QFileInfo::exists(path)) {
+            return path;
+        }
+    }
+    return QString();
+}
+}
 
 FFmpegPlayer::FFmpegPlayer(QWidget* videoRenderWnd, QObject* parent)
     : QObject(parent)
@@ -45,6 +68,9 @@ FFmpegPlayer::FFmpegPlayer(QWidget* videoRenderWnd, QObject* parent)
             }, Qt::QueuedConnection);
         }
     });
+
+    // 倍速切换失败时转发信号给 UI
+    connect(audioDecoder, &AudioDecoder::speedResetToDefault, this, &FFmpegPlayer::speedResetToDefault);
 
     // 位置定时器，每 500ms 发射一次当前播放时间
     positionTimer = new QTimer(this);
@@ -589,13 +615,24 @@ void FFmpegPlayer::convertAndQueueFrame(AVFrame* frame)
 
 QString FFmpegPlayer::getVideoFirstFrame(const QString& videoPath)
 {
-    QString ffmpegPath = QDir::currentPath() + "/ffmpeg/ffmpeg.exe";
-    QString firstFrame = QDir::currentPath() + "/firstFrame.png";
+    const QString ffmpegPath = findFfmpegExecutable();
+    if(ffmpegPath.isEmpty()) {
+        LOG() << "未找到 ffmpeg.exe，无法自动截取封面";
+        return "";
+    }
+
+    QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+    if(tempDir.isEmpty()) {
+        tempDir = QCoreApplication::applicationDirPath();
+    }
+    const QString firstFrame = QDir(tempDir).filePath(
+        QString("BiliVideoPlayer_firstFrame_%1.png").arg(QUuid::createUuid().toString(QUuid::WithoutBraces)));
 
     QStringList cmd;
     cmd << "-ss" << "00:00:00"
         << "-i" << videoPath
         << "-vframes" << "1"
+        << "-y"
         << firstFrame;
 
     QProcess ffmpegProcess;
@@ -603,6 +640,14 @@ QString FFmpegPlayer::getVideoFirstFrame(const QString& videoPath)
 
     if(!ffmpegProcess.waitForFinished(-1)) {
         LOG() << "ffmpeg 进程执行失败";
+        return "";
+    }
+    if(ffmpegProcess.exitStatus() != QProcess::NormalExit || ffmpegProcess.exitCode() != 0) {
+        LOG() << "ffmpeg 截帧失败" << ffmpegProcess.readAllStandardError();
+        return "";
+    }
+    if(!QFileInfo::exists(firstFrame)) {
+        LOG() << "ffmpeg 未生成封面图";
         return "";
     }
 

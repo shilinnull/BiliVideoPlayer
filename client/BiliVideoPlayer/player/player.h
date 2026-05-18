@@ -61,6 +61,9 @@ signals:
     /// 视频总时长（秒）
     void durationChanged(int64_t duration);
 
+    /// 设置倍速时重开音频设备失败，已回退到默认速度
+    void speedResetToDefault();
+
 private:
     void onPositionTick();
     void emitDuration(int64_t duration);

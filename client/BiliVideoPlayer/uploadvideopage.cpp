@@ -1,5 +1,7 @@
 #include <QFileDialog>
 #include <QFile>
+#include <QFileInfo>
+#include <QEvent>
 #include <QLayoutItem>
 #include <QPixmap>
 #include <QTextCursor>
@@ -23,6 +25,7 @@ UploadVideoPage::UploadVideoPage(QWidget *parent)
     auto kindAndTag = dataCenter->getKindAndTagsClassPtr();
     ui->kinds->addItems(kindAndTag->getAllKinds());
     ui->kinds->setCurrentIndex(-1);		// 默认设置不选中
+    ui->kinds->installEventFilter(this);
     // 默认情况下，上传视频成功图片隐藏，视频上传成功后显⽰
     ui->downIcon->hide();
 
@@ -51,14 +54,21 @@ UploadVideoPage::~UploadVideoPage()
     delete ui;
 }
 
+bool UploadVideoPage::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == ui->kinds && event->type() == QEvent::Wheel) {
+        return true;
+    }
+    return QWidget::eventFilter(watched, event);
+}
+
 void UploadVideoPage::setVideoTitle(const QString &videoFilePath)
 {
     resetPage();
     this->videoFilePath = videoFilePath;
 
     // 截图文件名设置到界面
-    int start = videoFilePath.lastIndexOf("/") + 1;
-    QString videoTitle = videoFilePath.mid(start);
+    QString videoTitle = QFileInfo(videoFilePath).fileName();
     ui->videoTittle->setText(videoTitle);
     ui->fileName->setText(videoTitle);
 }
@@ -232,6 +242,10 @@ void UploadVideoPage::onUploadVideoDone(const QString &videoId)
     isUploadVideoOk = true;
     // 设置视频首帧
     QString firstFrame= FFmpegPlayer::getVideoFirstFrame(videoFilePath);
+    if(firstFrame.isEmpty()) {
+        Toast::showMessage("自动截取封面失败，请手动更改封面图");
+        return;
+    }
     QPixmap pixmap(firstFrame);
     pixmap = pixmap.scaled(ui->imageLabel->size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
     ui->imageLabel->setPixmap(pixmap);

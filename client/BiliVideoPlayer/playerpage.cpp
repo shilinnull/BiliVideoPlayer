@@ -2,6 +2,7 @@
 #include <QKeySequence>
 #include <QJsonArray>
 #include <QPainter>
+#include <QSettings>
 
 #include "playerpage.h"
 #include "ui_playerpage.h"
@@ -49,6 +50,39 @@ PlayerPage::PlayerPage(const model::VideoInfo& videoInfo, QWidget *parent)
     connect(ui->playBtn, &QPushButton::clicked, this, &PlayerPage::onplayBtnClicked);
     connect(playSpeed, &PlaySpeed::setPlaySpeed, this, &PlayerPage::onPlaySpeedChanged);
     connect(volume, &Volume::setVolume, this, &PlayerPage::setVolume);
+    connect(Player, &FFmpegPlayer::speedResetToDefault, this, [this](){
+        syncPlaybackSpeedUi(1.0, true);
+        Toast::showMessage("倍速切换失败，已恢复默认速度");
+    });
+
+    // 倍速快捷键 Ctrl+= 加速 / Ctrl+- 减速
+    QShortcut* speedUpShortcut = new QShortcut(QKeySequence("Ctrl+="), this);
+    connect(speedUpShortcut, &QShortcut::activated, this, [this](){
+        const double speeds[] = {0.5, 1.0, 1.5, 2.0};
+        double cur = playSpeed->speed();
+        for(int i = 0; i < 3; ++i) {
+            if(qFuzzyCompare(cur, speeds[i])) {
+                onPlaySpeedChanged(speeds[i + 1]);
+                break;
+            }
+        }
+    });
+    QShortcut* speedDownShortcut = new QShortcut(QKeySequence("Ctrl+-"), this);
+    connect(speedDownShortcut, &QShortcut::activated, this, [this](){
+        const double speeds[] = {0.5, 1.0, 1.5, 2.0};
+        double cur = playSpeed->speed();
+        for(int i = 1; i < 4; ++i) {
+            if(qFuzzyCompare(cur, speeds[i])) {
+                onPlaySpeedChanged(speeds[i - 1]);
+                break;
+            }
+        }
+    });
+
+    // 从 QSettings 读取上次使用的倍速，UI 先显示但不应用到播放器（音频尚未初始化）
+    QSettings settings;
+    double savedSpeed = settings.value("playback/speed", 1.0).toDouble();
+    syncPlaybackSpeedUi(savedSpeed, false);
     connect(ui->videoSlider, &PlaySlider::setPlayProgress, this, &PlayerPage::onSetPlayProgress);
     connect(Player, &FFmpegPlayer::playPositionChanged, this, &PlayerPage::onPlayPositionChanged);
     connect(Player, &FFmpegPlayer::endOfPlaylist, this, &PlayerPage::onEndOfPlayList);
@@ -120,6 +154,13 @@ void PlayerPage::startPlaying()
     ui->videoSlider->setPlayStep(0);// 设置进度条
     ui->videoDuration->setText("00:00/" + secondToTime(videoInfo.videoDuration));
     setVolume(volume->getVolume()); // 设置音量
+
+    // 应用持久化的倍速
+    QSettings settings;
+    double savedSpeed = settings.value("playback/speed", 1.0).toDouble();
+    if(!qFuzzyCompare(savedSpeed, 1.0)) {
+        Player->setPlaySpeed(savedSpeed);
+    }
 }
 
 void PlayerPage::buildBulletScreenData()
@@ -351,7 +392,22 @@ void PlayerPage::onplayBtnClicked()
 
 void PlayerPage::onPlaySpeedChanged(double speed)
 {
-    if(Player) Player->setPlaySpeed(speed);
+    syncPlaybackSpeedUi(speed, true);
+    if(Player) {
+        Player->setPlaySpeed(speed);
+    }
+}
+
+void PlayerPage::syncPlaybackSpeedUi(double speed, bool persistSettings)
+{
+    ui->speedBtn->setText(QString("x%1").arg(speed));
+    playSpeed->setCurrentSpeed(speed);
+    if(!persistSettings) {
+        return;
+    }
+
+    QSettings settings;
+    settings.setValue("playback/speed", speed);
 }
 
 void PlayerPage::setVolume(int volumeRatio)
@@ -369,7 +425,11 @@ void PlayerPage::onPlayPositionChanged(int64_t playTime)
     ui->videoDuration->setText(curPlayTime + "/" + totalTime);
 
     // 修改进度条
-    ui->videoSlider->setPlayStep((double)playTime / videoInfo.videoDuration);
+    if(videoInfo.videoDuration > 0) {
+        ui->videoSlider->setPlayStep(static_cast<double>(playTime) / videoInfo.videoDuration);
+    } else {
+        ui->videoSlider->setPlayStep(0);
+    }
 
     // 更新弹幕数据
     showBulletScreen();
@@ -483,7 +543,7 @@ QString PlayerPage::secondToTime(int64_t second) const
         time += QString::asprintf("%02lld:", second / 60 / 60);
     }
     // 分钟
-    time += QString::asprintf("%02lld:%02lld", second / 60, second % 60);
+    time += QString::asprintf("%02lld:%02lld", (second / 60) % 60, second % 60);
     return time;
 }
 

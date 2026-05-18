@@ -171,6 +171,7 @@ set(FFMPEG_DLLS
     "${FFMPEG_DLL_DIR}/swscale-5.dll"
 )
 set(SDL_DLL "${FFMPEG_DLL_DIR}/SDL2.dll")
+set(FFMPEG_EXE "${PROJECT_SOURCE_DIR}/ffmpeg/ffmpeg.exe")
 
 if(WIN32)
     foreach(DLL_FILE IN LISTS FFMPEG_DLLS)
@@ -186,6 +187,13 @@ if(WIN32)
         add_custom_command(TARGET ${APP_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 "${SDL_DLL}"
+                "$<TARGET_FILE_DIR:${APP_NAME}>"
+        )
+    endif()
+    if(EXISTS "${FFMPEG_EXE}")
+        add_custom_command(TARGET ${APP_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${FFMPEG_EXE}"
                 "$<TARGET_FILE_DIR:${APP_NAME}>"
         )
     endif()
@@ -207,6 +215,9 @@ if(WIN32)
     endforeach()
     if(EXISTS "${SDL_DLL}")
         install(FILES "${SDL_DLL}" DESTINATION ${CMAKE_INSTALL_BINDIR})
+    endif()
+    if(EXISTS "${FFMPEG_EXE}")
+        install(FILES "${FFMPEG_EXE}" DESTINATION ${CMAKE_INSTALL_BINDIR})
     endif()
 endif()
 

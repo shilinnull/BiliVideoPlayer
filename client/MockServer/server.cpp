@@ -637,7 +637,7 @@ QHttpServerResponse MockServer::checkVideo(const QHttpServerRequest &req)
     LOG() << "[checkVideo] 收到 checkVideo 请求, requestId=" << jsonReq["requestId"].toString()
           << "videoId: " << jsonReq["videoId"].toString();
 
-    bool checkResult = jsonReq["checkResult"].isBool();
+    bool checkResult = jsonReq["checkResult"].toBool();
     QString videoId = jsonReq["videoId"].toString();
     if(checkResult) {
         LOG() << "视频: " << videoId  << "审核通过";
@@ -1352,7 +1352,7 @@ QHttpServerResponse MockServer::logout(const QHttpServerRequest &req)
     jsonResp["errorMsg"] ="";
 
     QJsonObject sessionObj;
-    sessionObj["sessionObj"] = jsonReq["sessionId"].toString();
+    sessionObj["sessionId"] = jsonReq["sessionId"].toString();
     jsonResp["result"] = sessionObj;
 
     QJsonDocument docResp;
@@ -1510,7 +1510,7 @@ QHttpServerResponse MockServer::newAdministrator(const QHttpServerRequest &req)
         LOG()<<"roleType: 普通管理员";
     }
 
-    int userStatue = adminJson["userStatu"].toInt();
+    int userStatue = adminJson["userStatus"].toInt();
     if(1 == userStatue){
         LOG()<<"userStatu: 启用";
     }else if(2 == userStatue){

@@ -4,17 +4,25 @@
 PlaySpeed::PlaySpeed(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::PlaySpeed)
+    , speedGroup(new QButtonGroup(this))
 {
     ui->setupUi(this);
     setWindowFlags(Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
 
-    connect(ui->speed05, &QPushButton::clicked, this, &PlaySpeed::onPlay05Speed);
-    connect(ui->speed10, &QPushButton::clicked, this, &PlaySpeed::onPlay10Speed);
-    connect(ui->speed15, &QPushButton::clicked, this, &PlaySpeed::onPlay15Speed);
-    connect(ui->speed20, &QPushButton::clicked, this, &PlaySpeed::onPlay20Speed);
+    speedGroup->setExclusive(true);
+    speedGroup->addButton(ui->speed05, 5);
+    speedGroup->addButton(ui->speed10, 10);
+    speedGroup->addButton(ui->speed15, 15);
+    speedGroup->addButton(ui->speed20, 20);
 
-    ui->speed10->setStyleSheet("background-color: rgba(255,255,255,0.41);");
+    ui->speed05->setCheckable(true);
+    ui->speed10->setCheckable(true);
+    ui->speed15->setCheckable(true);
+    ui->speed20->setCheckable(true);
+    ui->speed10->setChecked(true);
+
+    connect(speedGroup, &QButtonGroup::idClicked, this, &PlaySpeed::onSpeedChanged);
 }
 
 PlaySpeed::~PlaySpeed()
@@ -22,50 +30,23 @@ PlaySpeed::~PlaySpeed()
     delete ui;
 }
 
-void PlaySpeed::onPlay05Speed()
+double PlaySpeed::speed() const
 {
-    resetStyle(5);
-    emit setPlaySpeed(0.5);
+    int id = speedGroup->checkedId();
+    if(id < 0) return 1.0;
+    return id / 10.0;
 }
 
-void PlaySpeed::onPlay10Speed()
+void PlaySpeed::setCurrentSpeed(double speed)
 {
-    resetStyle(10);
-    emit setPlaySpeed(1.0);
-}
-
-void PlaySpeed::onPlay15Speed()
-{
-    resetStyle(15);
-    emit setPlaySpeed(1.5);
-}
-
-void PlaySpeed::onPlay20Speed()
-{
-    resetStyle(20);
-    emit setPlaySpeed(2.0);
-}
-
-void PlaySpeed::resetStyle(int speed)
-{
-    ui->speed05->setStyleSheet("");
-    ui->speed10->setStyleSheet("");
-    ui->speed15->setStyleSheet("");
-    ui->speed20->setStyleSheet("");
-    switch (speed) {
-    case 20:
-        ui->speed20->setStyleSheet("background-color : rgba(255, 255, 255, 0.41);");
-        break;
-    case 15:
-        ui->speed15->setStyleSheet("background-color : rgba(255, 255, 255, 0.41);");
-        break;
-    case 10:
-        ui->speed10->setStyleSheet("background-color : rgba(255, 255, 255, 0.41);");
-        break;
-    case 5:
-        ui->speed05->setStyleSheet("background-color : rgba(255, 255, 255, 0.41);");
-        break;
-    default:
-        break;
+    int id = qRound(speed * 10);
+    auto* btn = speedGroup->button(id);
+    if(btn) {
+        btn->setChecked(true);
     }
+}
+
+void PlaySpeed::onSpeedChanged(int id)
+{
+    emit setPlaySpeed(id / 10.0);
 }

@@ -9,6 +9,8 @@
 
 #include <cstdint>
 
+class QEvent;
+
 namespace Ui {
 class UploadVideoPage;
 }
@@ -23,6 +25,9 @@ public:
 
     // 设置待上传文件名到界面
     void setVideoTitle(const QString& videoFilePath);
+
+protected:
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
     void addTagsByKind(const QString& kind);	// 将kind下的标签以按钮的形式展示到界面上

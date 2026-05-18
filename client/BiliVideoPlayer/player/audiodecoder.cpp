@@ -66,6 +66,7 @@ bool AudioDecoder::openAudio(AVFormatContext *fmtCtx, int index)
 bool AudioDecoder::reopenAudioDevice()
 {
     if(audioDevice_ != 0) {
+        SDL_PauseAudioDevice(audioDevice_, 1);
         SDL_CloseAudioDevice(audioDevice_);
         audioDevice_ = 0;
     }
@@ -131,7 +132,6 @@ bool AudioDecoder::reopenAudioDevice()
                 wanted.channels = static_cast<Uint8>(outChannels);
                 if(!wanted.freq) {
                     qDebug() << "AudioDecoder: 没有找到可用的 SDL 音频配置";
-                    avcodec_free_context(&codecCtx_);
                     return false;
                 }
             }
@@ -257,18 +257,32 @@ void AudioDecoder::setSpeed(double speed)
 {
     if(speed <= 0.0) return;
     if(qFuzzyCompare(speed, speed_)) return;
+
     speed_ = speed;
-    if(!reopenAudioDevice()) {
-        qDebug() << "AudioDecoder: 重新打开音频设备失败，倍速" << speed;
-        speed_ = 1.0;
+    if(reopenAudioDevice()) {
+        return;
     }
+
+    qDebug() << "AudioDecoder: 重新打开音频设备失败，倍速" << speed;
+
+    // 倍速切换失败时回退到 1.0x；如果仍失败则停用音频并清空队列，避免持续堆积。
+    speed_ = 1.0;
+    if(reopenAudioDevice()) {
+        emit speedResetToDefault();
+        return;
+    }
+
+    qDebug() << "AudioDecoder: 回退到 1.0x 仍失败，禁用音频输出";
+    stop_ = true;
+    packetQueue_.empty();
 }
 
 double AudioDecoder::getAudioClock()
 {
     if(codecCtx_) {
         int hwBufSize = audioBufSize_ - audioBufIndex_;
-        int bytesPerSec = codecCtx_->sample_rate * codecCtx_->channels * audioDepth_;
+        // 使用实际输出采样率而非原始采样率，以正确反映倍速下的消耗速率
+        int bytesPerSec = audioSpec_.freq * audioSpec_.channels * audioDepth_;
         if(bytesPerSec > 0) {
             clock_ -= static_cast<double>(hwBufSize) / bytesPerSec;
         }
@@ -304,6 +318,13 @@ void AudioDecoder::flushAudio()
 
 void AudioDecoder::packetEnqueue(AVPacket *pkt)
 {
+    // 音频输出不可用时直接丢包，避免解复用线程持续投喂导致队列无限增长。
+    if(pkt == nullptr || stop_ || codecCtx_ == nullptr || audioDevice_ == 0) {
+        if(pkt != nullptr) {
+            av_packet_unref(pkt);
+        }
+        return;
+    }
     packetQueue_.enqueue(pkt);
 }
 

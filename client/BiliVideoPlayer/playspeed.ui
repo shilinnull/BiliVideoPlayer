@@ -35,20 +35,21 @@
    <item>
     <widget class="QWidget" name="playSpeedBg" native="true">
      <property name="styleSheet">
-      <string notr="true">#playSpeedBg{ 
-	background-color : #3D3B3B; 
-	border-radius : 4px; 
-}
-
-QPushButton{ 
-	border : none; 
+      <string notr="true">#playSpeedBg{
+	background-color : #3D3B3B;
 	border-radius : 4px;
-	color : #FFFFFF; 
-	font-size : 12px; 
-	font-family : Microsoft YaHei UI; 
 }
 
-QPushButton:hover { background-color: rgba(255, 255, 255, 0.41); }</string>
+QPushButton{
+	border : none;
+	border-radius : 4px;
+	color : #FFFFFF;
+	font-size : 12px;
+	font-family : Microsoft YaHei UI;
+}
+
+QPushButton:hover { background-color: rgba(255, 255, 255, 0.20); }
+QPushButton:checked { background-color: rgba(255, 255, 255, 0.41); }</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">

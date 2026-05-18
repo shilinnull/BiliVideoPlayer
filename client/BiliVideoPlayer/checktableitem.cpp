@@ -85,8 +85,6 @@ CheckTableItem::CheckTableItem(QWidget *parent, const model::VideoInfo& videoInf
     });
     dataCenter->downloadPhotoAsync(videoInfo.photoFileId);
 
-    // 视频封面按钮点击
-    connect(ui->videoBtn, &QPushButton::clicked, this, &CheckTableItem::onVideoBtnClicked);
 }
 
 CheckTableItem::~CheckTableItem()

@@ -67,6 +67,9 @@ signals:
     /// 携带 flushSeq，接收方可借此丢弃 seek 之前的过期信号。
     void playFinished(int flushSeq);
 
+    /// 设置倍速时重开音频设备失败，已回退到默认速度 1.0x
+    void speedResetToDefault();
+
 private:
     int decodeAudio();
     static void audioCallback(void *userdata, uint8_t *stream, int len);

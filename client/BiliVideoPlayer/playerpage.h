@@ -54,6 +54,7 @@ private slots:
     void onFrameReady(QImage image);                // 视频帧就绪
 
 private:
+    void syncPlaybackSpeedUi(double speed, bool persistSettings);
     QString secondToTime(int64_t second) const;           // 转换时间
     void initBarrageArea();							// 弹幕区域布局
     void syncLoginUserAvatar();                    // 同步当前登录用户头像

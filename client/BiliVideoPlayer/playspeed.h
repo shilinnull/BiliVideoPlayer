@@ -2,6 +2,7 @@
 #define PLAYSPEED_H
 
 #include <QWidget>
+#include <QButtonGroup>
 
 namespace Ui {
 class PlaySpeed;
@@ -14,19 +15,16 @@ class PlaySpeed : public QWidget
 public:
     explicit PlaySpeed(QWidget *parent = nullptr);
     ~PlaySpeed();
+    double speed() const;
+    void setCurrentSpeed(double speed);
 
 private slots:
-    void onPlay05Speed();
-    void onPlay10Speed();
-    void onPlay15Speed();
-    void onPlay20Speed();
+    void onSpeedChanged(int id);
 signals:
     void setPlaySpeed(double speed);
 private:
-    void resetStyle(int speed);
-
-private:
     Ui::PlaySpeed *ui;
+    QButtonGroup* speedGroup;
 };
 
 #endif // PLAYSPEED_H
