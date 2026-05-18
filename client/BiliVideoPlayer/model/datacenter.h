@@ -23,6 +23,7 @@ public:
     void initDataFile();                // 初始化数据文件
     void saveDataFile();                // 保存数据文件
     void loadDataFile();                // 从文件加载数据
+    void loadConfigFile();              // 加载配置文件
     const QString& getServerUrl() const;            // 获取服务器地址
     const KindAndTag* getKindAndTagsClassPtr();		// 获取所有分类
     const QString& getLoginSessionId() const ;		// 获取sessionId

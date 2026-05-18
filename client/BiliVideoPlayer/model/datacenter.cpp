@@ -1,3 +1,4 @@
+#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QJsonArray>
@@ -125,8 +126,12 @@ void DataCenter::loadDataFile()
         myselfInfo->identityType.append(identityTypeArray[i].toInt());
     }
 
+}
+
+void DataCenter::loadConfigFile()
+{
     // 从文件中读取配置信息
-    QDir dir(QDir::currentPath());
+    QDir dir(QCoreApplication::applicationDirPath());
     QString configPath = dir.absolutePath();
     configPath += "/config.ini";
 
@@ -566,6 +571,7 @@ DataCenter::DataCenter(QObject *parent)
 {
     // 加载配置文件数据
     loadDataFile();
+    loadConfigFile();
     // 先构造好netClient设置好url
     netClient.setServerUrl(serverURL);
 }

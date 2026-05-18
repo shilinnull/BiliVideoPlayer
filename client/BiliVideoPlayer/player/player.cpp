@@ -1,5 +1,4 @@
 #include "player.h"
-#include "player_internals.h"
 #include "audiodecoder.h"
 #include "util.h"
 
@@ -300,34 +299,7 @@ void FFmpegPlayer::startPlay(const QString& videoPath)
                 if(st->videoCtx) {
                     avcodec_send_packet(st->videoCtx, nullptr);
                     while(avcodec_receive_frame(st->videoCtx, frame) == 0) {
-                        if(!st->swsCtx) {
-                            st->swsCtx = sws_getContext(
-                                frame->width, frame->height, static_cast<AVPixelFormat>(frame->format),
-                                frame->width, frame->height, AV_PIX_FMT_RGB32,
-                                SWS_BILINEAR, nullptr, nullptr, nullptr);
-                        }
-
-                        AVFrame* yuvFrame = av_frame_alloc();
-                        yuvFrame->format = AV_PIX_FMT_RGB32;
-                        yuvFrame->width = frame->width;
-                        yuvFrame->height = frame->height;
-                        if(av_frame_get_buffer(yuvFrame, 32) < 0) {
-                            av_frame_free(&yuvFrame);
-                            continue;
-                        }
-
-                        sws_scale(st->swsCtx, frame->data, frame->linesize, 0, frame->height, yuvFrame->data, yuvFrame->linesize);
-
-                        VideoFrame vf;
-                        vf.frame = yuvFrame;
-                        vf.ptsSec = framePtsSec(frame, st->videoTimeBase);
-
-                        {
-                            std::lock_guard<std::mutex> lock(st->videoMutex);
-                            st->videoQueue.push_back(vf);
-                            st->frameDecoded.store(true);
-                        }
-                        st->videoCond.notify_one();
+                        convertAndQueueFrame(frame);
                         hasDrained = true;
                     }
                 }
@@ -376,30 +348,7 @@ void FFmpegPlayer::startPlay(const QString& videoPath)
                     while(true) {
                         int recvRet = avcodec_receive_frame(st->videoCtx, frame);
                         if(recvRet != 0) break;
-                        if(!st->swsCtx) {
-                            st->swsCtx = sws_getContext(
-                                frame->width, frame->height, static_cast<AVPixelFormat>(frame->format),
-                                frame->width, frame->height, AV_PIX_FMT_RGB32,
-                                SWS_BILINEAR, nullptr, nullptr, nullptr);
-                        }
-                        AVFrame* yuvFrame = av_frame_alloc();
-                        yuvFrame->format = AV_PIX_FMT_RGB32;
-                        yuvFrame->width = frame->width;
-                        yuvFrame->height = frame->height;
-                        if(av_frame_get_buffer(yuvFrame, 32) < 0) {
-                            av_frame_free(&yuvFrame);
-                            continue;
-                        }
-                        sws_scale(st->swsCtx, frame->data, frame->linesize, 0, frame->height, yuvFrame->data, yuvFrame->linesize);
-                        VideoFrame vf;
-                        vf.frame = yuvFrame;
-                        vf.ptsSec = framePtsSec(frame, st->videoTimeBase);
-                        {
-                            std::lock_guard<std::mutex> lock(st->videoMutex);
-                            st->videoQueue.push_back(vf);
-                            st->frameDecoded.store(true);
-                        }
-                        st->videoCond.notify_one();
+                        convertAndQueueFrame(frame);
                     }
                     sendRet = avcodec_send_packet(st->videoCtx, packet);
                 }
@@ -410,34 +359,7 @@ void FFmpegPlayer::startPlay(const QString& videoPath)
                         if(recvRet != 0) {
                             break;
                         }
-                        if(!st->swsCtx) {
-                            st->swsCtx = sws_getContext(
-                                frame->width, frame->height, static_cast<AVPixelFormat>(frame->format),
-                                frame->width, frame->height, AV_PIX_FMT_RGB32,
-                                SWS_BILINEAR, nullptr, nullptr, nullptr);
-                        }
-
-                        AVFrame* yuvFrame = av_frame_alloc();
-                        yuvFrame->format = AV_PIX_FMT_RGB32;
-                        yuvFrame->width = frame->width;
-                        yuvFrame->height = frame->height;
-                        if(av_frame_get_buffer(yuvFrame, 32) < 0) {
-                            av_frame_free(&yuvFrame);
-                            continue;
-                        }
-
-                        sws_scale(st->swsCtx, frame->data, frame->linesize, 0, frame->height, yuvFrame->data, yuvFrame->linesize);
-
-                        VideoFrame vf;
-                        vf.frame = yuvFrame;
-                        vf.ptsSec = framePtsSec(frame, st->videoTimeBase);
-
-                        {
-                            std::lock_guard<std::mutex> lock(st->videoMutex);
-                            st->videoQueue.push_back(vf);
-                            st->frameDecoded.store(true);
-                        }
-                        st->videoCond.notify_one();
+                        convertAndQueueFrame(frame);
                     }
                 } else if(sendRet < 0) {
                     LOG() << "avcodec_send_packet(视频) 返回" << sendRet;
@@ -627,6 +549,42 @@ void FFmpegPlayer::emitDuration(int64_t duration)
 {
     durationSec = duration;
     emit durationChanged(durationSec);
+}
+
+void FFmpegPlayer::convertAndQueueFrame(AVFrame* frame)
+{
+    auto* st = state.get();
+    if(!st) return;
+
+    if(!st->swsCtx) {
+        st->swsCtx = sws_getContext(
+            frame->width, frame->height, static_cast<AVPixelFormat>(frame->format),
+            frame->width, frame->height, AV_PIX_FMT_RGB32,
+            SWS_BILINEAR, nullptr, nullptr, nullptr);
+    }
+
+    AVFrame* yuvFrame = av_frame_alloc();
+    yuvFrame->format = AV_PIX_FMT_RGB32;
+    yuvFrame->width = frame->width;
+    yuvFrame->height = frame->height;
+    if(av_frame_get_buffer(yuvFrame, 32) < 0) {
+        av_frame_free(&yuvFrame);
+        return;
+    }
+
+    sws_scale(st->swsCtx, frame->data, frame->linesize, 0, frame->height,
+              yuvFrame->data, yuvFrame->linesize);
+
+    VideoFrame vf;
+    vf.frame = yuvFrame;
+    vf.ptsSec = framePtsSec(frame, st->videoTimeBase);
+
+    {
+        std::lock_guard<std::mutex> lock(st->videoMutex);
+        st->videoQueue.push_back(vf);
+        st->frameDecoded.store(true);
+    }
+    st->videoCond.notify_one();
 }
 
 QString FFmpegPlayer::getVideoFirstFrame(const QString& videoPath)

@@ -69,7 +69,7 @@ void VideoInfo::loadVideoInfo(const QJsonObject &jsonObj)
     photoFileId = jsonObj.value("photoFileId").toString();
     likeCount = jsonObj.value("likeCount").toInt();
     playCount = jsonObj.value("playCount").toInt();
-    videoSize = jsonObj.value("videoSize").toInt();
+    videoSize = jsonObj.value("videoSize").toVariant().toLongLong();
     videoDesc = jsonObj.value("videoDesc").toString();
     videoTitle = jsonObj.value("videoTitle").toString();
     videoDuration = jsonObj.value("videoDuration").toInt();

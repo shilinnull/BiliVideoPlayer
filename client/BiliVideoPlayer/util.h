@@ -88,11 +88,11 @@ static QString intToString2(int value) {
 // 隐藏邮箱
 static inline QString hideEmail(const QString& email) {
     int pos = email.indexOf('@');
+    if (pos <= 0) return email;
     return email.left(3) + QString(pos - 3, '*') + email.mid(pos);
 }
 
 static QString formatDate(const QString &dateStr) {
-    LOG() << dateStr;
     QString outputFormat = "yyyy-MM-dd HH:mm:ss";
     static const QStringList inputFormats = {
         "M-d HH:mm:ss",
@@ -121,7 +121,6 @@ static QString formatDate(const QString &dateStr) {
     QString newDate;
     if(dateTime.isValid()) {
         newDate = dateTime.toString(outputFormat);
-        LOG() << dateStr << " - " << newDate;
     } else {
         qDebug() << "Invalid date format";
     }

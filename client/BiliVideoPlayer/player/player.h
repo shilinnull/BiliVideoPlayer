@@ -4,6 +4,7 @@
 #include <QImage>
 #include <QObject>
 #include <memory>
+#include "player_internals.h"
 
 class QWidget;
 class QString;
@@ -63,6 +64,7 @@ signals:
 private:
     void onPositionTick();
     void emitDuration(int64_t duration);
+    void convertAndQueueFrame(AVFrame* frame);
 
     std::unique_ptr<FFmpegPlayerState> state;
     AudioDecoder* audioDecoder = nullptr;

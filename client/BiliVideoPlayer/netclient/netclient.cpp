@@ -267,7 +267,14 @@ void NetClient::uploadPhoto(const QByteArray &photoData, QWidget* wndPtr)
 void NetClient::downloadVideo(const QString &videoFileId)
 {
     // 1. 构造请求
+    auto dataCenter = model::DataCenter::getInstance();
     QString queryString;
+    queryString += "requestId=";
+    queryString += makeRequeId();
+    queryString += "&";
+    queryString += "sessionId=";
+    queryString += dataCenter->getLoginSessionId();
+    queryString += "&";
     queryString += "fileId=";
     queryString += videoFileId;
 
@@ -1138,16 +1145,17 @@ QString NetClient::makeRequeId()
     return "R" + QUuid::createUuid().toString().sliced(25, 12);
 }
 
-QNetworkReply *NetClient::sendHttpRequest(const QString &resourcePath, QJsonObject &jsonBody)
+QNetworkReply *NetClient::sendHttpRequest(const QString &resourcePath, const QJsonObject &jsonBody)
 {
     QNetworkRequest httpReq;
     httpReq.setUrl(QUrl(HTTP_URL + resourcePath));
     httpReq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf8");
 
-    // 设置请求id
-    jsonBody["requestId"] = makeRequeId();
+    // 设置请求id（在副本上修改，不改变传入的对象）
+    QJsonObject body = jsonBody;
+    body["requestId"] = makeRequeId();
 
-    QJsonDocument document(jsonBody);
+    QJsonDocument document(body);
     QNetworkReply* httpResp = httpClient.post(httpReq, document.toJson());
     return httpResp;
 }

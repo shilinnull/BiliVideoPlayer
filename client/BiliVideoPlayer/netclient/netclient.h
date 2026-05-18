@@ -65,7 +65,7 @@ public:
 
 private:
     static QString makeRequeId();
-    QNetworkReply* sendHttpRequest(const QString& resourcePath, QJsonObject& jsonBody);
+    QNetworkReply* sendHttpRequest(const QString& resourcePath, const QJsonObject& jsonBody);
     QJsonObject handleHttpResponse(QNetworkReply* httpResp, bool* ok, QString *reason);
 private:
     QString HTTP_URL;
